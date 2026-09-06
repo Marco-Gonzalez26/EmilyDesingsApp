@@ -1,0 +1,312 @@
+<ion-header>
+  <ion-toolbar class="ion-padding-horizontal">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>{{ usuario()?.nombre_completo || 'Usuario' }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+<div class="max-w-7xl mx-auto space-y-6">
+  <div class="flex items-center gap-4">
+    <button (click)="goBack()" class="p-2 hover:bg-emily-light rounded-lg transition-colors">
+      <ion-icon name="arrow-back" class="text-emily-dark"></ion-icon>
+    </button>
+    <div class="flex-1">
+      @if (usuario(); as user) {
+        <p class="text-emily-taupe">{{ user.email }}</p>
+      }
+    </div>
+    @if (usuario(); as user) {
+      <button
+        (click)="editUsuario()"
+        class="flex items-center gap-2 px-4 py-2 bg-emily-rose text-emily-white rounded-lg hover:bg-emily-rose/90 transition-colors"
+      >
+        <ion-icon name="create-outline"></ion-icon>
+        <span>Editar</span>
+      </button>
+    }
+  </div>
+
+  @if (isLoading()) {
+    <div
+      class="bg-emily-white rounded-xl p-20 shadow-sm border border-emily-cream flex items-center justify-center"
+    >
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-emily-rose"></div>
+    </div>
+  } @else if (usuario(); as user) {
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div class="lg:col-span-1 space-y-6">
+        <div class="bg-emily-white rounded-xl p-6 shadow-sm border border-emily-cream text-center">
+          <div
+            class="w-24 h-24 mx-auto mb-4 bg-emily-rose rounded-full flex items-center justify-center"
+          >
+            <span class="text-3xl font-bold text-emily-white">{{ userInitials() }}</span>
+          </div>
+
+          <h2 class="text-xl font-serif font-bold text-emily-dark mb-1">
+            {{ user.nombre_completo || 'Sin nombre' }}
+          </h2>
+
+          <p class="text-sm text-emily-taupe mb-3">{{ user.email }}</p>
+
+          <span
+            class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border"
+            [ngClass]="getEstadoBadge(user.activo)"
+          >
+            <ion-icon
+              [name]="user.activo ? 'checkmark-circle-outline' : 'close-circle-outline'"
+              class="mr-1"
+            ></ion-icon>
+            {{ getEstadoLabel(user.activo) }}
+          </span>
+
+          <div class="mt-4 pt-4 border-t border-emily-cream space-y-2 text-sm">
+            <div class="flex items-center justify-between">
+              <span class="text-emily-taupe">Miembro desde</span>
+              <span class="font-medium text-emily-dark">{{
+                formatShortDate(user.fecha_registro)
+              }}</span>
+            </div>
+            @if (user.fecha_ultimo_acceso) {
+              <div class="flex items-center justify-between">
+                <span class="text-emily-taupe">Último acceso</span>
+                <span class="font-medium text-emily-dark">{{
+                  formatShortDate(user.fecha_ultimo_acceso)
+                }}</span>
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="bg-emily-white rounded-xl p-6 shadow-sm border border-emily-cream">
+          <h3 class="text-lg font-serif font-semibold text-emily-dark mb-4">Estadísticas</h3>
+
+          <div class="space-y-4">
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-emily-taupe">Total Órdenes</span>
+              <span class="text-lg font-bold text-emily-dark">{{
+                user.estadisticas.total_ordenes
+              }}</span>
+            </div>
+
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-emily-taupe">Completadas</span>
+              <span class="text-lg font-bold text-green-600">{{
+                user.estadisticas.ordenes_completadas
+              }}</span>
+            </div>
+
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-emily-taupe">Total Gastado</span>
+              <span class="text-lg font-bold text-emily-rose">{{
+                formatCurrency(user.estadisticas.total_gastado)
+              }}</span>
+            </div>
+
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-emily-taupe">Ticket Promedio</span>
+              <span class="text-base font-medium text-emily-dark">{{
+                formatCurrency(user.estadisticas.ticket_promedio)
+              }}</span>
+            </div>
+
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-emily-taupe">Análisis IA</span>
+              <span class="text-base font-medium text-emily-dark">{{
+                user.estadisticas.total_analisis
+              }}</span>
+            </div>
+
+            @if (user.estadisticas.ultima_orden) {
+              <div class="pt-4 border-t border-emily-cream">
+                <p class="text-xs text-emily-taupe mb-1">Última orden</p>
+                <p class="text-sm font-medium text-emily-dark">
+                  {{ formatShortDate(user.estadisticas.ultima_orden.fecha) }}
+                </p>
+                <p class="text-lg font-bold text-emily-rose">
+                  {{ formatCurrency(user.estadisticas.ultima_orden.total) }}
+                </p>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="lg:col-span-2 space-y-6">
+        <div class="bg-emily-white rounded-xl shadow-sm border border-emily-cream">
+          <div class="border-b border-emily-cream">
+            <div class="flex gap-2 p-4">
+              <button
+                (click)="changeTab('info')"
+                [class.bg-emily-rose]="currentTab() === 'info'"
+                [class.text-emily-white]="currentTab() === 'info'"
+                [class.border-emily-rose]="currentTab() === 'info'"
+                class="px-4 py-2 border border-emily-cream rounded-lg transition-colors"
+              >
+                Información
+              </button>
+              <button
+                (click)="changeTab('ordenes')"
+                [class.bg-emily-rose]="currentTab() === 'ordenes'"
+                [class.text-emily-white]="currentTab() === 'ordenes'"
+                [class.border-emily-rose]="currentTab() === 'ordenes'"
+                class="px-4 py-2 border border-emily-cream rounded-lg transition-colors"
+              >
+                Órdenes ({{ user.estadisticas.total_ordenes }})
+              </button>
+              <button
+                (click)="changeTab('analisis')"
+                [class.bg-emily-rose]="currentTab() === 'analisis'"
+                [class.text-emily-white]="currentTab() === 'analisis'"
+                [class.border-emily-rose]="currentTab() === 'analisis'"
+                class="px-4 py-2 border border-emily-cream rounded-lg transition-colors"
+              >
+                Análisis IA ({{ user.estadisticas.total_analisis }})
+              </button>
+            </div>
+          </div>
+
+          <div class="p-6">
+            @if (currentTab() === 'info') {
+              <div class="space-y-6">
+                <div>
+                  <h3 class="text-lg font-serif font-semibold text-emily-dark mb-4">
+                    Información de Contacto
+                  </h3>
+
+                  <div class="space-y-4">
+                    <div class="flex items-start gap-3">
+                      <ion-icon name="mail-outline" class="text-emily-taupe mt-1"></ion-icon>
+                      <div>
+                        <p class="text-sm text-emily-taupe">Email</p>
+                        <p class="font-medium text-emily-dark">{{ user.email }}</p>
+                      </div>
+                    </div>
+
+                    <div class="flex items-start gap-3">
+                      <ion-icon name="call-outline" class="text-emily-taupe mt-1"></ion-icon>
+                      <div>
+                        <p class="text-sm text-emily-taupe">Teléfono</p>
+                        <p class="font-medium text-emily-dark">
+                          {{ user.telefono || 'No especificado' }}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div class="flex items-start gap-3">
+                      <ion-icon name="card-outline" class="text-emily-taupe mt-1"></ion-icon>
+                      <div>
+                        <p class="text-sm text-emily-taupe">Cédula/RUC</p>
+                        <p class="font-medium text-emily-dark">
+                          {{ user.cedula_ruc || 'No especificado' }}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div class="flex items-start gap-3">
+                      <ion-icon name="location-outline" class="text-emily-taupe mt-1"></ion-icon>
+                      <div>
+                        <p class="text-sm text-emily-taupe">Dirección</p>
+                        <p class="font-medium text-emily-dark">
+                          {{ user.direccion || 'No especificada' }}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            }
+
+            @if (currentTab() === 'ordenes') {
+              @if (isLoadingOrdenes()) {
+                <div class="flex items-center justify-center py-12">
+                  <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-emily-rose"></div>
+                </div>
+              } @else if (ordenes().length === 0) {
+                <div class="text-center py-12">
+                  <ion-icon
+                    name="cart-outline"
+                    class="text-emily-taupe text-5xl mx-auto mb-4"
+                  ></ion-icon>
+                  <p class="text-emily-taupe">No hay órdenes registradas</p>
+                </div>
+              } @else {
+                <div class="space-y-4">
+                  @for (orden of ordenes(); track orden.id) {
+                    <div
+                      class="border border-emily-cream rounded-lg p-4 hover:border-emily-rose transition-colors cursor-pointer"
+                      (click)="verOrden(orden.id)"
+                    >
+                      <div class="flex items-center justify-between mb-2">
+                        <div>
+                          <p class="font-semibold text-emily-dark">{{ orden.numero_orden }}</p>
+                          <p class="text-sm text-emily-taupe">
+                            {{ formatShortDate(orden.fecha_orden) }}
+                          </p>
+                        </div>
+                        <div class="text-right">
+                          <p class="text-lg font-bold text-emily-rose">
+                            {{ formatCurrency(orden.total) }}
+                          </p>
+                          <span
+                            class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border mt-1"
+                            [ngClass]="getOrdenEstadoColor(orden.estado)"
+                          >
+                            {{ orden.estado }}
+                          </span>
+                        </div>
+                      </div>
+                      <p class="text-sm text-emily-taupe">{{ orden.items?.length || 0 }} item(s)</p>
+                    </div>
+                  }
+                </div>
+              }
+            }
+
+            @if (currentTab() === 'analisis') {
+              @if (isLoadingAnalisis()) {
+                <div class="flex items-center justify-center py-12">
+                  <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-emily-rose"></div>
+                </div>
+              } @else if (analisis().length === 0) {
+                <div class="text-center py-12">
+                  <ion-icon
+                    name="camera-outline"
+                    class="text-emily-taupe text-5xl mx-auto mb-4"
+                  ></ion-icon>
+                  <p class="text-emily-taupe">No hay análisis morfológicos registrados</p>
+                </div>
+              } @else {
+                <div class="space-y-4">
+                  @for (analisis of analisis(); track analisis.id) {
+                    <div class="border border-emily-cream rounded-lg p-4">
+                      <div class="flex items-center justify-between">
+                        <div>
+                          <p class="font-semibold text-emily-dark">
+                            {{ analisis.tipo_cuerpo_detectado }}
+                          </p>
+                          <p class="text-sm text-emily-taupe">
+                            {{ formatDate(analisis.fecha_analisis) }}
+                          </p>
+                        </div>
+                        <div class="text-right">
+                          <p class="text-sm text-emily-taupe">Confianza</p>
+                          <p class="text-lg font-bold text-emily-dark">
+                            {{ (analisis.confianza * 100).toFixed(0) }}%
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>
+</ion-content>

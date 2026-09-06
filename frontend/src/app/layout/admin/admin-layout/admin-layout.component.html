@@ -1,0 +1,33 @@
+<ion-menu side="start" contentId="admin-content">
+  <ion-header>
+    <ion-toolbar color="dark">
+      <ion-title>Administración</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-content>
+    <ion-list>
+      @for (item of menuItems; track item.route) {
+        <ion-menu-toggle>
+          <ion-item button [routerLink]="item.route" routerLinkActive="active-item">
+            <ion-icon slot="start" [name]="item.icon"></ion-icon>
+            <ion-label>{{ item.label }}</ion-label>
+          </ion-item>
+        </ion-menu-toggle>
+      }
+    </ion-list>
+
+    <ion-list class="ion-padding-top">
+      <ion-menu-toggle>
+        <ion-item button (click)="logout()">
+          <ion-icon slot="start" name="log-out-outline"></ion-icon>
+          <ion-label>Cerrar sesión</ion-label>
+        </ion-item>
+      </ion-menu-toggle>
+    </ion-list>
+  </ion-content>
+</ion-menu>
+
+<div class="ion-page" id="admin-content">
+  <ion-router-outlet></ion-router-outlet>
+</div>

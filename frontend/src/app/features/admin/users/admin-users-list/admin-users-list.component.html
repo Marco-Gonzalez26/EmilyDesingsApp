@@ -1,0 +1,260 @@
+<ion-header>
+  <ion-toolbar class="ion-padding-horizontal">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Usuarios</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+<div class="max-w-7xl mx-auto space-y-6">
+  <div class="flex items-center justify-end">
+    <button
+      routerLink="/admin/usuarios/crear"
+      class="flex items-center gap-2 px-4 py-2 bg-emily-rose text-emily-white rounded-lg hover:bg-emily-rose/90 transition-colors"
+    >
+      <ion-icon name="add"></ion-icon>
+      <span>Crear Usuario</span>
+    </button>
+  </div>
+
+  <div class="bg-emily-white rounded-xl p-6 shadow-sm border border-emily-cream">
+    <div class="flex flex-col md:flex-row gap-4">
+      <div class="flex-1">
+        <div class="relative">
+          <div class="absolute left-4 top-1/2 -translate-y-1/2">
+            <ion-icon name="search-outline" class="text-emily-taupe"></ion-icon>
+          </div>
+          <input
+            type="text"
+            [(ngModel)]="searchTerm"
+            (ngModelChange)="onSearchChange()"
+            placeholder="Buscar por nombre o email..."
+            class="w-full pl-12 pr-4 py-3 border border-emily-cream rounded-lg focus:ring-2 focus:ring-emily-rose focus:border-transparent transition-all"
+          />
+        </div>
+      </div>
+
+      <button
+        (click)="toggleFilters()"
+        class="flex items-center gap-2 px-4 py-3 border border-emily-cream rounded-lg hover:bg-emily-light transition-colors"
+        [class.bg-emily-light]="showFilters()"
+      >
+        <ion-icon name="funnel-outline"></ion-icon>
+        <span>Filtros</span>
+      </button>
+    </div>
+
+    @if (showFilters()) {
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 pt-4 border-t border-emily-cream">
+        <div>
+          <label class="block text-sm font-medium text-emily-dark mb-2">Estado</label>
+          <select
+            [(ngModel)]="selectedActivo"
+            (ngModelChange)="onFilterChange()"
+            class="w-full px-4 py-3 border border-emily-cream rounded-lg focus:ring-2 focus:ring-emily-rose focus:border-transparent transition-all"
+          >
+            <option value="">Todos</option>
+            <option value="true">Activos</option>
+            <option value="false">Inactivos</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-emily-dark mb-2">Desde</label>
+          <input
+            type="date"
+            [(ngModel)]="fechaDesde"
+            (ngModelChange)="onFilterChange()"
+            class="w-full px-4 py-3 border border-emily-cream rounded-lg focus:ring-2 focus:ring-emily-rose focus:border-transparent transition-all"
+          />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-emily-dark mb-2">Hasta</label>
+          <input
+            type="date"
+            [(ngModel)]="fechaHasta"
+            (ngModelChange)="onFilterChange()"
+            class="w-full px-4 py-3 border border-emily-cream rounded-lg focus:ring-2 focus:ring-emily-rose focus:border-transparent transition-all"
+          />
+        </div>
+      </div>
+
+      <div class="flex justify-end mt-4">
+        <button
+          (click)="clearFilters()"
+          class="text-sm text-emily-rose hover:text-emily-rose/80 transition-colors"
+        >
+          Limpiar filtros
+        </button>
+      </div>
+    }
+  </div>
+
+  <div class="bg-emily-white rounded-xl p-6 shadow-sm border border-emily-cream">
+    <div class="flex items-center gap-3">
+      <div class="p-3 bg-emily-rose rounded-lg">
+        <ion-icon name="person-outline" class="text-emily-white"></ion-icon>
+      </div>
+      <div>
+        <p class="text-3xl font-bold text-emily-dark">{{ totalUsuarios() }}</p>
+        <p class="text-sm text-emily-taupe">Total de Usuarios</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-emily-white rounded-xl shadow-sm border border-emily-cream overflow-hidden">
+    @if (isLoading()) {
+      <div class="flex items-center justify-center py-20">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-emily-rose"></div>
+      </div>
+    } @else if (usuarios().length === 0) {
+      <div class="text-center py-20">
+        <ion-icon name="person-outline" class="text-emily-taupe text-5xl mx-auto mb-4"></ion-icon>
+        <p class="text-emily-taupe text-lg">No se encontraron usuarios</p>
+      </div>
+    } @else {
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead class="bg-emily-cream">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-emily-taupe uppercase">
+                Usuario
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-emily-taupe uppercase">
+                Contacto
+              </th>
+              <th class="px-6 py-3 text-center text-xs font-medium text-emily-taupe uppercase">
+                Órdenes
+              </th>
+              <th class="px-6 py-3 text-right text-xs font-medium text-emily-taupe uppercase">
+                Total Gastado
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-emily-taupe uppercase">
+                Registro
+              </th>
+              <th class="px-6 py-3 text-center text-xs font-medium text-emily-taupe uppercase">
+                Estado
+              </th>
+              <th class="px-6 py-3 text-center text-xs font-medium text-emily-taupe uppercase">
+                Acciones
+              </th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-emily-cream">
+            @for (usuario of usuarios(); track usuario.id) {
+              <tr class="hover:bg-emily-light transition-colors">
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+                    <div
+                      class="w-10 h-10 bg-emily-rose rounded-full flex items-center justify-center"
+                    >
+                      <span class="text-sm font-bold text-emily-white">
+                        {{ (usuario.nombre_completo || usuario.email)[0].toUpperCase() }}
+                      </span>
+                    </div>
+                    <div>
+                      <p class="font-medium text-emily-dark">
+                        {{ usuario.nombre_completo || 'Sin nombre' }}
+                      </p>
+                      <p class="text-sm text-emily-taupe">{{ usuario.email }}</p>
+                    </div>
+                  </div>
+                </td>
+
+                <td class="px-6 py-4 text-sm text-emily-taupe">
+                  {{ usuario.telefono || 'No especificado' }}
+                </td>
+
+                <td class="px-6 py-4 text-center">
+                  <div class="flex items-center justify-center gap-1">
+                    <ion-icon name="cart-outline" class="text-emily-taupe"></ion-icon>
+                    <span class="font-medium text-emily-dark">{{ usuario.total_ordenes }}</span>
+                  </div>
+                </td>
+
+                <td class="px-6 py-4 text-right">
+                  <span class="font-bold text-emily-rose">
+                    {{ formatCurrency(usuario.total_gastado) }}
+                  </span>
+                </td>
+
+                <td class="px-6 py-4 text-sm text-emily-taupe">
+                  {{ formatRegistrationDate(usuario.fecha_registro) }}
+                </td>
+
+                <td class="px-6 py-4 text-center">
+                  <span
+                    class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border"
+                    [ngClass]="getEstadoBadge(usuario.activo)"
+                  >
+                    <ion-icon
+                      [name]="usuario.activo ? 'checkmark-circle-outline' : 'close-circle-outline'"
+                      class="mr-1"
+                    ></ion-icon>
+                    {{ getEstadoLabel(usuario.activo) }}
+                  </span>
+                </td>
+
+                <td class="px-6 py-4 text-center">
+                  <button
+                    (click)="viewUsuarioDetail(usuario.id)"
+                    class="inline-flex items-center gap-1 px-3 py-2 text-sm text-emily-rose hover:bg-emily-rose/10 rounded-lg transition-colors"
+                  >
+                    <ion-icon name="eye-outline"></ion-icon>
+                    <span>Ver Detalle</span>
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <div class="px-6 py-4 border-t border-emily-cream flex items-center justify-between">
+        <div class="text-sm text-emily-taupe">
+          Mostrando {{ (currentPage() - 1) * itemsPerPage() + 1 }} -
+          {{ Math.min(currentPage() * itemsPerPage(), totalUsuarios()) }} de
+          {{ totalUsuarios() }} usuarios
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button
+            (click)="previousPage()"
+            [disabled]="currentPage() === 1"
+            class="px-3 py-2 border border-emily-cream rounded-lg hover:bg-emily-light transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Anterior
+          </button>
+
+          @for (page of getPageNumbers(); track page) {
+            @if (page === -1) {
+              <span class="px-3 py-2">...</span>
+            } @else {
+              <button
+                (click)="changePage(page)"
+                [class.bg-emily-rose]="page === currentPage()"
+                [class.text-emily-white]="page === currentPage()"
+                [class.border-emily-rose]="page === currentPage()"
+                class="px-3 py-2 border border-emily-cream rounded-lg hover:bg-emily-light transition-colors"
+              >
+                {{ page }}
+              </button>
+            }
+          }
+
+          <button
+            (click)="nextPage()"
+            [disabled]="currentPage() === totalPages()"
+            class="px-3 py-2 border border-emily-cream rounded-lg hover:bg-emily-light transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Siguiente
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+</div>
+</ion-content>

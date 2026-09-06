@@ -3,6 +3,7 @@ frontend/node_modules/
 frontend/www/
 frontend/android/app/build/
 frontend/android/build/
+frontend/android/app/src/main/assets/
 frontend/android/.gradle/
 frontend/android/.kotlin/
 frontend/android/.idea/

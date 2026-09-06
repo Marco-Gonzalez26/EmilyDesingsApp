@@ -1,0 +1,306 @@
+<ion-header>
+  <ion-toolbar class="ion-padding-horizontal">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Inventario</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="space-y-6">
+    <div class="flex items-center justify-end">
+      <button
+        (click)="loadInventarios()"
+        class="flex items-center gap-2 px-4 py-2 border border-emily-cream text-emily-dark rounded-lg hover:bg-emily-light transition-colors"
+      >
+        <ion-icon name="refresh-outline"></ion-icon>
+        <span>Actualizar</span>
+      </button>
+    </div>
+
+    <!-- Filters Bar -->
+    <div class="bg-emily-white rounded-xl p-4 shadow-sm border border-emily-cream space-y-4">
+      <!-- Toggle Filters Button -->
+      <div class="flex justify-between items-center">
+        <h3 class="font-medium text-emily-dark">Filtros</h3>
+        <button
+          (click)="toggleFilters()"
+          class="flex items-center gap-2 px-3 py-1.5 border border-emily-cream rounded-lg hover:bg-emily-light transition-colors text-sm"
+          [class.bg-emily-light]="showFilters()"
+        >
+          <ion-icon name="funnel-outline"></ion-icon>
+          <span>{{ showFilters() ? 'Ocultar' : 'Mostrar' }} Filtros</span>
+        </button>
+      </div>
+
+      <!-- Advanced Filters -->
+      @if (showFilters()) {
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 pt-4 border-t border-emily-cream">
+          <!-- Producto -->
+          <div>
+            <label class="block text-xs font-medium text-emily-taupe mb-1">Producto</label>
+            <select
+              [(ngModel)]="filters().producto_id"
+              (change)="onFilterChange()"
+              class="w-full px-3 py-2 border border-emily-cream rounded-lg text-sm focus:ring-2 focus:ring-emily-rose focus:border-transparent"
+            >
+              <option [value]="undefined">Todos los productos</option>
+              @for (product of products(); track product.id) {
+                <option [value]="product.id">{{ product.nombre }} ({{ product.sku }})</option>
+              }
+            </select>
+          </div>
+
+          <!-- Talla -->
+          <div>
+            <label class="block text-xs font-medium text-emily-taupe mb-1">Talla</label>
+            <select
+              [(ngModel)]="filters().talla_id"
+              (change)="onFilterChange()"
+              class="w-full px-3 py-2 border border-emily-cream rounded-lg text-sm focus:ring-2 focus:ring-emily-rose focus:border-transparent"
+            >
+              <option [value]="undefined">Todas las tallas</option>
+              @for (size of sizes(); track size.id) {
+                <option [value]="size.id">
+                  {{ size.nombre }}
+                </option>
+              }
+            </select>
+          </div>
+
+          <!-- Color -->
+          <div>
+            <label class="block text-xs font-medium text-emily-taupe mb-1">Color</label>
+            <select
+              [(ngModel)]="filters().color_id"
+              (change)="onFilterChange()"
+              class="w-full px-3 py-2 border border-emily-cream rounded-lg text-sm focus:ring-2 focus:ring-emily-rose focus:border-transparent"
+            >
+              <option [value]="undefined">Todos los colores</option>
+              @for (color of colors(); track color.id) {
+                <option [value]="color.id">{{ color.nombre }}</option>
+              }
+            </select>
+          </div>
+
+          <!-- Stock Bajo -->
+          <div>
+            <label class="block text-xs font-medium text-emily-taupe mb-1">Stock Bajo</label>
+            <select
+              [(ngModel)]="filters().stock_bajo"
+              (change)="onFilterChange()"
+              class="w-full px-3 py-2 border border-emily-cream rounded-lg text-sm focus:ring-2 focus:ring-emily-rose focus:border-transparent"
+            >
+              <option [value]="undefined">Sin filtro</option>
+              <option [value]="5">Menos de 5</option>
+              <option [value]="10">Menos de 10</option>
+              <option [value]="20">Menos de 20</option>
+              <option [value]="50">Menos de 50</option>
+            </select>
+          </div>
+
+          <!-- Botón Limpiar -->
+          <div class="md:col-span-4 flex justify-end">
+            <button
+              (click)="clearFilters()"
+              class="px-4 py-2 text-sm text-emily-taupe hover:text-emily-dark hover:bg-emily-light rounded-lg transition-colors"
+            >
+              Limpiar filtros
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div class="bg-emily-white rounded-lg p-4 border border-emily-cream">
+        <p class="text-sm text-emily-taupe">Total Registros</p>
+        <p class="text-2xl font-bold text-emily-dark mt-1">{{ totalInventarios() }}</p>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="bg-emily-white rounded-xl shadow-sm border border-emily-cream overflow-hidden">
+      @if (isLoading()) {
+        <div class="flex items-center justify-center py-20">
+          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-emily-rose"></div>
+        </div>
+      } @else if (inventarios().length === 0) {
+        <div class="text-center py-20">
+          <ion-icon name="cube-outline" class="text-emily-taupe text-5xl mb-4"></ion-icon>
+          <p class="text-emily-taupe">No hay registros de inventario</p>
+        </div>
+      } @else {
+        <!-- Table Content -->
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead class="bg-emily-cream">
+              <tr>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-emily-taupe uppercase tracking-wider"
+                >
+                  Producto
+                </th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-emily-taupe uppercase tracking-wider"
+                >
+                  Talla
+                </th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-emily-taupe uppercase tracking-wider"
+                >
+                  Color
+                </th>
+                <th
+                  class="px-6 py-3 text-center text-xs font-medium text-emily-taupe uppercase tracking-wider"
+                >
+                  Stock Total
+                </th>
+                <th
+                  class="px-6 py-3 text-center text-xs font-medium text-emily-taupe uppercase tracking-wider"
+                >
+                  Reservado
+                </th>
+                <th
+                  class="px-6 py-3 text-center text-xs font-medium text-emily-taupe uppercase tracking-wider"
+                >
+                  Disponible
+                </th>
+                <th
+                  class="px-6 py-3 text-center text-xs font-medium text-emily-taupe uppercase tracking-wider"
+                >
+                  Estado
+                </th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-emily-cream">
+              @for (inventory of inventarios(); track inventory.id) {
+                <tr
+                  class="hover:bg-emily-light transition-colors cursor-pointer"
+                  (click)="navigateToProductInventory(inventory.producto_id)"
+                >
+                  <!-- Producto -->
+                  <td class="px-6 py-4">
+                    <div>
+                      <p class="text-sm font-medium text-emily-dark">
+                        {{ inventory.producto?.nombre || 'Producto' }}
+                      </p>
+                      <p class="text-xs text-emily-taupe">
+                        SKU: {{ inventory.producto?.sku || '-' }}
+                      </p>
+                    </div>
+                  </td>
+
+                  <!-- Talla -->
+                  <td class="px-6 py-4">
+                    <span
+                      class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emily-light text-emily-dark"
+                    >
+                      {{ inventory.talla?.nombre || '-' }}
+                    </span>
+                  </td>
+
+                  <!-- Color -->
+                  <td class="px-6 py-4">
+                    <div class="flex items-center gap-2">
+                      @if (inventory.color?.codigo_hexadecimal; as hex) {
+                        <div
+                          class="w-6 h-6 rounded border-2 border-emily-cream"
+                          [style.backgroundColor]="hex"
+                        ></div>
+                      }
+                      <span class="text-sm text-emily-dark">{{
+                        inventory.color?.nombre || '-'
+                      }}</span>
+                    </div>
+                  </td>
+
+                  <!-- Stock Total -->
+                  <td class="px-6 py-4 text-center">
+                    <span class="text-sm font-medium text-emily-dark">{{ inventory.stock }}</span>
+                  </td>
+
+                  <!-- Reservado -->
+                  <td class="px-6 py-4 text-center">
+                    <span class="text-sm text-emily-taupe">{{ inventory.stock_reservado }}</span>
+                  </td>
+
+                  <!-- Disponible -->
+                  <td class="px-6 py-4 text-center">
+                    <span class="text-sm font-bold text-emily-dark">
+                      {{ inventory.stock - inventory.stock_reservado }}
+                    </span>
+                  </td>
+
+                  <!-- Estado -->
+                  <td class="px-6 py-4 text-center">
+                    @let level = getStockLevel(inventory);
+                    <span
+                      class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border"
+                      [ngClass]="getStockColor(level)"
+                    >
+                      @if (level === 'critico') {
+                        <ion-icon name="alert-circle-outline" class="mr-1"></ion-icon>
+                        Sin Stock
+                      } @else if (level === 'bajo') {
+                        <ion-icon name="alert-circle-outline" class="mr-1"></ion-icon>
+                        Stock Bajo
+                      } @else if (level === 'normal') {
+                        Normal
+                      } @else {
+                        Alto
+                      }
+                    </span>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        @if (totalPages() > 1) {
+          <div class="px-6 py-4 border-t border-emily-cream flex items-center justify-between">
+            <div class="text-sm text-emily-taupe">
+              Mostrando {{ (currentPage() - 1) * itemsPerPage() + 1 }} a
+              {{ Math.min(currentPage() * itemsPerPage(), totalInventarios()) }} de
+              {{ totalInventarios() }} registros
+            </div>
+
+            <div class="flex gap-2">
+              <button
+                (click)="previousPage()"
+                [disabled]="currentPage() === 1"
+                class="px-3 py-1 rounded-lg border border-emily-cream text-emily-dark hover:bg-emily-light transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Anterior
+              </button>
+
+              @for (page of [].constructor(Math.min(totalPages(), 5)); track $index) {
+                <button
+                  (click)="changePage($index + 1)"
+                  [class.bg-emily-rose]="currentPage() === $index + 1"
+                  [class.text-emily-white]="currentPage() === $index + 1"
+                  [class.border-emily-rose]="currentPage() === $index + 1"
+                  class="px-3 py-1 rounded-lg border border-emily-cream text-emily-dark hover:bg-emily-light transition-colors"
+                >
+                  {{ $index + 1 }}
+                </button>
+              }
+
+              <button
+                (click)="nextPage()"
+                [disabled]="currentPage() === totalPages()"
+                class="px-3 py-1 rounded-lg border border-emily-cream text-emily-dark hover:bg-emily-light transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Siguiente
+              </button>
+            </div>
+          </div>
+        }
+      }
+    </div>
+  </div>
+</ion-content>

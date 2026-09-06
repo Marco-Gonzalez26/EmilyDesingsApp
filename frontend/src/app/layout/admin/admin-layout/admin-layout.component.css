@@ -1,0 +1,8 @@
+nav {
+  scrollbar-width: thin;
+  scrollbar-color: #d4a5a5 #f5ede3;
+}
+
+nav {
+  scroll-behavior: smooth;
+}

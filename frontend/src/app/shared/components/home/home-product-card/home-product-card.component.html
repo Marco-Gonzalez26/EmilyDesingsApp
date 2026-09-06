@@ -1,0 +1,43 @@
+<div
+  class="group relative overflow-hidden rounded-2xl bg-emily-white shadow-lg hover:shadow-2xl transition-all duration-500"
+>
+  <div class="relative h-80 overflow-hidden">
+    <img
+      [src]="image()"
+      [alt]="title()"
+      class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-out"
+    />
+    <div
+      class="absolute inset-0 bg-gradient-to-t from-emily-dark/60 via-emily-dark/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+    ></div>
+  </div>
+
+  <div class="p-6 space-y-3">
+    <h3
+      class="text-2xl font-serif font-bold text-emily-dark group-hover:text-emily-gold transition-colors duration-300"
+    >
+      {{ title() }}
+    </h3>
+
+    @if (description()) {
+      <p class="text-emily-taupe text-sm leading-relaxed line-clamp-2">
+        {{ description() }}
+      </p>
+    }
+
+    @if (link()) {
+      <a
+        [routerLink]="link()"
+        class="mt-4 inline-block px-6 py-2.5 bg-emily-taupe text-emily-white text-sm font-medium rounded-lg hover:bg-emily-dark transition-all duration-300 transform group-hover:translate-x-1"
+      >
+        {{ buttonText() }}
+      </a>
+    } @else {
+      <button
+        class="mt-4 px-6 py-2.5 bg-emily-taupe text-emily-white text-sm font-medium rounded-lg hover:bg-emily-dark transition-all duration-300 transform group-hover:translate-x-1"
+      >
+        {{ buttonText() }}
+      </button>
+    }
+  </div>
+</div>

@@ -1,0 +1,151 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/ordenes"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Detalle de Orden</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="ion-padding">
+<div class="bg-emily-light">
+  @if (isLoading()) {
+    <div class="max-w-4xl mx-auto px-4 md:px-6 py-10">
+      <div class="bg-emily-white rounded-2xl p-6 animate-pulse">
+        <div class="h-8 bg-emily-cream rounded w-1/3 mb-6"></div>
+        <div class="space-y-3">
+          <div class="h-4 bg-emily-cream rounded w-full"></div>
+          <div class="h-4 bg-emily-cream rounded w-3/4"></div>
+          <div class="h-4 bg-emily-cream rounded w-5/6"></div>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (!isLoading() && orden()) {
+    <div class="max-w-4xl mx-auto px-4 md:px-6 py-10">
+      <div class="flex items-center gap-4 mb-8">
+        <a
+          routerLink="/ordenes"
+          class="flex items-center gap-1.5 text-emily-taupe hover:text-emily-dark transition text-sm"
+        >
+          <ion-icon name="arrow-back"></ion-icon>
+          Volver a mis órdenes
+        </a>
+      </div>
+
+      <div class="bg-emily-white rounded-2xl p-6 md:p-8 mb-6">
+        <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-6">
+          <div>
+            <h1 class="font-serif text-2xl md:text-3xl text-emily-dark mb-2">
+              {{ orden()!.numero_orden }}
+            </h1>
+            <div class="flex items-center gap-2 text-sm text-emily-taupe">
+              <ion-icon name="calendar-outline"></ion-icon>
+              <span>{{ formatDate(orden()!.fecha_orden) }}</span>
+            </div>
+          </div>
+          <span
+            class="text-sm font-semibold px-4 py-2 rounded-xl"
+            [class]="getEstadoClass(orden()!.estado)"
+          >
+            {{ orden()!.estado }}
+          </span>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6 mb-6">
+          <div class="bg-emily-light rounded-xl p-4">
+            <div class="flex items-start gap-3">
+              <ion-icon name="location-outline" class="text-emily-gold mt-1"></ion-icon>
+              <div>
+                <p class="text-xs text-emily-taupe mb-1">Dirección de envío</p>
+                <p class="text-sm text-emily-dark">{{ orden()!.direccion_envio }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-emily-light rounded-xl p-4">
+            <div class="flex items-start gap-3">
+              <ion-icon name="card-outline" class="text-emily-gold mt-1"></ion-icon>
+              <div>
+                <p class="text-xs text-emily-taupe mb-1">Método de pago</p>
+                <p class="text-sm text-emily-dark capitalize">
+                  {{ orden()!.metodo_pago || 'Stripe' }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="border-t border-emily-cream pt-6">
+          <h2 class="font-semibold text-emily-dark mb-4">Productos</h2>
+          <div class="space-y-3">
+            @for (item of orden()!.items; track item.producto_id) {
+              <div class="flex gap-4 p-3 bg-emily-light rounded-xl">
+                <div class="w-16 h-20 bg-emily-cream rounded-lg shrink-0">
+                  @if (item.producto) {
+                    <img
+                      src="{{ item.producto.imagenes[0]?.url_imagen }}"
+                      alt="{{ item.producto.nombre }}"
+                      class="w-full h-full object-cover rounded-lg"
+                    />
+                  }
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-medium text-emily-dark truncate">
+                    {{ item.nombre_producto }}
+                  </p>
+                  <p class="text-xs text-emily-taupe mt-1">Cantidad: {{ item.cantidad }}</p>
+                  <p class="text-sm font-semibold text-emily-dark mt-1">
+                    ${{ item.precio_unitario | number: '1.2-2' }} × {{ item.cantidad }}
+                  </p>
+                </div>
+                <div class="text-right">
+                  <p class="text-sm font-bold text-emily-dark">
+                    ${{ item.subtotal | number: '1.2-2' }}
+                  </p>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-emily-white rounded-2xl p-6">
+        <h2 class="font-semibold text-emily-dark mb-4">Resumen</h2>
+        <div class="space-y-3">
+          <div class="flex justify-between text-sm">
+            <span class="text-emily-taupe">Subtotal</span>
+            <span class="text-emily-dark font-medium"
+              >${{ orden()!.subtotal | number: '1.2-2' }}</span
+            >
+          </div>
+          <div class="flex justify-between text-sm">
+            <span class="text-emily-taupe">Envío</span>
+            <span class="text-emily-dark font-medium"
+              >${{ orden()!.costo_envio | number: '1.2-2' }}</span
+            >
+          </div>
+          <div class="flex justify-between text-sm">
+            <span class="text-emily-taupe">Impuestos</span>
+            <span class="text-emily-dark font-medium"
+              >${{ orden()!.impuestos | number: '1.2-2' }}</span
+            >
+          </div>
+          <div class="flex justify-between pt-3 border-t border-emily-cream">
+            <span class="font-semibold text-emily-dark text-lg">Total</span>
+            <span class="font-bold text-emily-dark text-xl"
+              >${{ orden()!.total | number: '1.2-2' }}</span
+            >
+          </div>
+          <button
+            (click)="downloadReceipt()"
+            class="mt-6 w-full block text-center bg-emily-gold hover:bg-emily-taupe text-emily-white font-semibold py-3 rounded-xl transition"
+          >
+            Descargar Recibo PDF
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>
+</ion-content>

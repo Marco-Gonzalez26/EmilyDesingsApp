@@ -1,0 +1,70 @@
+<div
+  [routerLink]="['/productos', product().id]"
+  class="bg-emily-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer group relative"
+  [class.pointer-events-none]="!product().tiene_stock"
+  [class.cursor-not-allowed]="!product().tiene_stock"
+>
+  @if (!product().tiene_stock) {
+    <div class="absolute inset-0 bg-emily-dark/60 z-10 flex items-center justify-center rounded-xl">
+      <span class="bg-emily-white px-4 py-2 rounded-lg text-sm font-semibold text-emily-dark">
+        Sin stock
+      </span>
+    </div>
+  }
+
+  <div class="relative overflow-hidden">
+    <img
+      [src]="getMainImage()"
+      [alt]="product().nombre"
+      class="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-500"
+    />
+
+    <div class="absolute top-2 left-2 flex flex-col gap-1">
+      @if (product().es_nuevo) {
+        <span class="bg-emily-sage text-emily-white text-xs px-2 py-0.5 rounded-full font-medium">
+          Nuevo
+        </span>
+      }
+      @if (hasDiscount()) {
+        <span class="bg-emily-rose text-emily-white text-xs px-2 py-0.5 rounded-full font-medium">
+          -{{ getDiscountPercent() }}%
+        </span>
+      }
+    </div>
+
+    <button
+      (click)="onFavoriteClick($event)"
+      [attr.aria-pressed]="isFavorite()"
+      class="absolute top-2 right-2 w-8 h-8 flex items-center justify-center shrink-0 bg-white rounded-full shadow-sm hover:bg-emily-white transition"
+    >
+      <ion-icon
+        [name]="isFavorite() ? 'heart' : 'heart-outline'"
+        [class]="isFavorite() ? 'text-emily-rose' : 'text-emily-dark'"
+        class="block leading-none text-base"
+      ></ion-icon>
+    </button>
+  </div>
+
+  <div class="p-3">
+    <h3 class="text-sm font-medium text-emily-dark truncate">{{ product().nombre }}</h3>
+
+    <div class="flex items-center gap-2 mt-1 mb-3">
+      <span class="text-sm font-semibold text-emily-dark">
+        ${{ getPrice() | number: '1.2-2' }}
+      </span>
+      @if (hasDiscount()) {
+        <span class="text-xs text-emily-taupe line-through">
+          ${{ product().precio_regular | number: '1.2-2' }}
+        </span>
+      }
+    </div>
+
+    <button
+      (click)="onAddToCart($event)"
+      class="w-full bg-emily-dark hover:bg-emily-taupe text-emily-white text-xs font-medium py-2 rounded-lg transition flex items-center justify-center gap-1.5"
+    >
+      <ion-icon name="bag-handle-outline"></ion-icon>
+      Agregar
+    </button>
+  </div>
+</div>
