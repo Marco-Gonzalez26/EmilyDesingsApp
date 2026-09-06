@@ -1,0 +1,154 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Catálogo</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-modal class="lg:hidden" [isOpen]="filtersVisible()" [breakpoints]="[0, 1]" [initialBreakpoint]="1" handle="true" [backdropDismiss]="true" (ionModalDidDismiss)="filtersVisible.set(false)">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>Filtros</ion-title>
+        <ion-buttons slot="end">
+          <ion-button fill="clear" (click)="filtersVisible.set(false)"><ion-icon name="close"></ion-icon></ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content class="ion-padding">
+      <app-filters (filtersChanged)="onFiltersChanged($event); filtersVisible.set(false)" (filtersCleared)="onFiltersCleared(); filtersVisible.set(false)"></app-filters>
+    </ion-content>
+    <ion-footer>
+      <ion-toolbar>
+        <div class="flex gap-2 p-2">
+          <ion-button fill="outline" expand="block" class="flex-1" (click)="onFiltersCleared(); filtersVisible.set(false)">Limpiar</ion-button>
+          <ion-button expand="block" class="flex-1" (click)="filtersVisible.set(false)">Aplicar</ion-button>
+        </div>
+      </ion-toolbar>
+    </ion-footer>
+  </ng-template>
+</ion-modal>
+
+<ion-content>
+
+<div class="bg-emily-light">
+  <div class="max-w-7xl mx-auto px-4 md:px-6 py-8">
+    <div class="flex flex-col lg:flex-row gap-6 lg:gap-8">
+      <aside class="hidden lg:block shrink-0 lg:w-64">
+        <app-filters (filtersChanged)="onFiltersChanged($event)" (filtersCleared)="onFiltersCleared()"></app-filters>
+      </aside>
+
+      <main class="flex-1 min-w-0">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+          <div>
+            <h1 class="text-2xl font-serif text-emily-dark">Catálogo de Ropa</h1>
+            <p class="text-sm text-emily-taupe mt-1">{{ totalProducts() }} productos encontrados</p>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <button
+              (click)="filtersVisible.set(!filtersVisible())"
+              class="text-sm border border-emily-taupe/30 bg-emily-white text-emily-dark rounded-lg px-3 py-2 outline-none hover:border-emily-rose transition"
+            >
+              <ion-icon name="funnel-outline"></ion-icon>
+              Filtros
+            </button>
+            <input
+              type="search"
+              placeholder="Buscar productos..."
+              [ngModel]="searchTerm()"
+              (ngModelChange)="onSearchChange($event)"
+              class="text-sm border border-emily-taupe/30 bg-emily-white text-emily-dark rounded-lg px-3 py-2 outline-none focus:border-emily-rose transition w-full sm:w-52"
+            />
+            <select
+              [ngModel]="selectedSort()"
+              (ngModelChange)="onSortChange($event)"
+              class="text-sm border border-emily-taupe/30 bg-emily-white text-emily-dark rounded-lg px-3 py-2 outline-none focus:border-emily-rose transition"
+            >
+              @for (opt of sortOptions; track opt.value) {
+                <option [value]="opt.value">{{ opt.label }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        @if (isLoading()) {
+          <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+            @for (i of [1, 2, 3, 4, 5, 6, 7, 8]; track i) {
+              <div class="bg-emily-white rounded-xl overflow-hidden animate-pulse">
+                <div class="bg-emily-cream h-64 w-full"></div>
+                <div class="p-3 space-y-2">
+                  <div class="h-4 bg-emily-cream rounded w-3/4"></div>
+                  <div class="h-4 bg-emily-cream rounded w-1/2"></div>
+                  <div class="h-8 bg-emily-cream rounded"></div>
+                </div>
+              </div>
+            }
+          </div>
+        }
+
+        @if (!isLoading()) {
+          <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+            @for (product of products(); track product.id) {
+              <app-product-card
+                [product]="product"
+                [isFavorite]="isFavorite(product.id)"
+                (favoriteToggled)="toggleFavorite($event)"
+                (addToCartRequested)="addToCart($event)"
+              />
+            }
+          </div>
+        }
+
+        @if (!isLoading() && products().length === 0) {
+          <div class="text-center py-20">
+            <p class="text-emily-taupe text-lg">No se encontraron productos</p>
+            <button
+              (click)="onFiltersCleared()"
+              class="mt-4 text-emily-gold hover:text-emily-dark transition text-sm font-medium"
+            >
+              Limpiar filtros
+            </button>
+          </div>
+        }
+
+        @if (!isLoading() && totalPages() > 1) {
+          <div class="flex justify-center items-center gap-1 mt-10">
+            <button
+              (click)="prevPage()"
+              [disabled]="currentPage() === 1"
+              class="p-2 rounded-lg border border-emily-taupe/30 text-emily-taupe hover:border-emily-dark hover:text-emily-dark transition disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              <ion-icon name="chevron-back"></ion-icon>
+            </button>
+
+            @for (page of pages(); track $index) {
+              <button
+                (click)="goToPage(page)"
+                [disabled]="page === '...'"
+                class="w-9 h-9 rounded-lg text-sm font-medium transition"
+                [class]="
+                  page === currentPage()
+                    ? 'bg-emily-dark text-emily-white'
+                    : page === '...'
+                      ? 'text-emily-taupe cursor-default'
+                      : 'border border-emily-taupe/30 text-emily-taupe hover:border-emily-dark hover:text-emily-dark'
+                "
+              >
+                {{ page }}
+              </button>
+            }
+
+            <button
+              (click)="nextPage()"
+              [disabled]="currentPage() === totalPages()"
+              class="p-2 rounded-lg border border-emily-taupe/30 text-emily-taupe hover:border-emily-dark hover:text-emily-dark transition disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              <ion-icon name="chevron-forward"></ion-icon>
+            </button>
+          </div>
+        }
+      </main>
+    </div>
+  </div>
+</div>
+
+</ion-content>

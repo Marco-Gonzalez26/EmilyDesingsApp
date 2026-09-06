@@ -1,0 +1,255 @@
+<div class="bg-emily-white rounded-xl p-5 shadow-sm">
+
+
+
+  <div class="flex items-center justify-between mb-5">
+    <h2 class="text-lg font-semibold text-emily-dark">Filtros</h2>
+    <button
+      *ngIf="hasActiveFilters()"
+      (click)="clearFilters()"
+      class="text-xs text-emily-rose hover:text-emily-dark transition font-medium"
+    >
+      Limpiar todo
+    </button>
+  </div>
+
+
+  <div class="flex flex-col gap-2 mb-5 pb-5 border-b border-emily-cream">
+    <label class="flex items-center gap-2 cursor-pointer group">
+      <div
+        (click)="toggleNuevos()"
+        class="w-4 h-4 rounded border-2 flex items-center justify-center transition cursor-pointer"
+        [class]="
+          soloNuevos()
+            ? 'bg-emily-sage border-emily-sage'
+            : 'border-emily-taupe/40 group-hover:border-emily-sage'
+        "
+      >
+        <svg
+          *ngIf="soloNuevos()"
+          class="w-2.5 h-2.5 text-white"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="3"
+            d="M5 13l4 4L19 7"
+          />
+        </svg>
+      </div>
+      <span class="text-sm text-emily-taupe group-hover:text-emily-dark transition"
+        >Solo nuevos</span
+      >
+      <span
+        class="ml-auto text-xs bg-emily-sage/20 text-emily-sage px-2 py-0.5 rounded-full font-medium"
+        >Nuevo</span
+      >
+    </label>
+
+    <label class="flex items-center gap-2 cursor-pointer group">
+      <div
+        (click)="toggleOfertas()"
+        class="w-4 h-4 rounded border-2 flex items-center justify-center transition cursor-pointer"
+        [class]="
+          soloOfertas()
+            ? 'bg-emily-rose border-emily-rose'
+            : 'border-emily-taupe/40 group-hover:border-emily-rose'
+        "
+      >
+        <svg
+          *ngIf="soloOfertas()"
+          class="w-2.5 h-2.5 text-white"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="3"
+            d="M5 13l4 4L19 7"
+          />
+        </svg>
+      </div>
+      <span class="text-sm text-emily-taupe group-hover:text-emily-dark transition"
+        >Solo ofertas</span
+      >
+      <span
+        class="ml-auto text-xs bg-emily-rose/20 text-emily-rose px-2 py-0.5 rounded-full font-medium"
+        >Oferta</span
+      >
+    </label>
+  </div>
+
+
+  <div class="mb-5 pb-5 border-b border-emily-cream">
+    <button
+      (click)="toggleSection('categoria')"
+      class="flex justify-between items-center w-full mb-3 group"
+    >
+      <h3 class="text-sm font-semibold text-emily-dark group-hover:text-emily-taupe transition">
+        Categoría
+      </h3>
+      <ion-icon
+        [name]="sections().categoria ? 'remove' : 'add'"
+        class="text-emily-taupe"
+      ></ion-icon>
+    </button>
+
+    <div *ngIf="sections().categoria">
+
+      <div *ngIf="categorias().length === 0" class="space-y-2">
+        <div *ngFor="let i of [1, 2, 3, 4]" class="h-4 bg-emily-cream rounded animate-pulse"></div>
+      </div>
+
+
+      <ul class="space-y-1">
+        <li *ngFor="let cat of categorias()">
+          <button
+            (click)="selectCategoria(cat.id)"
+            class="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg transition text-left"
+            [class]="
+              isCategoriaSelected(cat.id)
+                ? 'bg-emily-cream text-emily-dark font-medium'
+                : 'text-emily-taupe hover:bg-emily-light hover:text-emily-dark'
+            "
+          >
+            <span
+              class="w-2 h-2 rounded-full shrink-0 transition"
+              [class]="isCategoriaSelected(cat.id) ? 'bg-emily-gold' : 'bg-emily-taupe/30'"
+            ></span>
+            <span class="text-sm">{{ cat.nombre }}</span>
+          </button>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+
+  <div class="mb-5 pb-5 border-b border-emily-cream">
+    <button
+      (click)="toggleSection('marca')"
+      class="flex justify-between items-center w-full mb-3 group"
+    >
+      <h3 class="text-sm font-semibold text-emily-dark group-hover:text-emily-taupe transition">
+        Marca
+      </h3>
+      <ion-icon
+        [name]="sections().marca ? 'remove' : 'add'"
+        class="text-emily-taupe"
+      ></ion-icon>
+    </button>
+
+    <div *ngIf="sections().marca">
+
+      <div *ngIf="marcas().length === 0" class="space-y-2">
+        <div *ngFor="let i of [1, 2, 3]" class="h-4 bg-emily-cream rounded animate-pulse"></div>
+      </div>
+
+
+      <ul class="space-y-1 max-h-48 overflow-y-auto pr-1">
+        <li *ngFor="let marca of marcas()">
+          <button
+            (click)="toggleMarca(marca.id)"
+            class="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg transition text-left"
+            [class]="
+              isMarcaSelected(marca.id)
+                ? 'bg-emily-cream text-emily-dark font-medium'
+                : 'text-emily-taupe hover:bg-emily-light hover:text-emily-dark'
+            "
+          >
+            <div
+              class="w-3.5 h-3.5 rounded border-2 flex items-center justify-center shrink-0 transition"
+              [class]="
+                isMarcaSelected(marca.id)
+                  ? 'bg-emily-gold border-emily-gold'
+                  : 'border-emily-taupe/40'
+              "
+            >
+              <svg
+                *ngIf="isMarcaSelected(marca.id)"
+                class="w-2 h-2 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="3"
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+            </div>
+            <span class="text-sm">{{ marca.nombre }}</span>
+          </button>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+
+  <div class="mb-5">
+    <button
+      (click)="toggleSection('precio')"
+      class="flex justify-between items-center w-full mb-3 group"
+    >
+      <h3 class="text-sm font-semibold text-emily-dark group-hover:text-emily-taupe transition">
+        Precio
+      </h3>
+      <ion-icon
+        [name]="sections().precio ? 'remove' : 'add'"
+        class="text-emily-taupe"
+      ></ion-icon>
+    </button>
+
+    <div *ngIf="sections().precio" class="space-y-3">
+
+      <div class="flex justify-between items-center">
+        <span class="text-xs font-medium text-emily-dark bg-emily-cream px-2 py-1 rounded">
+          ${{ precioMin() }}
+        </span>
+        <span class="text-xs text-emily-taupe">—</span>
+        <span class="text-xs font-medium text-emily-dark bg-emily-cream px-2 py-1 rounded">
+          ${{ precioMax() }}
+        </span>
+      </div>
+
+
+      <div>
+        <label class="text-xs text-emily-taupe mb-1 block">Mínimo</label>
+        <input
+          type="range"
+          [min]="PRECIO_MIN"
+          [max]="PRECIO_MAX"
+          [value]="precioMin()"
+          (input)="onPrecioMinChange(+$any($event.target).value)"
+          class="w-full accent-emily-gold cursor-pointer h-1"
+        />
+      </div>
+
+
+      <div>
+        <label class="text-xs text-emily-taupe mb-1 block">Máximo</label>
+        <input
+          type="range"
+          [min]="PRECIO_MIN"
+          [max]="PRECIO_MAX"
+          [value]="precioMax()"
+          (input)="onPrecioMaxChange(+$any($event.target).value)"
+          class="w-full accent-emily-gold cursor-pointer h-1"
+        />
+      </div>
+    </div>
+  </div>
+
+  <button
+    (click)="clearFilters()"
+    class="w-full py-2.5 border border-emily-taupe/40 text-emily-taupe hover:border-emily-dark hover:text-emily-dark text-sm rounded-lg transition font-medium"
+  >
+    Limpiar Filtros
+  </button>
+</div>
