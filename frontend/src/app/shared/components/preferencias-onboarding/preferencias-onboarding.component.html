@@ -1,0 +1,71 @@
+  <ion-header>
+    <ion-toolbar>
+      <ion-title>Personaliza tu estilo</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-content class="ion-padding">
+    <div class="max-w-lg mx-auto space-y-6 py-2">
+      <div class="text-center">
+        <div class="w-12 h-12 bg-emily-rose/10 rounded-2xl flex items-center justify-center mx-auto mb-3">
+          <ion-icon name="sparkles" class="text-emily-rose text-xl"></ion-icon>
+        </div>
+        <h2 class="text-xl font-serif font-bold text-emily-dark">¿Cuál es tu estilo?</h2>
+        <p class="text-sm text-emily-taupe mt-1">Elige al menos 1 (máx 5) para alimentar tus recomendaciones con IA</p>
+      </div>
+
+      @if (isLoadingEstilos()) {
+        <div class="flex flex-col items-center py-8 gap-3">
+          <ion-spinner name="crescent"></ion-spinner>
+          <p class="text-sm text-emily-taupe">Cargando estilos...</p>
+        </div>
+      } @else if (estilosError()) {
+        <div class="text-center py-8">
+          <p class="text-sm text-emily-taupe mb-3">No se pudieron cargar los estilos</p>
+          <ion-button fill="outline" size="small" (click)="cargarEstilos()">Reintentar</ion-button>
+        </div>
+      } @else {
+        <div class="flex flex-wrap gap-2 justify-center">
+          @for (estilo of estilos(); track estilo.id) {
+            <button
+              (click)="toggleEstilo(estilo.id)"
+              [class.bg-emily-dark]="isSelected(estilo.id)"
+              [class.text-emily-white]="isSelected(estilo.id)"
+              [class.border-emily-dark]="isSelected(estilo.id)"
+              [class.bg-emily-white]="!isSelected(estilo.id)"
+              [class.text-emily-dark]="!isSelected(estilo.id)"
+              [class.border-emily-taupe]="!isSelected(estilo.id)"
+              class="px-4 py-2 rounded-full border text-sm font-medium transition-all flex items-center gap-1.5"
+            >
+              @if (isSelected(estilo.id)) {
+                <ion-icon name="checkmark"></ion-icon>
+              }
+              {{ estilo.nombre }}
+            </button>
+          }
+        </div>
+        <p class="text-center text-xs text-emily-taupe">{{ seleccionados().size }}/5 seleccionados</p>
+      }
+
+      <div class="bg-emily-cream/50 rounded-2xl p-4 border border-emily-rose/10">
+        <label class="block text-sm font-medium text-emily-dark mb-2">Rango de precio preferido</label>
+        <p class="text-xs text-emily-taupe mb-3">${{ precioMin() }} — ${{ precioMax() }}</p>
+        <ion-range dualKnobs="true" [min]="0" [max]="500" [step]="10" [value]="{ lower: precioMin(), upper: precioMax() }" (ionChange)="onPrecioChange($event)"></ion-range>
+        <div class="flex justify-between text-xs text-emily-taupe"><span>$0</span><span>$500</span></div>
+      </div>
+
+      @if (saveError()) {
+        <div class="bg-red-50 border border-red-200 rounded-xl p-3 text-sm text-red-700 text-center">{{ saveError() }}</div>
+      }
+
+      <ion-button expand="block" color="primary" (click)="guardar()" [disabled]="!puedeContinuar()">
+        @if (isSaving()) {
+          <ion-spinner name="crescent" slot="start"></ion-spinner>
+          Guardando...
+        } @else {
+          Continuar
+        }
+      </ion-button>
+      <p class="text-center text-xs text-emily-taupe">Podrás cambiar esto en tu perfil cuando quieras</p>
+    </div>
+  </ion-content>
