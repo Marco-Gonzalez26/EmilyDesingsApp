@@ -1,0 +1,313 @@
+<ion-header>
+  <ion-toolbar class="ion-padding-horizontal">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Productos</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+<div class="space-y-6">
+  <div class="flex items-center justify-end">
+    <button
+      (click)="navigateToCreate()"
+      class="flex items-center gap-2 px-4 py-2 bg-emily-rose text-emily-white rounded-lg hover:bg-emily-rose/90 transition-colors shadow-sm"
+    >
+      <ion-icon name="add"></ion-icon>
+      <span>Nuevo Producto</span>
+    </button>
+  </div>
+
+  <div class="bg-emily-white rounded-xl p-4 shadow-sm border border-emily-cream space-y-4">
+    <div class="flex gap-3">
+      <div class="relative flex-1">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <ion-icon name="search-outline" class="text-emily-taupe"></ion-icon>
+        </div>
+        <input
+          type="text"
+          [value]="filters().search"
+          (input)="onSearch($event)"
+          placeholder="Buscar por nombre, descripción o SKU..."
+          class="w-full pl-10 pr-4 py-2 border border-emily-cream rounded-lg focus:ring-2 focus:ring-emily-rose focus:border-transparent transition-all"
+        />
+      </div>
+      <button
+        (click)="toggleFilters()"
+        class="flex items-center gap-2 px-4 py-2 border border-emily-cream rounded-lg hover:bg-emily-light transition-colors"
+        [class.bg-emily-light]="showFilters()"
+      >
+        <ion-icon name="funnel-outline"></ion-icon>
+        <span>Filtros</span>
+      </button>
+    </div>
+
+    @if (showFilters()) {
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 pt-4 border-t border-emily-cream">
+        <div>
+          <label class="block text-xs font-medium text-emily-taupe mb-1">Categoría</label>
+          <select
+            [(ngModel)]="filters().categoria_id"
+            (change)="onFilterChange()"
+            class="w-full px-3 py-2 border border-emily-cream rounded-lg text-sm focus:ring-2 focus:ring-emily-rose focus:border-transparent"
+          >
+            <option [value]="undefined">Todas</option>
+            @for (cat of categories(); track cat.id) {
+              <option [value]="cat.id">{{ cat.nombre }}</option>
+            }
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-emily-taupe mb-1">Marca</label>
+          <select
+            [(ngModel)]="filters().marca_id"
+            (change)="onFilterChange()"
+            class="w-full px-3 py-2 border border-emily-cream rounded-lg text-sm focus:ring-2 focus:ring-emily-rose focus:border-transparent"
+          >
+            <option [value]="undefined">Todas</option>
+            @for (brand of brands(); track brand.id) {
+              <option [value]="brand.id">{{ brand.nombre }}</option>
+            }
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-emily-taupe mb-1">Estado</label>
+          <select
+            [(ngModel)]="filters().activo"
+            (change)="onFilterChange()"
+            class="w-full px-3 py-2 border border-emily-cream rounded-lg text-sm focus:ring-2 focus:ring-emily-rose focus:border-transparent"
+          >
+            <option [value]="undefined">Todos</option>
+            <option [value]="true">Activos</option>
+            <option [value]="false">Inactivos</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-emily-taupe mb-1">Tipo</label>
+          <select
+            class="w-full px-3 py-2 border border-emily-cream rounded-lg text-sm focus:ring-2 focus:ring-emily-rose focus:border-transparent"
+          >
+            <option value="">Todos</option>
+            <option value="nuevo">Nuevos</option>
+            <option value="oferta">En Oferta</option>
+            <option value="destacado">Destacados</option>
+          </select>
+        </div>
+
+        <div class="md:col-span-4 flex justify-end">
+          <button
+            (click)="clearFilters()"
+            class="px-4 py-2 text-sm text-emily-taupe hover:text-emily-dark hover:bg-emily-light rounded-lg transition-colors"
+          >
+            Limpiar filtros
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+    <div class="bg-emily-white rounded-lg p-4 border border-emily-cream">
+      <p class="text-sm text-emily-taupe">Total Productos</p>
+      <p class="text-2xl font-bold text-emily-dark mt-1">{{ totalProducts() }}</p>
+    </div>
+    <div class="bg-emily-white rounded-lg p-4 border border-emily-cream">
+      <p class="text-sm text-emily-taupe">Página Actual</p>
+      <p class="text-2xl font-bold text-emily-dark mt-1">
+        {{ currentPage() }} / {{ totalPages() }}
+      </p>
+    </div>
+  </div>
+
+  <div class="bg-emily-white rounded-xl shadow-sm border border-emily-cream overflow-hidden">
+    @if (isLoading()) {
+      <div class="flex items-center justify-center py-20">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-emily-rose"></div>
+      </div>
+    } @else if (products().length === 0) {
+      <div class="text-center py-20">
+        <p class="mt-4 text-emily-taupe">
+          @if (filters().search) {
+            No se encontraron productos con "{{ filters().search }}"
+          } @else {
+            No hay productos registrados
+          }
+        </p>
+        @if (!filters().search) {
+          <button
+            (click)="navigateToCreate()"
+            class="mt-4 px-4 py-2 bg-emily-rose text-emily-white rounded-lg hover:bg-emily-rose/90 transition-colors"
+          >
+            Crear primer producto
+          </button>
+        }
+      </div>
+    } @else {
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-6">
+        @for (product of products(); track product.id) {
+          <div
+            class="group relative bg-emily-white border border-emily-cream rounded-xl overflow-hidden hover:shadow-lg transition-shadow"
+          >
+            <div class="relative aspect-square bg-emily-light overflow-hidden">
+              <img
+                [src]="getMainImage(product)"
+                [alt]="product.nombre"
+                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              />
+
+              <div class="absolute top-2 left-2 flex flex-col gap-2">
+                @if (product.es_nuevo) {
+                  <span class="px-2 py-1 bg-green-500 text-white text-xs font-medium rounded"
+                    >Nuevo</span
+                  >
+                }
+                @if (product.es_oferta) {
+                  <span class="px-2 py-1 bg-red-500 text-white text-xs font-medium rounded"
+                    >Oferta</span
+                  >
+                }
+                @if (product.es_destacado) {
+                  <span class="px-2 py-1 bg-emily-gold text-white text-xs font-medium rounded"
+                    >★ Destacado</span
+                  >
+                }
+              </div>
+
+              @if (hasDiscount(product)) {
+                <div class="absolute top-2 right-2">
+                  <span class="px-2 py-1 bg-emily-rose text-white text-xs font-bold rounded-full">
+                    -{{ getDiscountPercentage(product) }}%
+                  </span>
+                </div>
+              }
+
+              <div
+                class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2"
+              >
+                <button
+                  (click)="navigateToProductInventory(product.id); $event.stopPropagation()"
+                  class="p-2 bg-emily-white rounded-lg hover:bg-emily-cream transition-colors"
+                  title="Ver Inventario"
+                >
+                  <ion-icon name="cube-outline" class="text-emily-dark"></ion-icon>
+                </button>
+                <button
+                  (click)="navigateToEdit(product)"
+                  class="p-2 bg-emily-white rounded-lg hover:bg-emily-cream transition-colors"
+                  title="Editar"
+                >
+                  <ion-icon name="create-outline" class="text-emily-dark"></ion-icon>
+                </button>
+                <button
+                  (click)="openDeleteConfirm(product)"
+                  class="p-2 bg-emily-white rounded-lg hover:bg-red-50 transition-colors"
+                  title="Eliminar"
+                >
+                  <ion-icon name="trash-outline" class="text-red-600"></ion-icon>
+                </button>
+              </div>
+            </div>
+
+            <div class="p-4">
+              <p class="text-xs text-emily-taupe mb-1">SKU: {{ product.sku }}</p>
+              <h3 class="font-medium text-emily-dark mb-2 line-clamp-2" [title]="product.nombre">
+                {{ product.nombre }}
+              </h3>
+
+              <div class="flex items-baseline gap-2 mb-3">
+                @if (hasDiscount(product)) {
+                  <span class="text-lg font-bold text-emily-rose">
+                    ${{ getPrecioFinal(product).toFixed(2) }}
+                  </span>
+                  <span class="text-sm text-emily-taupe line-through">
+                    ${{ getRegularPrice(product).toFixed(2) }}
+                  </span>
+                } @else {
+                  <span class="text-lg font-bold text-emily-dark">
+                    ${{ getRegularPrice(product).toFixed(2) }}
+                  </span>
+                }
+              </div>
+
+              <div class="flex items-center justify-between">
+                @if (product.activo) {
+                  <span
+                    class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"
+                  >
+                    Activo
+                  </span>
+                } @else {
+                  <span
+                    class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
+                  >
+                    Inactivo
+                  </span>
+                }
+
+                <span class="text-xs text-emily-taupe">
+                  {{ product.imagenes.length || 0 }} foto(s)
+                </span>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+
+      @if (totalPages() > 1) {
+        <div class="px-6 py-4 border-t border-emily-cream flex items-center justify-between">
+          <div class="text-sm text-emily-taupe">
+            Mostrando {{ (currentPage() - 1) * itemsPerPage() + 1 }} a
+            {{ Math.min(currentPage() * itemsPerPage(), totalProducts()) }} de
+            {{ totalProducts() }} productos
+          </div>
+
+          <div class="flex gap-2">
+            <button
+              (click)="previousPage()"
+              [disabled]="currentPage() === 1"
+              class="px-3 py-1 rounded-lg border border-emily-cream text-emily-dark hover:bg-emily-light transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Anterior
+            </button>
+
+            @for (page of [].constructor(Math.min(totalPages(), 5)); track $index) {
+              <button
+                (click)="changePage($index + 1)"
+                [class.bg-emily-rose]="currentPage() === $index + 1"
+                [class.text-emily-white]="currentPage() === $index + 1"
+                [class.border-emily-rose]="currentPage() === $index + 1"
+                class="px-3 py-1 rounded-lg border border-emily-cream text-emily-dark hover:bg-emily-light transition-colors"
+              >
+                {{ $index + 1 }}
+              </button>
+            }
+
+            <button
+              (click)="nextPage()"
+              [disabled]="currentPage() === totalPages()"
+              class="px-3 py-1 rounded-lg border border-emily-cream text-emily-dark hover:bg-emily-light transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Siguiente
+            </button>
+          </div>
+        </div>
+      }
+    }
+  </div>
+</div>
+
+<app-confirm-dialog
+  [isOpen]="isConfirmOpen()"
+  [title]="'¿Eliminar producto?'"
+  [message]="'¿Está seguro de que desea eliminar este producto?'"
+  [confirmText]="'Eliminar'"
+  [cancelText]="'Cancelar'"
+  [type]="'danger'"
+  (confirm)="confirmDelete()"
+  (cancel)="closeDeleteConfirm()"
+/>
+</ion-content>

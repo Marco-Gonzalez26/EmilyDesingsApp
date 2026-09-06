@@ -1,0 +1,9 @@
+canvas {
+  max-height: 100%;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}

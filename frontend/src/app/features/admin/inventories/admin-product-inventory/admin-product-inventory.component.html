@@ -1,0 +1,497 @@
+<!-- src/app/features/admin/inventory/admin-product-inventory/admin-product-inventory.component.html -->
+
+<ion-header>
+  <ion-toolbar class="ion-padding-horizontal">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>{{ product()?.nombre ? 'Inventario: ' + product()?.nombre : 'Inventario' }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+<div class="max-w-6xl mx-auto space-y-6">
+  <!-- Header -->
+  <div class="flex items-center gap-4">
+    <button (click)="goBack()" class="p-2 hover:bg-emily-light rounded-lg transition-colors">
+      <ion-icon name="arrow-back" class="text-emily-dark"></ion-icon>
+    </button>
+    <div class="flex-1">
+      @if (product(); as prod) {
+        <p class="text-emily-taupe">SKU: {{ prod.sku }}</p>
+      }
+    </div>
+    <button
+      (click)="openCreateForm()"
+      class="flex items-center gap-2 px-4 py-2 bg-emily-rose text-emily-white rounded-lg hover:bg-emily-rose/90 transition-colors shadow-sm"
+    >
+      <ion-icon name="add"></ion-icon>
+      <span>Agregar Variante</span>
+    </button>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="bg-emily-white rounded-lg p-6 border border-emily-cream">
+      <p class="text-sm text-emily-taupe mb-1">Stock Total</p>
+      <p class="text-3xl font-bold text-emily-dark">{{ stockTotal() }}</p>
+    </div>
+    <div class="bg-emily-white rounded-lg p-6 border border-emily-cream">
+      <p class="text-sm text-emily-taupe mb-1">Stock Reservado</p>
+      <p class="text-3xl font-bold text-yellow-600">{{ stockReservadoTotal() }}</p>
+    </div>
+    <div class="bg-emily-white rounded-lg p-6 border border-emily-cream">
+      <p class="text-sm text-emily-taupe mb-1">Stock Disponible</p>
+      <p class="text-3xl font-bold text-green-600">{{ stockDisponibleTotal() }}</p>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="bg-emily-white rounded-xl shadow-sm border border-emily-cream overflow-hidden">
+    @if (isLoading()) {
+      <div class="flex items-center justify-center py-20">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-emily-rose"></div>
+      </div>
+    } @else if (inventarios().length === 0) {
+      <div class="text-center py-20">
+        <svg
+          class="mx-auto h-12 w-12 text-emily-taupe mb-4"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+          />
+        </svg>
+        <p class="text-emily-taupe mb-4">No hay variantes de inventario para este producto</p>
+        <button
+          (click)="openCreateForm()"
+          class="px-4 py-2 bg-emily-rose text-emily-white rounded-lg hover:bg-emily-rose/90 transition-colors"
+        >
+          Agregar primera variante
+        </button>
+      </div>
+    } @else {
+      <!-- Table Content -->
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead class="bg-emily-cream">
+            <tr>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-emily-taupe uppercase tracking-wider"
+              >
+                Talla
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-emily-taupe uppercase tracking-wider"
+              >
+                Color
+              </th>
+              <th
+                class="px-6 py-3 text-center text-xs font-medium text-emily-taupe uppercase tracking-wider"
+              >
+                Stock Total
+              </th>
+              <th
+                class="px-6 py-3 text-center text-xs font-medium text-emily-taupe uppercase tracking-wider"
+              >
+                Reservado
+              </th>
+              <th
+                class="px-6 py-3 text-center text-xs font-medium text-emily-taupe uppercase tracking-wider"
+              >
+                Disponible
+              </th>
+              <th
+                class="px-6 py-3 text-center text-xs font-medium text-emily-taupe uppercase tracking-wider"
+              >
+                Estado
+              </th>
+              <th
+                class="px-6 py-3 text-right text-xs font-medium text-emily-taupe uppercase tracking-wider"
+              >
+                Acciones
+              </th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-emily-cream">
+            @for (inventory of inventarios(); track inventory.id) {
+              <tr class="hover:bg-emily-light transition-colors">
+                <!-- Talla -->
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span
+                    class="inline-flex items-center px-3 py-1 rounded-lg text-sm font-medium bg-emily-sage text-emily-white"
+                  >
+                    {{ inventory.talla?.nombre || '-' }}
+                  </span>
+                </td>
+
+                <!-- Color -->
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center gap-2">
+                    @if (inventory.color?.codigo_hexadecimal; as hex) {
+                      <div
+                        class="w-8 h-8 rounded-lg border-2 border-emily-cream shadow-sm"
+                        [style.backgroundColor]="hex"
+                      ></div>
+                    }
+                    <span class="text-sm font-medium text-emily-dark">
+                      {{ inventory.color?.nombre || '-' }}
+                    </span>
+                  </div>
+                </td>
+
+                <!-- Stock Total -->
+                <td class="px-6 py-4 text-center">
+                  <span class="text-lg font-bold text-emily-dark">{{ inventory.stock }}</span>
+                </td>
+
+                <!-- Reservado -->
+                <td class="px-6 py-4 text-center">
+                  <span class="text-sm font-medium text-yellow-600">{{
+                    inventory.stock_reservado
+                  }}</span>
+                </td>
+
+                <!-- Disponible -->
+                <td class="px-6 py-4 text-center">
+                  <span class="text-lg font-bold text-green-600">
+                    {{ inventory.stock - inventory.stock_reservado }}
+                  </span>
+                </td>
+
+                <!-- Estado -->
+                <td class="px-6 py-4 text-center">
+                  @let level = getStockLevel(inventory);
+                  <span
+                    class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium"
+                    [ngClass]="getStockColor(level)"
+                  >
+                    @if (level === 'critico') {
+                      <ion-icon name="alert-circle-outline" class="mr-1"></ion-icon>
+                      Agotado
+                    } @else if (level === 'bajo') {
+                      <ion-icon name="alert-circle-outline" class="mr-1"></ion-icon>
+                      Bajo
+                    } @else if (level === 'normal') {
+                      Normal
+                    } @else {
+                      Alto
+                    }
+                  </span>
+                </td>
+
+                <!-- Acciones -->
+                <td class="px-6 py-4 whitespace-nowrap text-right">
+                  <div class="flex items-center justify-end gap-2">
+                    <!-- Ajuste Rápido -->
+                    <button
+                      (click)="openAjusteModal(inventory)"
+                      class="p-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors"
+                      title="Ajustar stock"
+                    >
+                      <ion-icon name="chevron-up"></ion-icon>
+                      <ion-icon name="chevron-down"></ion-icon>
+                    </button>
+
+                    <!-- Editar -->
+                    <button
+                      (click)="openEditForm(inventory)"
+                      class="p-2 text-emily-taupe hover:text-emily-dark hover:bg-emily-light rounded-lg transition-colors"
+                      title="Editar"
+                    >
+                      <ion-icon name="create-outline"></ion-icon>
+                    </button>
+
+                    <!-- Eliminar -->
+                    <button
+                      (click)="openDeleteConfirm(inventory)"
+                      class="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
+                      title="Eliminar"
+                      [disabled]="inventory.stock_reservado > 0"
+                      [class.opacity-50]="inventory.stock_reservado > 0"
+                      [class.cursor-not-allowed]="inventory.stock_reservado > 0"
+                    >
+                      <ion-icon name="trash-outline"></ion-icon>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>
+
+<!-- Modal: Crear/Editar Inventario -->
+@if (isFormOpen()) {
+  <div
+    class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+    (click)="closeForm()"
+  >
+    <div
+      class="bg-emily-white rounded-xl shadow-xl max-w-md w-full"
+      (click)="$event.stopPropagation()"
+    >
+      <!-- Header -->
+      <div class="flex items-center justify-between p-6 border-b border-emily-cream">
+        <h2 class="text-xl font-serif font-bold text-emily-dark">
+          {{ selectedInventory() ? 'Editar Inventario' : 'Nueva Variante' }}
+        </h2>
+        <button (click)="closeForm()" class="p-1 hover:bg-emily-light rounded-lg transition-colors">
+          <ion-icon name="close" class="text-emily-taupe"></ion-icon>
+        </button>
+      </div>
+
+      <!-- Form -->
+      <form [formGroup]="inventoryForm" (ngSubmit)="onSubmitForm()">
+        <div class="p-6 space-y-4">
+          <!-- Talla -->
+          <div>
+            <label class="block text-sm font-medium text-emily-dark mb-2">
+              Talla <span class="text-red-500">*</span>
+            </label>
+            <select
+              formControlName="talla_id"
+              class="w-full px-4 py-3 border border-emily-cream rounded-lg focus:ring-2 focus:ring-emily-rose focus:border-transparent transition-all disabled:bg-emily-light disabled:cursor-not-allowed"
+            >
+              <option value="">Selecciona una talla</option>
+              @for (size of sizes(); track size.id) {
+                <option [value]="size.id">
+                  {{ size.nombre }}
+                </option>
+              }
+            </select>
+            @if (inventoryForm.get('talla_id')?.invalid && inventoryForm.get('talla_id')?.touched) {
+              <p class="text-red-500 text-sm mt-1">La talla es requerida</p>
+            }
+          </div>
+
+          <!-- Color -->
+          <div>
+            <label class="block text-sm font-medium text-emily-dark mb-2">
+              Color <span class="text-red-500">*</span>
+            </label>
+            <select
+              formControlName="color_id"
+              class="w-full px-4 py-3 border border-emily-cream rounded-lg focus:ring-2 focus:ring-emily-rose focus:border-transparent transition-all disabled:bg-emily-light disabled:cursor-not-allowed"
+            >
+              <option value="">Selecciona un color</option>
+              @for (color of colors(); track color.id) {
+                <option [value]="color.id">{{ color.nombre }}</option>
+              }
+            </select>
+            @if (inventoryForm.get('color_id')?.invalid && inventoryForm.get('color_id')?.touched) {
+              <p class="text-red-500 text-sm mt-1">El color es requerido</p>
+            }
+          </div>
+
+          <!-- Stock -->
+          <div>
+            <label class="block text-sm font-medium text-emily-dark mb-2">
+              Stock Total <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="number"
+              min="0"
+              formControlName="stock"
+              class="w-full px-4 py-3 border border-emily-cream rounded-lg focus:ring-2 focus:ring-emily-rose focus:border-transparent transition-all"
+              placeholder="0"
+            />
+            @if (inventoryForm.get('stock')?.invalid && inventoryForm.get('stock')?.touched) {
+              <p class="text-red-500 text-sm mt-1">
+                El stock es requerido y debe ser mayor o igual a 0
+              </p>
+            }
+          </div>
+
+          <!-- Stock Reservado -->
+          <div>
+            <label class="block text-sm font-medium text-emily-dark mb-2"> Stock Reservado </label>
+            <input
+              type="number"
+              min="0"
+              formControlName="stock_reservado"
+              class="w-full px-4 py-3 border border-emily-cream rounded-lg focus:ring-2 focus:ring-emily-rose focus:border-transparent transition-all"
+              placeholder="0"
+            />
+            <p class="text-xs text-emily-taupe mt-1">Stock reservado en carritos de compra</p>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="p-6 border-t border-emily-cream flex gap-3 justify-end">
+          <button
+            type="button"
+            (click)="closeForm()"
+            class="px-6 py-3 rounded-lg border border-emily-cream text-emily-dark hover:bg-emily-light transition-colors"
+            [disabled]="isSubmitting()"
+          >
+            Cancelar
+          </button>
+
+          <button
+            type="submit"
+            class="px-6 py-3 rounded-lg bg-emily-rose text-emily-white hover:bg-emily-rose/90 transition-colors flex items-center gap-2 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            [disabled]="inventoryForm.invalid || isSubmitting()"
+          >
+            @if (isSubmitting()) {
+              <div
+                class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"
+              ></div>
+              <span>Guardando...</span>
+            } @else {
+              <ion-icon name="checkmark"></ion-icon>
+              <span>{{ selectedInventory() ? 'Actualizar' : 'Crear' }}</span>
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+<!-- Modal: Ajustar Stock -->
+@if (isAjusteOpen()) {
+  <div
+    class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+    (click)="closeAjusteModal()"
+  >
+    <div
+      class="bg-emily-white rounded-xl shadow-xl max-w-md w-full"
+      (click)="$event.stopPropagation()"
+    >
+      <!-- Header -->
+      <div class="flex items-center justify-between p-6 border-b border-emily-cream">
+        <div>
+          <h2 class="text-xl font-serif font-bold text-emily-dark">Ajustar Stock</h2>
+          @if (selectedInventory(); as inv) {
+            <p class="text-sm text-emily-taupe mt-1">
+              {{ inv.talla?.nombre }} - {{ inv.color?.nombre }}
+            </p>
+          }
+        </div>
+        <button
+          (click)="closeAjusteModal()"
+          class="p-1 hover:bg-emily-light rounded-lg transition-colors"
+        >
+          <ion-icon name="close" class="text-emily-taupe"></ion-icon>
+        </button>
+      </div>
+
+      <!-- Form -->
+      <form [formGroup]="ajusteForm" (ngSubmit)="onSubmitAjuste()">
+        <div class="p-6 space-y-4">
+          @if (selectedInventory(); as inv) {
+            <!-- Stock Actual -->
+            <div class="bg-emily-cream rounded-lg p-4">
+              <p class="text-sm text-emily-taupe mb-2">Stock Actual</p>
+              <div class="grid grid-cols-3 gap-4 text-center">
+                <div>
+                  <p class="text-2xl font-bold text-emily-dark">{{ inv.stock }}</p>
+                  <p class="text-xs text-emily-taupe">Total</p>
+                </div>
+                <div>
+                  <p class="text-2xl font-bold text-yellow-600">{{ inv.stock_reservado }}</p>
+                  <p class="text-xs text-emily-taupe">Reservado</p>
+                </div>
+                <div>
+                  <p class="text-2xl font-bold text-green-600">
+                    {{ inv.stock - inv.stock_reservado }}
+                  </p>
+                  <p class="text-xs text-emily-taupe">Disponible</p>
+                </div>
+              </div>
+            </div>
+          }
+
+          <!-- Ajuste -->
+          <div>
+            <label class="block text-sm font-medium text-emily-dark mb-2">
+              Ajuste <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="number"
+              formControlName="ajuste"
+              class="w-full px-4 py-3 border border-emily-cream rounded-lg focus:ring-2 focus:ring-emily-rose focus:border-transparent transition-all"
+              placeholder="Ej: +10 o -5"
+            />
+            <p class="text-xs text-emily-taupe mt-1">
+              Usa números positivos para agregar (+10) o negativos para quitar (-5)
+            </p>
+          </div>
+
+          <!-- Razón -->
+          <div>
+            <label class="block text-sm font-medium text-emily-dark mb-2"> Razón (opcional) </label>
+            <input
+              type="text"
+              formControlName="razon"
+              class="w-full px-4 py-3 border border-emily-cream rounded-lg focus:ring-2 focus:ring-emily-rose focus:border-transparent transition-all"
+              placeholder="Ej: Recibido de proveedor, Devolución, etc."
+            />
+          </div>
+
+          <!-- Preview -->
+          @if (ajusteForm.get('ajuste')?.value && selectedInventory(); as inv) {
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <p class="text-sm font-medium text-blue-900 mb-2">Stock Nuevo:</p>
+              <p class="text-3xl font-bold text-blue-600">
+                {{ inv.stock + ajusteForm.get('ajuste')?.value }}
+              </p>
+            </div>
+          }
+        </div>
+
+        <!-- Footer -->
+        <div class="p-6 border-t border-emily-cream flex gap-3 justify-end">
+          <button
+            type="button"
+            (click)="closeAjusteModal()"
+            class="px-6 py-3 rounded-lg border border-emily-cream text-emily-dark hover:bg-emily-light transition-colors"
+            [disabled]="isSubmitting()"
+          >
+            Cancelar
+          </button>
+
+          <button
+            type="submit"
+            class="px-6 py-3 rounded-lg bg-emily-rose text-emily-white hover:bg-emily-rose/90 transition-colors flex items-center gap-2 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            [disabled]="ajusteForm.invalid || isSubmitting()"
+          >
+            @if (isSubmitting()) {
+              <div
+                class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"
+              ></div>
+              <span>Ajustando...</span>
+            } @else {
+              <ion-icon name="checkmark"></ion-icon>
+              <span>Ajustar Stock</span>
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+<!-- Modal de Confirmación Delete -->
+<app-confirm-dialog
+  [isOpen]="isConfirmOpen()"
+  [title]="'¿Eliminar variante?'"
+  [message]="
+    '¿Estás seguro de que deseas eliminar esta variante de inventario? Esta acción no se puede deshacer.'
+  "
+  [confirmText]="'Eliminar'"
+  [cancelText]="'Cancelar'"
+  [type]="'danger'"
+  (confirm)="confirmDelete()"
+  (cancel)="closeDeleteConfirm()"
+/>
+</ion-content>

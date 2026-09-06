@@ -1,0 +1,253 @@
+<ion-header>
+  <ion-toolbar class="ion-padding-horizontal">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>{{ order()?.numero_orden ? 'Orden ' + order()?.numero_orden : 'Orden' }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+<div class="max-w-6xl mx-auto space-y-6">
+  <div class="flex items-center gap-4">
+    <button (click)="goBack()" class="p-2 hover:bg-emily-light rounded-lg transition-colors">
+      <ion-icon name="arrow-back" class="text-emily-dark"></ion-icon>
+    </button>
+    <div class="flex-1">
+      @if (order(); as ord) {
+        <p class="text-emily-taupe">{{ formatDate(ord.fecha_orden) }}</p>
+      }
+    </div>
+    @if (order(); as ord) {
+      <button
+        (click)="openEstadoModal()"
+        class="px-4 py-2 bg-emily-rose text-emily-white rounded-lg hover:bg-emily-rose/90 transition-colors"
+      >
+        Cambiar Estado
+      </button>
+    }
+  </div>
+
+  @if (isLoading()) {
+    <div
+      class="bg-emily-white rounded-xl p-20 shadow-sm border border-emily-cream flex items-center justify-center"
+    >
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-emily-rose"></div>
+    </div>
+  } @else if (order(); as ord) {
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div class="lg:col-span-2 space-y-6">
+        <div class="bg-emily-white rounded-xl shadow-sm border border-emily-cream p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-serif font-semibold text-emily-dark">Productos</h2>
+            <span class="text-sm text-emily-taupe">{{ ord.items.length }} item(s)</span>
+          </div>
+
+          <div class="space-y-4">
+            @for (item of ord.items; track item.id) {
+              <div class="flex gap-4 p-4 bg-emily-cream rounded-lg">
+                <div class="w-16 h-16 bg-emily-light rounded flex items-center justify-center">
+                  <ion-icon name="cube-outline" class="text-emily-taupe"></ion-icon>
+                </div>
+                <div class="flex-1">
+                  <h3 class="font-medium text-emily-dark">{{ item.nombre_producto }}</h3>
+                  <div class="flex gap-4 text-sm text-emily-taupe mt-1">
+                    <span>Cantidad: {{ item.cantidad }}</span>
+                    <span>Precio: {{ formatCurrency(item.precio_unitario) }}</span>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <p class="font-bold text-emily-dark">{{ formatCurrency(item.subtotal) }}</p>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="bg-emily-white rounded-xl shadow-sm border border-emily-cream p-6">
+          <h2 class="text-lg font-serif font-semibold text-emily-dark mb-4">Dirección de Envío</h2>
+          <div class="flex items-start gap-3">
+            <ion-icon name="location-outline" class="text-emily-taupe mt-1"></ion-icon>
+            <p class="text-emily-dark whitespace-pre-line">{{ ord.direccion_envio }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="space-y-6">
+        <div class="bg-emily-white rounded-xl shadow-sm border border-emily-cream p-6">
+          <h2 class="text-lg font-serif font-semibold text-emily-dark mb-4">Estado</h2>
+          <div class="flex justify-center mb-4">
+            <span
+              class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium border"
+              [ngClass]="getEstadoColor(ord.estado)"
+            >
+              <ion-icon [name]="getEstadoIcon(ord.estado)" class="mr-2"></ion-icon>
+              {{ ord.estado }}
+            </span>
+          </div>
+          @if (ord.fecha_actualizacion_estado) {
+            <p class="text-xs text-emily-taupe text-center">
+              Actualizado: {{ formatDate(ord.fecha_actualizacion_estado) }}
+            </p>
+          }
+          @if (ord.motivo_cancelacion) {
+            <div class="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+              <p class="text-xs font-medium text-red-800 mb-1">Motivo de cancelación:</p>
+              <p class="text-sm text-red-700">{{ ord.motivo_cancelacion }}</p>
+            </div>
+          }
+        </div>
+
+        <div class="bg-emily-white rounded-xl shadow-sm border border-emily-cream p-6">
+          <h2 class="text-lg font-serif font-semibold text-emily-dark mb-4">Cliente</h2>
+          @if (ord.usuario; as usuario) {
+            <div class="space-y-3">
+              <div class="flex items-center gap-3">
+                <ion-icon name="person-outline" class="text-emily-taupe"></ion-icon>
+                <div>
+                  <p class="font-medium text-emily-dark">
+                    {{ usuario.nombre_completo }}
+                  </p>
+                  <p class="text-sm text-emily-taupe">{{ usuario.email }}</p>
+                </div>
+              </div>
+            </div>
+          } @else {
+            <p class="text-sm text-emily-taupe">Sin información del cliente</p>
+          }
+        </div>
+
+        <div class="bg-emily-white rounded-xl shadow-sm border border-emily-cream p-6">
+          <h2 class="text-lg font-serif font-semibold text-emily-dark mb-4">Resumen</h2>
+          <div class="space-y-3">
+            <div class="flex justify-between text-sm">
+              <span class="text-emily-taupe">Subtotal:</span>
+              <span class="font-medium text-emily-dark">{{ formatCurrency(ord.subtotal) }}</span>
+            </div>
+            <div class="flex justify-between text-sm">
+              <span class="text-emily-taupe">Envío:</span>
+              <span class="font-medium text-emily-dark">{{ formatCurrency(ord.costo_envio) }}</span>
+            </div>
+            <div class="flex justify-between text-sm">
+              <span class="text-emily-taupe">Impuestos:</span>
+              <span class="font-medium text-emily-dark">{{ formatCurrency(ord.impuestos) }}</span>
+            </div>
+            <div class="pt-3 border-t border-emily-cream">
+              <div class="flex justify-between">
+                <span class="font-semibold text-emily-dark">Total:</span>
+                <span class="font-bold text-lg text-emily-rose">{{
+                  formatCurrency(ord.total)
+                }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-emily-white rounded-xl shadow-sm border border-emily-cream p-6">
+          <h2 class="text-lg font-serif font-semibold text-emily-dark mb-4">Pago</h2>
+          <div class="flex items-center gap-3">
+            <ion-icon name="card-outline" class="text-emily-taupe"></ion-icon>
+            <div>
+              <p class="font-medium text-emily-dark">{{ ord.metodo_pago || 'No especificado' }}</p>
+              @if (ord.stripe_payment_id) {
+                <p class="text-xs text-emily-taupe">ID: {{ ord.stripe_payment_id }}</p>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>
+
+@if (isModalOpen()) {
+  <div
+    class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+    (click)="closeEstadoModal()"
+  >
+    <div
+      class="bg-emily-white rounded-xl shadow-xl max-w-md w-full"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="flex items-center justify-between p-6 border-b border-emily-cream">
+        <h2 class="text-xl font-serif font-bold text-emily-dark">Cambiar Estado</h2>
+        <button
+          (click)="closeEstadoModal()"
+          class="p-1 hover:bg-emily-light rounded-lg transition-colors"
+        >
+          <ion-icon name="close" class="text-emily-taupe"></ion-icon>
+        </button>
+      </div>
+
+      <form [formGroup]="estadoForm" (ngSubmit)="onSubmitEstado()">
+        <div class="p-6 space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-emily-dark mb-2">
+              Nuevo Estado <span class="text-red-500">*</span>
+            </label>
+            <select
+              formControlName="estado"
+              class="w-full px-4 py-3 border border-emily-cream rounded-lg focus:ring-2 focus:ring-emily-rose focus:border-transparent transition-all"
+            >
+              <option value="">Selecciona un estado</option>
+              @for (estado of estadosDisponibles; track estado) {
+                <option [value]="estado">{{ estado }}</option>
+              }
+            </select>
+            @if (estadoForm.get('estado')?.invalid && estadoForm.get('estado')?.touched) {
+              <p class="text-red-500 text-sm mt-1">El estado es requerido</p>
+            }
+          </div>
+
+          @if (estadoForm.get('estado')?.value === 'Cancelado') {
+            <div>
+              <label class="block text-sm font-medium text-emily-dark mb-2">
+                Motivo de Cancelación <span class="text-red-500">*</span>
+              </label>
+              <textarea
+                formControlName="motivo_cancelacion"
+                rows="3"
+                class="w-full px-4 py-3 border border-emily-cream rounded-lg focus:ring-2 focus:ring-emily-rose focus:border-transparent transition-all resize-none"
+                placeholder="Explica por qué se cancela la orden..."
+              ></textarea>
+              @if (
+                estadoForm.get('motivo_cancelacion')?.invalid &&
+                estadoForm.get('motivo_cancelacion')?.touched
+              ) {
+                <p class="text-red-500 text-sm mt-1">El motivo es requerido al cancelar</p>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="p-6 border-t border-emily-cream flex gap-3 justify-end">
+          <button
+            type="button"
+            (click)="closeEstadoModal()"
+            class="px-6 py-3 rounded-lg border border-emily-cream text-emily-dark hover:bg-emily-light transition-colors"
+            [disabled]="isSubmitting()"
+          >
+            Cancelar
+          </button>
+
+          <button
+            type="submit"
+            class="px-6 py-3 rounded-lg bg-emily-rose text-emily-white hover:bg-emily-rose/90 transition-colors flex items-center gap-2 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            [disabled]="estadoForm.invalid || isSubmitting()"
+          >
+            @if (isSubmitting()) {
+              <div
+                class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"
+              ></div>
+              <span>Actualizando...</span>
+            } @else {
+              <ion-icon name="checkmark"></ion-icon>
+              <span>Actualizar Estado</span>
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+</ion-content>

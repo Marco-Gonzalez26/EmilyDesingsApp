@@ -1,0 +1,124 @@
+<div id="analysis-tab-content" class="space-y-6">
+  <div class="flex items-center justify-between">
+    <div>
+      <h2 class="text-2xl font-serif font-bold text-emily-dark">Productos Recomendados</h2>
+      <p class="text-emily-taupe mt-1">
+        Ranking de los productos que el motor de IA recomienda con mayor frecuencia
+      </p>
+    </div>
+  </div>
+
+  @if (cargando()) {
+    <div class="flex items-center justify-center py-20">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-emily-rose"></div>
+    </div>
+  } @else {
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="bg-emily-white rounded-xl p-6 shadow-sm border border-emily-cream">
+        <div class="flex items-center justify-between">
+          <div class="p-3 bg-emily-rose rounded-lg">
+            <ion-icon name="sparkles-outline" class="text-emily-white text-2xl"></ion-icon>
+          </div>
+          <div class="text-right">
+            <p class="text-3xl font-bold text-emily-dark">{{ getTotalRecomendaciones() }}</p>
+            <p class="text-sm text-emily-taupe mt-1">Recomendaciones Totales</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-emily-white rounded-xl p-6 shadow-sm border border-emily-cream">
+        <div class="flex items-center justify-between">
+          <div class="p-3 bg-emily-gold rounded-lg">
+            <ion-icon name="cube-outline" class="text-emily-white text-2xl"></ion-icon>
+          </div>
+          <div class="text-right">
+            <p class="text-3xl font-bold text-emily-dark">{{ topProductos().length }}</p>
+            <p class="text-sm text-emily-taupe mt-1">Productos Distintos</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-emily-white rounded-xl p-6 shadow-sm border border-emily-cream">
+        <div class="flex items-center justify-between">
+          <div class="p-3 bg-emily-sage rounded-lg">
+            <ion-icon name="stats-chart-outline" class="text-emily-white text-2xl"></ion-icon>
+          </div>
+          <div class="text-right">
+            <p class="text-3xl font-bold text-emily-dark">{{ getScorePromedio() }}</p>
+            <p class="text-sm text-emily-taupe mt-1">Score Promedio</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-emily-white rounded-xl shadow-sm border border-emily-cream overflow-hidden">
+      <div class="p-6 border-b border-emily-cream">
+        <h3 class="text-lg font-serif font-semibold text-emily-dark">
+          Top 10 Productos Más Recomendados
+        </h3>
+        <p class="text-sm text-emily-taupe mt-1">
+          Productos que la IA recomienda con mayor frecuencia
+        </p>
+      </div>
+
+      @if (topProductos().length === 0) {
+        <div class="p-12 text-center text-emily-taupe">
+          No hay datos de recomendaciones disponibles
+        </div>
+      } @else {
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead class="bg-emily-cream">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-emily-taupe uppercase">
+                  #
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-emily-taupe uppercase">
+                  Producto
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-emily-taupe uppercase">
+                  Categoría
+                </th>
+                <th class="px-6 py-3 text-right text-xs font-medium text-emily-taupe uppercase">
+                  Veces Recomendado
+                </th>
+                <th class="px-6 py-3 text-right text-xs font-medium text-emily-taupe uppercase">
+                  Veces Agregado
+                </th>
+                <th class="px-6 py-3 text-right text-xs font-medium text-emily-taupe uppercase">
+                  Tasa Conversión
+                </th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-emily-cream">
+              @for (producto of topProductos(); track $index) {
+                <tr class="hover:bg-emily-light transition-colors">
+                  <td class="px-6 py-4">
+                    <span
+                      class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emily-rose text-emily-white text-xs font-bold"
+                    >
+                      {{ $index + 1 }}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 text-sm font-medium text-emily-dark">
+                    {{ producto.nombre }}
+                  </td>
+                  <td class="px-6 py-4 text-sm text-emily-taupe">{{ producto.categoria }}</td>
+                  <td class="px-6 py-4 text-sm font-medium text-emily-dark text-right">
+                    {{ producto.veces_recomendado }}
+                  </td>
+                  <td class="px-6 py-4 text-sm font-medium text-emily-dark text-right">
+                    {{ producto.veces_agregado }}
+                  </td>
+                  <td class="px-6 py-4 text-sm font-medium text-emily-sage text-right">
+                    {{ formatTasa(producto.tasa_conversion) }}
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  }
+</div>

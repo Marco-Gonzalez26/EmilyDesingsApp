@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">EmilyDesigns</string>
+    <string name="title_activity_main">EmilyDesigns</string>
+    <string name="package_name">com.emilydesigns.mobile</string>
+    <string name="custom_url_scheme">com.emilydesigns.mobile</string>
+</resources>

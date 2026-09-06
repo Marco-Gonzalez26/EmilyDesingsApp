@@ -1,0 +1,218 @@
+<ion-header>
+  <ion-toolbar class="ion-padding-horizontal">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/admin/usuarios"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ getTitle() }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+<div class="max-w-3xl mx-auto space-y-6">
+  <p class="text-emily-taupe">
+    {{
+      isEditMode()
+        ? 'Actualiza los datos del usuario'
+        : 'Completa el formulario para crear un nuevo usuario'
+    }}
+  </p>
+
+  @if (isLoading()) {
+    <div
+      class="bg-emily-white rounded-xl p-20 shadow-sm border border-emily-cream flex items-center justify-center"
+    >
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-emily-rose"></div>
+    </div>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="bg-emily-white rounded-xl shadow-sm border border-emily-cream">
+        <div class="p-6 border-b border-emily-cream">
+          <h3 class="text-lg font-serif font-semibold text-emily-dark">Información Básica</h3>
+        </div>
+
+        <div class="p-6 space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="md:col-span-2">
+              <label class="block text-sm font-medium text-emily-dark mb-2">
+                Email <span class="text-red-500">*</span>
+              </label>
+              <div class="relative">
+                <div class="absolute left-4 top-1/2 -translate-y-1/2">
+                  <ion-icon name="mail-outline" class="text-emily-taupe"></ion-icon>
+                </div>
+                <input
+                  type="email"
+                  formControlName="email"
+                  class="w-full pl-12 pr-4 py-3 border border-emily-cream rounded-lg focus:ring-2 focus:ring-emily-rose focus:border-transparent transition-all disabled:bg-emily-light disabled:cursor-not-allowed"
+                  placeholder="usuario@ejemplo.com"
+                />
+              </div>
+              @if (form.get('email')?.invalid && form.get('email')?.touched) {
+                <p class="text-red-500 text-sm mt-1">Email válido requerido</p>
+              }
+            </div>
+
+            @if (!isEditMode()) {
+              <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-emily-dark mb-2">
+                  Contraseña <span class="text-red-500">*</span>
+                </label>
+                <div class="relative">
+                  <div class="absolute left-4 top-1/2 -translate-y-1/2">
+                    <ion-icon name="shield-checkmark-outline" class="text-emily-taupe"></ion-icon>
+                  </div>
+                  <input
+                    [type]="showPassword() ? 'text' : 'password'"
+                    formControlName="password"
+                    class="w-full pl-12 pr-12 py-3 border border-emily-cream rounded-lg focus:ring-2 focus:ring-emily-rose focus:border-transparent transition-all"
+                    placeholder="Mínimo 6 caracteres"
+                  />
+                  <button
+                    type="button"
+                    (click)="togglePasswordVisibility()"
+                    class="absolute right-3 top-1/2 -translate-y-1/2 text-emily-taupe hover:text-emily-dark"
+                  >
+                    {{ showPassword() ? '👁️' : '👁️‍🗨️' }}
+                  </button>
+                </div>
+                @if (form.get('password')?.invalid && form.get('password')?.touched) {
+                  <p class="text-red-500 text-sm mt-1">Mínimo 6 caracteres</p>
+                }
+              </div>
+            }
+
+            <div class="md:col-span-2">
+              <label class="block text-sm font-medium text-emily-dark mb-2">
+                Nombre Completo <span class="text-red-500">*</span>
+              </label>
+              <div class="relative">
+                <div class="absolute left-4 top-1/2 -translate-y-1/2">
+                  <ion-icon name="person-outline" class="text-emily-taupe"></ion-icon>
+                </div>
+                <input
+                  type="text"
+                  formControlName="nombre_completo"
+                  class="w-full pl-12 pr-4 py-3 border border-emily-cream rounded-lg focus:ring-2 focus:ring-emily-rose focus:border-transparent transition-all"
+                  placeholder="Juan Pérez García"
+                />
+              </div>
+              @if (form.get('nombre_completo')?.invalid && form.get('nombre_completo')?.touched) {
+                <p class="text-red-500 text-sm mt-1">Nombre requerido (mínimo 2 caracteres)</p>
+              }
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-emily-dark mb-2"> Teléfono </label>
+              <div class="relative">
+                <div class="absolute left-4 top-1/2 -translate-y-1/2">
+                  <ion-icon name="call-outline" class="text-emily-taupe"></ion-icon>
+                </div>
+                <input
+                  type="tel"
+                  formControlName="telefono"
+                  class="w-full pl-12 pr-4 py-3 border border-emily-cream rounded-lg focus:ring-2 focus:ring-emily-rose focus:border-transparent transition-all"
+                  placeholder="0987654321"
+                />
+              </div>
+              @if (form.get('telefono')?.invalid && form.get('telefono')?.touched) {
+                <p class="text-red-500 text-sm mt-1">Debe tener 10 dígitos</p>
+              }
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-emily-dark mb-2"> Cédula / RUC </label>
+              <div class="relative">
+                <div class="absolute left-4 top-1/2 -translate-y-1/2">
+                  <ion-icon name="card-outline" class="text-emily-taupe"></ion-icon>
+                </div>
+                <input
+                  type="text"
+                  formControlName="cedula_ruc"
+                  class="w-full pl-12 pr-4 py-3 border border-emily-cream rounded-lg focus:ring-2 focus:ring-emily-rose focus:border-transparent transition-all"
+                  placeholder="1234567890"
+                />
+              </div>
+              @if (form.get('cedula_ruc')?.invalid && form.get('cedula_ruc')?.touched) {
+                <p class="text-red-500 text-sm mt-1">Debe tener entre 10 y 13 dígitos</p>
+              }
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-emily-dark mb-2"> Ciudad </label>
+              <div class="relative">
+                <div class="absolute left-4 top-1/2 -translate-y-1/2">
+                  <ion-icon name="card-outline" class="text-emily-taupe"></ion-icon>
+                </div>
+                <input
+                  type="text"
+                  formControlName="ciudad"
+                  class="w-full pl-12 pr-4 py-3 border border-emily-cream rounded-lg focus:ring-2 focus:ring-emily-rose focus:border-transparent transition-all"
+                  placeholder="Quevedo"
+                />
+              </div>
+              @if (form.get('ciudad')?.invalid && form.get('ciudad')?.touched) {
+                <p class="text-red-500 text-sm mt-1">Ciudad requerida</p>
+              }
+            </div>
+
+            <div class="md:col-span-2">
+              <label class="block text-sm font-medium text-emily-dark mb-2"> Dirección </label>
+              <div class="relative">
+                <div class="absolute left-4 top-4">
+                  <ion-icon name="location-outline" class="text-emily-taupe"></ion-icon>
+                </div>
+                <textarea
+                  formControlName="direccion"
+                  rows="3"
+                  class="w-full pl-12 pr-4 py-3 border border-emily-cream rounded-lg focus:ring-2 focus:ring-emily-rose focus:border-transparent transition-all resize-none"
+                  placeholder="Av. Principal 123, Quito, Ecuador"
+                ></textarea>
+              </div>
+            </div>
+
+            <div class="md:col-span-2">
+              <label class="block text-sm font-medium text-emily-dark mb-2">
+                Rol <span class="text-red-500">*</span>
+              </label>
+              <select
+                formControlName="rol"
+                class="w-full px-4 py-3 border border-emily-cream rounded-lg focus:ring-2 focus:ring-emily-rose focus:border-transparent transition-all"
+              >
+                <option value="cliente">Cliente</option>
+                <option value="administrador">Administrador</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-6 border-t border-emily-cream flex gap-3 justify-end">
+          <button
+            type="button"
+            (click)="goBack()"
+            class="px-6 py-3 rounded-lg border border-emily-cream text-emily-dark hover:bg-emily-light transition-colors"
+            [disabled]="isSubmitting()"
+          >
+            Cancelar
+          </button>
+
+          <button
+            type="submit"
+            class="px-6 py-3 rounded-lg bg-emily-rose text-emily-white hover:bg-emily-rose/90 transition-colors flex items-center gap-2 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            [disabled]="form.invalid || isSubmitting()"
+          >
+            @if (isSubmitting()) {
+              <div
+                class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"
+              ></div>
+              <span>{{ getSubmitLabel() }}</span>
+            } @else {
+              <ion-icon name="checkmark"></ion-icon>
+              <span>{{ getSubmitLabel() }}</span>
+            }
+          </button>
+        </div>
+      </div>
+    </form>
+  }
+</div>
+</ion-content>
