@@ -1,0 +1,126 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/cuenta"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Crear cuenta</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="w-full max-w-md mx-auto">
+    <div class="text-center mb-6">
+      <h1 class="text-3xl font-serif text-emily-gold mb-1">Emily Designs</h1>
+      <h2 class="text-lg text-emily-dark">Crear Cuenta</h2>
+    </div>
+
+    @if (errorMessage) {
+      <div class="bg-emily-rose/20 border border-emily-rose text-emily-dark px-4 py-3 rounded-lg text-sm mb-4">
+        {{ errorMessage }}
+      </div>
+    }
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="space-y-4">
+      <ion-item>
+        <ion-label position="stacked">Nombre completo</ion-label>
+        <ion-input type="text" formControlName="nombre_completo" placeholder="Nombre completo"></ion-input>
+      </ion-item>
+      @if (nombre_completo?.invalid && nombre_completo?.touched) {
+        <p class="text-sm text-emily-rose px-2 -mt-2">El nombre es requerido</p>
+      }
+
+      <ion-item>
+        <ion-label position="stacked">Cédula o RUC</ion-label>
+        <ion-input type="text" formControlName="cedula_ruc" placeholder="10 o 13 dígitos"></ion-input>
+      </ion-item>
+      @if (cedula_ruc?.invalid && cedula_ruc?.touched) {
+        <p class="text-sm text-emily-rose px-2 -mt-2">
+          @if (cedula_ruc?.errors?.['required']) { La cédula o RUC es requerido }
+          @if (cedula_ruc?.errors?.['pattern']) { Ingresa una cédula (10 dígitos) o RUC (13 dígitos) válido }
+        </p>
+      }
+
+      <ion-item>
+        <ion-label position="stacked">Correo electrónico</ion-label>
+        <ion-input type="email" formControlName="email" placeholder="correo@ejemplo.com"></ion-input>
+      </ion-item>
+      @if (email?.invalid && email?.touched) {
+        <p class="text-sm text-emily-rose px-2 -mt-2">
+          @if (email?.errors?.['required']) { El email es requerido }
+          @if (email?.errors?.['email']) { Ingresa un email válido }
+        </p>
+      }
+
+      <ion-item>
+        <ion-label position="stacked">Contraseña</ion-label>
+        <ion-input
+          [type]="showPassword ? 'text' : 'password'"
+          formControlName="password"
+          placeholder="Mínimo 8 caracteres"
+        >
+          <ion-button slot="end" fill="clear" (click)="togglePasswordVisibility()">
+            <ion-icon slot="icon-only" [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+          </ion-button>
+        </ion-input>
+      </ion-item>
+      @if (password?.invalid && password?.touched) {
+        <p class="text-sm text-emily-rose px-2 -mt-2">
+          @if (password?.errors?.['required']) { La contraseña es requerida }
+          @if (password?.errors?.['minlength']) { Mínimo 8 caracteres }
+        </p>
+      }
+
+      <div class="flex gap-3">
+        <ion-item class="flex-1">
+          <ion-label position="stacked">Ciudad <span class="text-emily-rose">*</span></ion-label>
+          <ion-input type="text" formControlName="ciudad" placeholder="Quevedo"></ion-input>
+        </ion-item>
+        <ion-item class="flex-1">
+          <ion-label position="stacked">Teléfono <span class="text-emily-rose">*</span></ion-label>
+          <ion-input type="tel" formControlName="telefono" placeholder="0987654321"></ion-input>
+        </ion-item>
+      </div>
+      @if ((ciudad?.invalid && ciudad?.touched) || (telefono?.invalid && telefono?.touched)) {
+        <p class="text-sm text-emily-rose px-2 -mt-2">
+          @if (ciudad?.errors?.['required']) { La ciudad es requerida }
+          @if (telefono?.errors?.['required']) { El teléfono es requerido }
+          @if (telefono?.errors?.['pattern']) { Teléfono 7-15 dígitos }
+        </p>
+      }
+
+      <ion-item>
+        <ion-label position="stacked">Dirección <span class="text-emily-rose">*</span></ion-label>
+        <ion-input type="text" formControlName="direccion" placeholder="Calle principal y secundaria"></ion-input>
+      </ion-item>
+      @if (direccion?.invalid && direccion?.touched) {
+        <p class="text-sm text-emily-rose px-2 -mt-2">La dirección es requerida (mínimo 3 caracteres)</p>
+      }
+
+      <label class="flex items-start gap-3 px-2 py-2 border rounded-lg" [class.border-emily-rose]="acepta_terminos?.invalid && acepta_terminos?.touched" [class.bg-emily-rose/5]="acepta_terminos?.invalid && acepta_terminos?.touched">
+        <input type="checkbox" formControlName="acepta_terminos" class="mt-1 accent-emily-dark" />
+        <span class="text-sm text-emily-dark leading-tight">
+          Acepto los
+          <button type="button" class="text-emily-gold underline font-medium" (click)="abrirTerminos()">Términos y Condiciones y la LOPDP del Ecuador</button>
+          <span class="text-emily-rose">*</span>
+        </span>
+      </label>
+      @if (acepta_terminos?.invalid && acepta_terminos?.touched) {
+        <p class="text-sm text-emily-rose px-2 -mt-2">Debes aceptar los Términos y Condiciones</p>
+      }
+
+      <ion-button type="submit" expand="block" color="primary" [disabled]="isLoading || registerForm.invalid">
+        @if (isLoading) {
+          <ion-spinner name="crescent" slot="start"></ion-spinner>
+          Creando cuenta...
+        } @else {
+          Registrarme
+        }
+      </ion-button>
+
+      <p class="text-center text-sm text-emily-taupe">
+        ¿Ya tienes una cuenta?
+        <a routerLink="/iniciar-sesion" class="text-emily-gold font-medium">Inicia sesión</a>
+      </p>
+    </form>
+  </div>
+</ion-content>
