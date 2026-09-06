@@ -1,0 +1,641 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/catalogo"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Perfil</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="">
+  <div class="bg-emily-cream py-8 px-4">
+    <div class="max-w-6xl mx-auto space-y-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-3xl font-serif font-bold text-emily-dark">
+            Mi Perfil
+          </h1>
+          <p class="text-emily-taupe mt-1">Gestiona tu información personal</p>
+        </div>
+      </div>
+
+      @if (isLoading()) {
+        <div class="flex items-center justify-center py-20">
+          <div
+            class="animate-spin rounded-full h-12 w-12 border-b-2 border-emily-rose"
+          ></div>
+        </div>
+      } @else if (user(); as currentUser) {
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="lg:col-span-1 space-y-6">
+            <div
+              class="bg-emily-white rounded-xl p-6 shadow-sm border border-emily-cream text-center"
+            >
+              <div
+                class="w-24 h-24 mx-auto mb-4 bg-emily-rose rounded-full flex items-center justify-center"
+              >
+                <span class="text-3xl font-bold text-emily-white">{{
+                  userInitials()
+                }}</span>
+              </div>
+
+              <h2 class="text-xl font-serif font-bold text-emily-dark mb-1">
+                {{ currentUser.nombre_completo || "Usuario" }}
+              </h2>
+
+              <p class="text-sm text-emily-taupe mb-3">
+                {{ currentUser.email }}
+              </p>
+
+              <span
+                class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium"
+                [ngClass]="getRolBadge(currentUser.rol)"
+              >
+                {{ getRolLabel(currentUser.rol) }}
+              </span>
+
+              <div
+                class="mt-4 pt-4 border-t border-emily-cream text-xs text-emily-taupe"
+              >
+                <p>Miembro desde</p>
+                <p class="font-medium text-emily-dark">
+                  {{ formatDate(currentUser.fecha_registro) }}
+                </p>
+              </div>
+            </div>
+
+            <!-- Stats -->
+            @if (statistics(); as stats) {
+              <div
+                class="bg-emily-white rounded-xl p-6 shadow-sm border border-emily-cream"
+              >
+                <h3
+                  class="text-lg font-serif font-semibold text-emily-dark mb-4"
+                >
+                  Estadísticas
+                </h3>
+
+                <div class="space-y-4">
+                  <div class="flex items-center justify-between">
+                    <span class="text-sm text-emily-taupe">Total Órdenes</span>
+                    <span class="text-lg font-bold text-emily-dark">{{
+                      stats.total_ordenes
+                    }}</span>
+                  </div>
+
+                  <div class="flex items-center justify-between">
+                    <span class="text-sm text-emily-taupe">Completadas</span>
+                    <span class="text-lg font-bold text-green-600">{{
+                      stats.ordenes_completadas
+                    }}</span>
+                  </div>
+
+                  <div class="flex items-center justify-between">
+                    <span class="text-sm text-emily-taupe">Total Gastado</span>
+                    <span class="text-lg font-bold text-emily-rose">{{
+                      formatCurrency(stats.total_gastado)
+                    }}</span>
+                  </div>
+
+                  <div class="flex items-center justify-between">
+                    <span class="text-sm text-emily-taupe"
+                      >Ticket Promedio</span
+                    >
+                    <span class="text-base font-medium text-emily-dark">{{
+                      formatCurrency(stats.ticket_promedio)
+                    }}</span>
+                  </div>
+
+                  <div class="flex items-center justify-between">
+                    <span class="text-sm text-emily-taupe"
+                      >Productos recomendados</span
+                    >
+                    <span class="text-sm font-medium text-emily-dark text-right"
+                      >Te hemos recomendado
+                      {{ seleccionadosPrefs().size * 2 || 5 }} productos según
+                      tus preferencias</span
+                    >
+                  </div>
+                </div>
+              </div>
+              <a
+                routerLink="/ordenes"
+                class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-emily-dark text-white rounded-xl hover:bg-emily-taupe transition font-medium"
+              >
+                <ion-icon name="cart-outline"></ion-icon
+                ><span>Ver órdenes</span>
+              </a>
+            }
+
+            <!-- <div class="bg-red-50 rounded-xl p-6 shadow-sm border border-red-200">
+            <h3 class="text-lg font-serif font-semibold text-red-800 mb-2">Zona de Peligro</h3>
+            <p class="text-sm text-red-600 mb-4">Esta acción es irreversible</p>
+            <button
+              (click)="deleteAccount()"
+              class="w-full flex items-center justify-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+            >
+              <ion-icon name="trash-outline"></ion-icon>
+              <span>Eliminar Cuenta</span>
+            </button>
+          </div> -->
+          </div>
+
+          <div class="lg:col-span-2 space-y-6">
+            <div
+              class="bg-emily-white rounded-xl shadow-sm border border-emily-cream"
+            >
+              <div
+                class="p-6 border-b border-emily-cream flex items-center justify-between"
+              >
+                <div>
+                  <h3 class="text-lg font-serif font-semibold text-emily-dark">
+                    Información Personal
+                  </h3>
+                  <p class="text-sm text-emily-taupe mt-1">
+                    Actualiza tus datos personales
+                  </p>
+                </div>
+                @if (!isEditMode()) {
+                  <button
+                    (click)="enableEditMode()"
+                    class="flex items-center gap-2 px-4 py-2 border border-emily-cream text-emily-dark rounded-lg hover:bg-emily-light transition-colors"
+                  >
+                    <ion-icon name="create-outline"></ion-icon>
+                    <span>Editar</span>
+                  </button>
+                }
+              </div>
+
+              <div class="p-6">
+                <form [formGroup]="profileForm" (ngSubmit)="onSubmitProfile()">
+                  <div class="space-y-4">
+                    <!-- Email (Read-only) -->
+                    <div>
+                      <label
+                        class="block text-sm font-medium text-emily-dark mb-2"
+                      >
+                        Email
+                      </label>
+                      <input
+                        type="email"
+                        [value]="currentUser.email"
+                        disabled
+                        class="w-full px-4 py-3 border border-emily-cream rounded-lg bg-emily-light text-emily-taupe cursor-not-allowed"
+                      />
+                      <p class="text-xs text-emily-taupe mt-1">
+                        El email no se puede cambiar
+                      </p>
+                    </div>
+
+                    <div>
+                      <label
+                        class="block text-sm font-medium text-emily-dark mb-2"
+                      >
+                        Nombre Completo <span class="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        formControlName="nombre_completo"
+                        [disabled]="!isEditMode()"
+                        class="w-full px-4 py-3 border border-emily-cream rounded-lg focus:ring-2 focus:ring-emily-rose focus:border-transparent transition-all disabled:bg-emily-light disabled:cursor-not-allowed"
+                        placeholder="Juan Pérez"
+                      />
+                      @if (
+                        profileForm.get("nombre_completo")?.invalid &&
+                        profileForm.get("nombre_completo")?.touched
+                      ) {
+                        <p class="text-red-500 text-sm mt-1">
+                          El nombre es requerido (mínimo 2 caracteres)
+                        </p>
+                      }
+                    </div>
+
+                    <div>
+                      <label
+                        class="block text-sm font-medium text-emily-dark mb-2"
+                      >
+                        Teléfono
+                      </label>
+                      <div class="relative">
+                        <div class="absolute left-4 top-1/2 -translate-y-1/2">
+                          <ion-icon
+                            name="call-outline"
+                            class="text-emily-taupe"
+                          ></ion-icon>
+                        </div>
+                        <input
+                          type="tel"
+                          formControlName="telefono"
+                          [disabled]="!isEditMode()"
+                          class="w-full pl-12 pr-4 py-3 border border-emily-cream rounded-lg focus:ring-2 focus:ring-emily-rose focus:border-transparent transition-all disabled:bg-emily-light disabled:cursor-not-allowed"
+                          placeholder="0987654321"
+                        />
+                      </div>
+                      @if (
+                        profileForm.get("telefono")?.invalid &&
+                        profileForm.get("telefono")?.touched
+                      ) {
+                        <p class="text-red-500 text-sm mt-1">
+                          Debe tener 10 dígitos
+                        </p>
+                      }
+                    </div>
+
+                    <div>
+                      <label
+                        class="block text-sm font-medium text-emily-dark mb-2"
+                      >
+                        Cédula / RUC
+                      </label>
+                      <div class="relative">
+                        <div class="absolute left-4 top-1/2 -translate-y-1/2">
+                          <ion-icon
+                            name="card-outline"
+                            class="text-emily-taupe"
+                          ></ion-icon>
+                        </div>
+                        <input
+                          type="text"
+                          formControlName="cedula_ruc"
+                          [disabled]="!isEditMode()"
+                          class="w-full pl-12 pr-4 py-3 border border-emily-cream rounded-lg focus:ring-2 focus:ring-emily-rose focus:border-transparent transition-all disabled:bg-emily-light disabled:cursor-not-allowed"
+                          placeholder="1234567890"
+                        />
+                      </div>
+                      @if (
+                        profileForm.get("cedula_ruc")?.invalid &&
+                        profileForm.get("cedula_ruc")?.touched
+                      ) {
+                        <p class="text-red-500 text-sm mt-1">
+                          Debe tener entre 10 y 13 dígitos
+                        </p>
+                      }
+                    </div>
+
+                    <div>
+                      <label
+                        class="block text-sm font-medium text-emily-dark mb-2"
+                      >
+                        Dirección
+                      </label>
+                      <div class="relative">
+                        <div class="absolute left-4 top-4">
+                          <ion-icon
+                            name="location-outline"
+                            class="text-emily-taupe"
+                          ></ion-icon>
+                        </div>
+                        <textarea
+                          formControlName="direccion"
+                          [disabled]="!isEditMode()"
+                          rows="3"
+                          class="w-full pl-12 pr-4 py-3 border border-emily-cream rounded-lg focus:ring-2 focus:ring-emily-rose focus:border-transparent transition-all resize-none disabled:bg-emily-light disabled:cursor-not-allowed"
+                          placeholder="Av. Principal 123, Quito, Ecuador"
+                        ></textarea>
+                      </div>
+                    </div>
+                  </div>
+
+                  @if (isEditMode()) {
+                    <div
+                      class="flex gap-3 justify-end mt-6 pt-6 border-t border-emily-cream"
+                    >
+                      <button
+                        type="button"
+                        (click)="cancelEdit()"
+                        class="px-6 py-3 rounded-lg border border-emily-cream text-emily-dark hover:bg-emily-light transition-colors"
+                        [disabled]="isSubmitting()"
+                      >
+                        Cancelar
+                      </button>
+
+                      <button
+                        type="submit"
+                        class="px-6 py-3 rounded-lg bg-emily-rose text-emily-white hover:bg-emily-rose/90 transition-colors flex items-center gap-2 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                        [disabled]="profileForm.invalid || isSubmitting()"
+                      >
+                        @if (isSubmitting()) {
+                          <div
+                            class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"
+                          ></div>
+                          <span>Guardando...</span>
+                        } @else {
+                          <ion-icon name="checkmark"></ion-icon>
+                          <span>Guardar Cambios</span>
+                        }
+                      </button>
+                    </div>
+                  }
+                </form>
+              </div>
+            </div>
+
+            <div
+              class="bg-emily-white rounded-xl shadow-sm border border-emily-cream"
+            >
+              <div
+                class="p-6 border-b border-emily-cream flex items-center justify-between"
+              >
+                <div>
+                  <h3 class="text-lg font-serif font-semibold text-emily-dark">
+                    Preferencias de estilo
+                  </h3>
+                  <p class="text-sm text-emily-taupe mt-1">
+                    Alimenta tu Para Ti — hasta 5 estilos y rango de precio
+                  </p>
+                </div>
+                @if (!isEditPrefs()) {
+                  <button
+                    (click)="isEditPrefs.set(true)"
+                    class="flex items-center gap-2 px-4 py-2 border border-emily-cream text-emily-dark rounded-lg hover:bg-emily-light transition-colors"
+                  >
+                    <ion-icon name="create-outline"></ion-icon
+                    ><span>Editar</span>
+                  </button>
+                }
+              </div>
+              <div class="p-6 space-y-4">
+                <div class="flex flex-wrap gap-2">
+                  @for (estilo of estilos(); track estilo.id) {
+                    <button
+                      (click)="toggleEstiloPref(estilo.id)"
+                      [disabled]="!isEditPrefs()"
+                      [class.bg-emily-dark]="isSelectedPref(estilo.id)"
+                      [class.text-emily-white]="isSelectedPref(estilo.id)"
+                      [class.border-emily-dark]="isSelectedPref(estilo.id)"
+                      [class.bg-emily-white]="!isSelectedPref(estilo.id)"
+                      [class.text-emily-dark]="!isSelectedPref(estilo.id)"
+                      class="px-3 py-1.5 rounded-full border text-sm font-medium transition"
+                      [class.opacity-60]="!isEditPrefs()"
+                    >
+                      @if (isSelectedPref(estilo.id)) {
+                        <ion-icon name="checkmark" class="mr-1"></ion-icon>
+                      }
+                      {{ estilo.nombre }}
+                    </button>
+                  }
+                </div>
+                <p class="text-xs text-emily-taupe">
+                  {{ seleccionadosPrefs().size }}/5 seleccionados
+                </p>
+                <div class="bg-emily-cream/30 rounded-xl p-4">
+                  <p class="text-sm font-medium text-emily-dark mb-1">
+                    Rango de precio: ${{ precioMinPref() }} — ${{
+                      precioMaxPref()
+                    }}
+                  </p>
+                  <ion-range
+                    dualKnobs="true"
+                    [min]="0"
+                    [max]="500"
+                    [step]="10"
+                    [value]="{ lower: precioMinPref(), upper: precioMaxPref() }"
+                    (ionChange)="onPrecioPrefChange($event)"
+                    [disabled]="!isEditPrefs()"
+                  ></ion-range>
+                </div>
+                @if (isEditPrefs()) {
+                  <div class="flex gap-3 justify-end">
+                    <button
+                      type="button"
+                      (click)="isEditPrefs.set(false); cargarPreferencias()"
+                      class="px-4 py-2 border border-emily-cream rounded-lg text-emily-dark"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      type="button"
+                      (click)="guardarPreferencias()"
+                      [disabled]="
+                        isSavingPrefs() || seleccionadosPrefs().size < 1
+                      "
+                      class="px-4 py-2 bg-emily-rose text-white rounded-lg disabled:opacity-50 flex items-center gap-2"
+                    >
+                      @if (isSavingPrefs()) {
+                        <ion-spinner name="crescent"></ion-spinner>
+                      }
+                      <span>Guardar preferencias</span>
+                    </button>
+                  </div>
+
+                } @else {
+                  <p class="text-xs text-emily-taupe">
+                    Cámbialas cuando quieras
+                  </p>
+                }
+              </div>
+            </div>
+
+            <div
+              class="bg-emily-white rounded-xl shadow-sm border border-emily-cream"
+            >
+              <div class="p-6 border-b border-emily-cream">
+                <div>
+                  <h3 class="text-lg font-serif font-semibold text-emily-dark">
+                    Seguridad
+                  </h3>
+                  <p class="text-sm text-emily-taupe mt-1">
+                    Gestiona tu contraseña y el segundo factor
+                  </p>
+                </div>
+                <div
+                  class="mt-4 flex items-center justify-between gap-3 p-4 bg-emily-cream/30 rounded-xl"
+                >
+                  <div class="flex items-center gap-3">
+                    <ion-icon
+                      name="shield-checkmark-outline"
+                      class="text-emily-dark text-xl"
+                    ></ion-icon>
+                    <div>
+                      <p class="text-sm font-medium text-emily-dark">
+                        Autenticación en 2 pasos
+                      </p>
+                      <p class="text-xs text-emily-taupe">
+                        @if (totpEnabled() === true) {
+                          Activado
+                        } @else if (totpEnabled() === false) {
+                          Desactivado
+                        } @else {
+                          ...
+                        }
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    (click)="abrirTwofa()"
+                    class="px-4 py-2 bg-emily-dark text-emily-white text-sm rounded-lg hover:bg-emily-taupe transition"
+                  >
+                    {{ totpEnabled() ? "Gestionar" : "Activar" }}
+                  </button>
+                </div>
+              </div>
+              <div
+                class="p-6 border-b border-emily-cream flex items-center justify-between"
+              >
+                <div>
+                  <h3 class="text-lg font-serif font-semibold text-emily-dark">
+                    Contraseña
+                  </h3>
+                  <p class="text-sm text-emily-taupe mt-1">
+                    Gestiona tu contraseña
+                  </p>
+                </div>
+                <button
+                  (click)="togglePasswordChange()"
+                  class="flex items-center gap-2 px-4 py-2 border border-emily-cream text-emily-dark rounded-lg hover:bg-emily-light transition-colors"
+                >
+                  @if (isChangingPassword()) {
+                    <ion-icon name="close"></ion-icon>
+                    <span>Cancelar</span>
+                  } @else {
+                    <ion-icon name="lock-closed-outline"></ion-icon>
+                    <span>Cambiar Contraseña</span>
+                  }
+                </button>
+              </div>
+
+              @if (isChangingPassword()) {
+                <div class="p-6">
+                  <form
+                    [formGroup]="passwordForm"
+                    (ngSubmit)="onSubmitPassword()"
+                  >
+                    <div class="space-y-4">
+                      <div>
+                        <label
+                          class="block text-sm font-medium text-emily-dark mb-2"
+                        >
+                          Contraseña Actual <span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative">
+                          <input
+                            [type]="showPasswordActual() ? 'text' : 'password'"
+                            formControlName="password_actual"
+                            class="w-full px-4 py-3 border border-emily-cream rounded-lg focus:ring-2 focus:ring-emily-rose focus:border-transparent transition-all"
+                            placeholder="••••••••"
+                          />
+                          <button
+                            type="button"
+                            (click)="togglePasswordVisibility('actual')"
+                            class="absolute right-3 top-1/2 -translate-y-1/2 text-emily-taupe hover:text-emily-dark"
+                          >
+                            {{ showPasswordActual() ? "👁️" : "👁️‍🗨️" }}
+                          </button>
+                        </div>
+                        @if (
+                          passwordForm.get("password_actual")?.invalid &&
+                          passwordForm.get("password_actual")?.touched
+                        ) {
+                          <p class="text-red-500 text-sm mt-1">
+                            La contraseña actual es requerida
+                          </p>
+                        }
+                      </div>
+
+                      <div>
+                        <label
+                          class="block text-sm font-medium text-emily-dark mb-2"
+                        >
+                          Nueva Contraseña <span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative">
+                          <input
+                            [type]="showPasswordNueva() ? 'text' : 'password'"
+                            formControlName="password_nueva"
+                            class="w-full px-4 py-3 border border-emily-cream rounded-lg focus:ring-2 focus:ring-emily-rose focus:border-transparent transition-all"
+                            placeholder="••••••••"
+                          />
+                          <button
+                            type="button"
+                            (click)="togglePasswordVisibility('nueva')"
+                            class="absolute right-3 top-1/2 -translate-y-1/2 text-emily-taupe hover:text-emily-dark"
+                          >
+                            {{ showPasswordNueva() ? "👁️" : "👁️‍🗨️" }}
+                          </button>
+                        </div>
+                        @if (
+                          passwordForm.get("password_nueva")?.invalid &&
+                          passwordForm.get("password_nueva")?.touched
+                        ) {
+                          <p class="text-red-500 text-sm mt-1">
+                            Mínimo 6 caracteres
+                          </p>
+                        }
+                      </div>
+
+                      <div>
+                        <label
+                          class="block text-sm font-medium text-emily-dark mb-2"
+                        >
+                          Confirmar Nueva Contraseña
+                          <span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative">
+                          <input
+                            [type]="
+                              showPasswordConfirmacion() ? 'text' : 'password'
+                            "
+                            formControlName="password_confirmacion"
+                            class="w-full px-4 py-3 border border-emily-cream rounded-lg focus:ring-2 focus:ring-emily-rose focus:border-transparent transition-all"
+                            placeholder="••••••••"
+                          />
+                          <button
+                            type="button"
+                            (click)="togglePasswordVisibility('confirmacion')"
+                            class="absolute right-3 top-1/2 -translate-y-1/2 text-emily-taupe hover:text-emily-dark"
+                          >
+                            {{ showPasswordConfirmacion() ? "👁️" : "👁️‍🗨️" }}
+                          </button>
+                        </div>
+                        @if (
+                          passwordForm.errors?.["passwordsMismatch"] &&
+                          passwordForm.get("password_confirmacion")?.touched
+                        ) {
+                          <p class="text-red-500 text-sm mt-1">
+                            Las contraseñas no coinciden
+                          </p>
+                        }
+                      </div>
+                    </div>
+
+                    <div
+                      class="flex justify-end mt-6 pt-6 border-t border-emily-cream"
+                    >
+                      <button
+                        type="submit"
+                        class="px-6 py-3 rounded-lg bg-emily-rose text-emily-white hover:bg-emily-rose/90 transition-colors flex items-center gap-2 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                        [disabled]="passwordForm.invalid || isSubmitting()"
+                      >
+                        @if (isSubmitting()) {
+                          <div
+                            class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"
+                          ></div>
+                          <span>Actualizando...</span>
+                        } @else {
+                          <ion-icon name="checkmark"></ion-icon>
+                          <span>Cambiar Contraseña</span>
+                        }
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              } @else {
+                <div class="p-6">
+                  <p class="text-sm text-emily-taupe">
+                    Última actualización:
+                    {{
+                      formatDate(
+                        currentUser.fecha_ultimo_acceso ||
+                          currentUser.fecha_registro
+                      )
+                    }}
+                  </p>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</ion-content>

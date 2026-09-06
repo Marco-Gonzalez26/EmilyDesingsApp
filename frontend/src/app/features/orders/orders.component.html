@@ -1,0 +1,93 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/inicio"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Mis Ordenes</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="ion-padding">
+<div class="bg-emily-light">
+  <div class="max-w-6xl mx-auto px-4 md:px-6 py-10">
+    <div class="mb-8">
+      <h1 class="font-serif text-3xl text-emily-dark mb-2">Mis Ordenes</h1>
+      <p class="text-emily-taupe">Revisa el estado de tus compras</p>
+    </div>
+
+    @if (isLoading()) {
+      <div class="space-y-4">
+        @for (i of [1, 2, 3]; track i) {
+          <div class="bg-emily-white rounded-2xl p-6 animate-pulse">
+            <div class="h-4 bg-emily-cream rounded w-1/4 mb-4"></div>
+            <div class="h-3 bg-emily-cream rounded w-1/3 mb-2"></div>
+            <div class="h-3 bg-emily-cream rounded w-1/2"></div>
+          </div>
+        }
+      </div>
+    }
+
+    @if (!isLoading() && ordenes().length === 0) {
+      <div class="text-center py-24">
+        <ion-icon name="cube-outline" class="text-emily-cream mx-auto block mb-4"></ion-icon>
+        <p class="text-emily-taupe text-lg mb-2">No tienes ÃƒÂ³rdenes aÃƒÂºn</p>
+        <p class="text-emily-taupe/60 text-sm mb-6">
+          Comienza a comprar y tus ÃƒÂ³rdenes aparecerÃƒÂ¡n aquÃƒÂ­
+        </p>
+        <a
+          routerLink="/catalogo"
+          class="inline-block bg-emily-dark text-emily-white px-8 py-3 rounded-xl font-medium hover:bg-emily-taupe transition text-sm"
+        >
+          Ver CatÃƒÂ¡logo
+        </a>
+      </div>
+    }
+
+    @if (!isLoading() && ordenes().length > 0) {
+      <div class="space-y-4">
+        @for (orden of ordenes(); track orden.id) {
+          <div class="bg-emily-white rounded-2xl p-6 hover:shadow-md transition">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+              <div>
+                <div class="flex items-center gap-3 mb-2">
+                  <h3 class="font-semibold text-emily-dark">{{ orden.numero_orden }}</h3>
+                  <span
+                    class="text-xs font-medium px-2.5 py-1 rounded-full"
+                    [class]="getEstadoClass(orden.estado)"
+                  >
+                    {{ orden.estado }}
+                  </span>
+                </div>
+                <div class="flex items-center gap-4 text-sm text-emily-taupe">
+                  <span class="flex items-center gap-1.5">
+                    <ion-icon name="calendar-outline"></ion-icon>
+                    {{ formatDate(orden.fecha_orden) }}
+                  </span>
+                  <span
+                    >{{ orden.items.length || 0 }}
+                    {{ orden.items.length === 1 ? 'producto' : 'productos' }}</span
+                  >
+                </div>
+              </div>
+
+              <div class="flex items-center gap-4">
+                <div class="text-right">
+                  <p class="text-sm text-emily-taupe">Total</p>
+                  <p class="text-xl font-bold text-emily-dark">
+                    ${{ orden.total | number: '1.2-2' }}
+                  </p>
+                </div>
+                <a
+                  [routerLink]="['/ordenes', orden.id]"
+                  class="px-4 py-2 bg-emily-dark hover:bg-emily-taupe text-emily-white text-sm font-medium rounded-xl transition"
+                >
+                  Ver detalle
+                </a>
+</div>
+</div>
+</div>
+  }
+</div>
+}
+</div>
+</div>
+</ion-content>
