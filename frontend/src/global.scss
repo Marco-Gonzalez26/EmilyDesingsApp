@@ -1,0 +1,301 @@
+/*
+ * App Global CSS
+ * Ionic core CSS + Tailwind v3 + EmilyDesigns theme
+ */
+
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap");
+
+@import "@ionic/angular/css/core.css";
+
+@import "@ionic/angular/css/normalize.css";
+@import "@ionic/angular/css/structure.css";
+@import "@ionic/angular/css/typography.css";
+@import "@ionic/angular/css/display.css";
+
+@import "@ionic/angular/css/padding.css";
+@import "@ionic/angular/css/float-elements.css";
+@import "@ionic/angular/css/text-alignment.css";
+@import "@ionic/angular/css/text-transformation.css";
+@import "@ionic/angular/css/flex-utils.css";
+
+/* Tailwind CSS v3 */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* EmilyDesigns base styles */
+
+:root {
+  --ion-font-family: "Playfair Display", serif;
+}
+html,
+body {
+  height: 100%;
+  overscroll-behavior: none;
+}
+
+html {
+  color-scheme: light;
+  background-color: #fefefa;
+  color: #3e352f;
+}
+
+body {
+  font-family: "Inter", sans-serif;
+  background-color: #fefefa !important;
+  color: #3e352f !important;
+  overflow-x: hidden;
+}
+
+ion-app,
+app-root {
+  display: block;
+  height: 100%;
+  background-color: #fefefa;
+  color: #3e352f;
+}
+
+ion-content {
+  --overflow: auto;
+}
+
+ion-content::part(scroll) {
+  overscroll-behavior-y: contain;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Playfair Display", serif;
+}
+
+/* Playfair Display on Ionic components (body/paragraphs stay Inter) */
+ion-button,
+ion-label,
+ion-tab-button,
+ion-item,
+ion-input,
+ion-textarea,
+ion-select,
+ion-chip,
+ion-toolbar,
+ion-title,
+ion-badge,
+ion-searchbar,
+ion-segment-button,
+ion-toggle,
+ion-checkbox,
+ion-radio {
+  font-family: "Playfair Display", serif;
+}
+
+ion-content {
+  --background: #fefefa !important;
+  --color: #3e352f !important;
+}
+
+/* Emily palette utilities (important so they win over Ionic component styles) */
+.bg-emily-white {
+  background-color: rgb(254 254 250) !important;
+}
+.bg-emily-cream {
+  background-color: rgb(245 237 227) !important;
+}
+.bg-emily-light {
+  background-color: rgb(249 245 240) !important;
+}
+.bg-emily-rose {
+  background-color: rgb(212 165 165) !important;
+}
+.bg-emily-gold {
+  background-color: rgb(201 169 97) !important;
+}
+.bg-emily-sage {
+  background-color: rgb(168 181 160) !important;
+}
+.bg-emily-taupe {
+  background-color: rgb(139 127 118) !important;
+}
+.bg-emily-dark {
+  background-color: rgb(62 53 47) !important;
+}
+
+.text-emily-white {
+  color: rgb(254 254 250) !important;
+}
+.text-emily-cream {
+  color: rgb(245 237 227) !important;
+}
+.text-emily-light {
+  color: rgb(249 245 240) !important;
+}
+.text-emily-rose {
+  color: rgb(212 165 165) !important;
+}
+.text-emily-gold {
+  color: rgb(201 169 97) !important;
+}
+.text-emily-sage {
+  color: rgb(168 181 160) !important;
+}
+.text-emily-taupe {
+  color: rgb(139 127 118) !important;
+}
+.text-emily-dark {
+  color: rgb(62 53 47) !important;
+}
+
+.border-emily-white {
+  border-color: rgb(254 254 250) !important;
+}
+.border-emily-cream {
+  border-color: rgb(245 237 227) !important;
+}
+.border-emily-light {
+  border-color: rgb(249 245 240) !important;
+}
+.border-emily-rose {
+  border-color: rgb(212 165 165) !important;
+}
+.border-emily-gold {
+  border-color: rgb(201 169 97) !important;
+}
+.border-emily-sage {
+  border-color: rgb(168 181 160) !important;
+}
+.border-emily-taupe {
+  border-color: rgb(139 127 118) !important;
+}
+.border-emily-dark {
+  border-color: rgb(62 53 47) !important;
+}
+
+/* Horizontal snap scrolling for home carousels */
+.emily-snap {
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.emily-snap > * {
+  scroll-snap-align: start;
+}
+
+.emily-snap::-webkit-scrollbar {
+  display: none;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f5ede3;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d4a5a5;
+  border-radius: 10px;
+  transition: background 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #c99393;
+}
+
+/* Print styles (dashboard reports) */
+@media print {
+  aside,
+  header,
+  footer,
+  ion-tab-bar,
+  button,
+  .no-print,
+  .dashboard-tabs,
+  nav {
+    display: none !important;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    background: white !important;
+  }
+
+  #general-tab-content,
+  #productos-tab-content,
+  #clientes-tab-content,
+  #ventas-tab-content,
+  #analisis-tab-content {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 20px !important;
+    box-shadow: none !important;
+  }
+
+  .bg-emily-white,
+  .bg-emily-cream {
+    background-color: white !important;
+    border: 1px solid #e5e7eb !important;
+  }
+
+  table {
+    page-break-inside: auto;
+  }
+
+  tr {
+    page-break-inside: avoid;
+    page-break-after: auto;
+  }
+
+  thead {
+    display: table-header-group;
+  }
+
+  canvas {
+    max-width: 100% !important;
+    height: auto !important;
+    page-break-inside: avoid;
+  }
+
+  .kpi-card,
+  .chart-container {
+    page-break-inside: avoid;
+  }
+
+  .text-emily-dark {
+    color: black !important;
+  }
+
+  .text-emily-taupe {
+    color: #4b5563 !important;
+  }
+
+  .border-emily-cream {
+    border-color: #d1d5db !important;
+  }
+
+  .bg-emily-cream {
+    background-color: #f3f4f6 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .bg-emily-rose,
+  .bg-emily-gold,
+  .bg-emily-sage {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 1.5cm;
+  }
+}
