@@ -1,0 +1,68 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Favoritos</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="bg-emily-light min-h-full">
+    <div class="max-w-7xl mx-auto px-4 md:px-6 py-8">
+      @if (!authService.isAuthenticated()) {
+        <div class="flex flex-col items-center justify-center py-16 px-4 text-center">
+          <ion-icon name="heart-outline" size="large" class="text-emily-rose mb-4"></ion-icon>
+          <h2 class="font-serif text-2xl text-emily-dark mb-2">Tus favoritos</h2>
+          <p class="text-emily-taupe mb-6 max-w-sm">
+            Inicia sesión para guardar tus prendas favoritas y mejorar tus recomendaciones.
+          </p>
+          <ion-button [routerLink]="['/iniciar-sesion']" color="primary" expand="block" class="mb-3 w-full max-w-xs">
+            Iniciar sesión
+          </ion-button>
+          <ion-button [routerLink]="['/crear-cuenta']" fill="outline" expand="block" class="w-full max-w-xs">
+            Crear cuenta
+          </ion-button>
+        </div>
+      } @else {
+        <div class="mb-6">
+          <h1 class="text-2xl font-serif text-emily-dark">Mis Favoritos</h1>
+          <p class="text-sm text-emily-taupe mt-1">{{ products().length }} prendas guardadas</p>
+        </div>
+
+        @if (isLoading()) {
+          <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+            @for (i of [1, 2, 3, 4]; track i) {
+              <div class="bg-emily-white rounded-xl overflow-hidden animate-pulse">
+                <div class="bg-emily-cream h-64 w-full"></div>
+                <div class="p-3 space-y-2">
+                  <div class="h-4 bg-emily-cream rounded w-3/4"></div>
+                  <div class="h-4 bg-emily-cream rounded w-1/2"></div>
+                </div>
+              </div>
+            }
+          </div>
+        }
+
+        @if (!isLoading() && products().length === 0) {
+          <div class="text-center py-20">
+            <ion-icon name="heart-outline" class="text-emily-taupe mb-4" size="large"></ion-icon>
+            <p class="text-emily-taupe text-lg mb-2">Aún no tienes favoritos</p>
+            <p class="text-sm text-emily-taupe mb-6">Toca el corazón en cualquier prenda para guardarla aquí</p>
+            <ion-button [routerLink]="['/catalogo']" color="primary">Explorar catálogo</ion-button>
+          </div>
+        }
+
+        @if (!isLoading() && products().length > 0) {
+          <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+            @for (product of products(); track product.id) {
+              <app-product-card
+                [product]="product"
+                [isFavorite]="isFavorite(product.id)"
+                (favoriteToggled)="toggleFavorite($event)"
+                (addToCartRequested)="addToCart($event)"
+              />
+            }
+          </div>
+        }
+      }
+    </div>
+  </div>
+</ion-content>
