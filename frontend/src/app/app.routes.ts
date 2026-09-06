@@ -38,6 +38,7 @@ import { AccountPageComponent } from './features/account/account.page';
 import { ParaTiPage } from './features/para-ti/para-ti.page';
 import { FavoritesPage } from './features/favorites/favorites.page';
 import { Verify2faComponent } from './features/auth/verify-2fa/verify-2fa.component';
+import { admin2faCanDeactivateGuard } from './core/guards/admin-2fa.guard';
 
 export const routes: Routes = [
   {
@@ -141,7 +142,7 @@ export const routes: Routes = [
       {
         path: 'configuracion',
         loadComponent: () => import('./features/admin/configuracion/configuracion.component').then((m) => m.ConfiguracionComponent),
-        // canDeactivate: [admin2faCanDeactivateGuard],
+        canDeactivate: [admin2faCanDeactivateGuard],
       },
     ],
   },

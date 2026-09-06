@@ -23,8 +23,9 @@ export class Verify2faComponent {
   isVerifying = signal(false);
 
   async verificar(): Promise<void> {
-    if (this.code().length !== 6) {
-      this.toast.error('Ingresa 6 dígitos');
+    const len = this.code().trim().length;
+    if (len !== 6 && len !== 8) {
+      this.toast.error('Ingresa 6 dígitos o tu código de recuperación');
       return;
     }
     this.isVerifying.set(true);
