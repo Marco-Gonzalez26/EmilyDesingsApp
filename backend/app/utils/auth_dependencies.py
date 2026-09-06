@@ -76,7 +76,7 @@ def get_current_admin_user(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="No tiene permisos de administrador para realizar esta acción",
         )
-    # por ahora opcional: no bloquea admin sin 2FA
+    auth_service.verify_admin_2fa_or_block(current_user)
     return current_user
 
 

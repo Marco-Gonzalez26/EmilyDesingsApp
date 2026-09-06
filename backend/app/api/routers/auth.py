@@ -57,12 +57,25 @@ def login(credentials: UserLogin, db: Session = Depends(get_db), request: Reques
 @router.post("/2fa/verify-login")
 @limiter.limit("5/minute")  # rate 5/min por IP
 def verify_login(payload: Verify2FARequest, request: Request, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    code = payload.code.strip()
+    # recovery Hex8: un solo uso, se marca usado
+    if len(code) == 8:
+        rows = db.query(TotpRecoveryCode).filter(
+            TotpRecoveryCode.usuario_id == current_user.id,
+            TotpRecoveryCode.usado == False,
+        ).all()
+        for row in rows:
+            if verify_password(code, row.code_hash):
+                row.usado = True
+                db.commit()
+                return {**auth_service.create_user_token(current_user), "user": UsuarioResponse.model_validate(current_user)}
+        raise HTTPException(400, "Código de recuperación inválido o ya usado")
     # single-use: verify_totp con user_id previene replay misma ventana 30s
     secret_enc = getattr(current_user, "totp_secret_encrypted", None)
     if not secret_enc:
         raise HTTPException(400, "No hay secreto")
     secret = decrypt_secret(secret_enc)
-    if not auth_service.verify_totp(secret, payload.code, str(current_user.id)):
+    if not auth_service.verify_totp(secret, code, str(current_user.id)):
         raise HTTPException(400, "Código 2FA inválido")
     return {**auth_service.create_user_token(current_user), "user": UsuarioResponse.model_validate(current_user)}
 
