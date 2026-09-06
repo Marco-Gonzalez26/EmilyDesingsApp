@@ -1,0 +1,133 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Para Ti</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  @if (!authService.isAuthenticated()) {
+    <div class="flex flex-col items-center justify-center py-16 px-4 text-center">
+      <ion-icon name="sparkles-outline" size="large" class="text-emily-gold mb-4"></ion-icon>
+      <h2 class="font-serif text-2xl text-emily-dark mb-2">Recomendaciones para ti</h2>
+      <p class="text-emily-taupe mb-6 max-w-sm">
+        Inicia sesión para recibir sugerencias personalizadas basadas en tus gustos y preferencias.
+      </p>
+      <ion-button [routerLink]="['/iniciar-sesion']" color="primary" expand="block" class="mb-3 w-full max-w-xs">
+        Iniciar sesión
+      </ion-button>
+      <ion-button [routerLink]="['/crear-cuenta']" fill="outline" expand="block" class="w-full max-w-xs">
+        Crear cuenta
+      </ion-button>
+    </div>
+  } @else {
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <h1 class="text-2xl font-serif text-emily-dark">Recomendaciones para ti</h1>
+        <p class="text-sm text-emily-taupe mt-1">
+          Seleccionadas según tus gustos y preferencias
+        </p>
+      </div>
+      @if (algoritmos().length > 0) {
+        <ion-icon name="sparkles" class="text-emily-gold shrink-0" size="large"></ion-icon>
+      }
+    </div>
+
+    @if (isLoading()) {
+      <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+        @for (i of [1, 2, 3, 4, 5, 6, 7, 8]; track i) {
+          <div class="bg-emily-white rounded-xl overflow-hidden animate-pulse">
+            <div class="bg-emily-cream h-64 w-full"></div>
+            <div class="p-3 space-y-2">
+              <div class="h-4 bg-emily-cream rounded w-3/4"></div>
+              <div class="h-4 bg-emily-cream rounded w-1/2"></div>
+              <div class="h-8 bg-emily-cream rounded"></div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    @if (!isLoading() && error()) {
+      <div class="text-center py-20">
+        <ion-icon name="cloud-offline-outline" class="text-emily-taupe mb-4" size="large"></ion-icon>
+        <p class="text-emily-taupe text-lg mb-6">No pudimos cargar tus recomendaciones</p>
+        <ion-button color="primary" (click)="loadRecommendations()">Reintentar</ion-button>
+      </div>
+    }
+
+    @if (!isLoading() && !error() && recommendations().length === 0) {
+      <div class="text-center py-20">
+        <ion-icon name="heart-outline" class="text-emily-taupe mb-4" size="large"></ion-icon>
+        <p class="text-emily-taupe text-lg mb-2">Aún no tenemos recomendaciones para ti</p>
+        <p class="text-sm text-emily-taupe mb-6">
+          Visita el catálogo y explora productos para que podamos conocerte mejor
+        </p>
+        <ion-button [routerLink]="['/catalogo']" color="primary">Explorar catálogo</ion-button>
+      </div>
+    }
+
+    @if (!isLoading() && !error() && recommendations().length > 0) {
+      <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+        @for (rec of recommendations(); track rec.producto_id) {
+          <div
+            class="bg-emily-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer group relative"
+            (click)="verProducto(rec)"
+          >
+            <div class="relative overflow-hidden">
+              <img
+                [src]="getMainImage(rec)"
+                [alt]="rec.nombre"
+                class="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-500"
+              />
+
+              @if (hasDiscount(rec)) {
+                <span class="absolute top-2 left-2 bg-emily-rose text-emily-white text-xs px-2 py-0.5 rounded-full font-medium">
+                  -{{ getDiscountPercent(rec) }}%
+                </span>
+              }
+
+              <button
+                (click)="toggleFavorite(rec.producto_id); $event.stopPropagation()"
+                [attr.aria-pressed]="isFavorite(rec.producto_id)"
+                class="absolute top-2 right-2 w-8 h-8 flex items-center justify-center shrink-0 bg-white rounded-full shadow-sm hover:bg-emily-white transition"
+              >
+                <ion-icon
+                  [name]="isFavorite(rec.producto_id) ? 'heart' : 'heart-outline'"
+                  [class]="isFavorite(rec.producto_id) ? 'text-emily-rose' : 'text-emily-dark'"
+                  class="block leading-none text-base"
+                ></ion-icon>
+              </button>
+            </div>
+
+            <div class="p-3">
+              @if (rec.categoria) {
+                <p class="text-xs text-emily-taupe uppercase tracking-wide">{{ rec.categoria }}</p>
+              }
+              <h3 class="text-sm font-medium text-emily-dark truncate mt-0.5">{{ rec.nombre }}</h3>
+
+              <div class="flex items-center gap-2 mt-1 mb-3">
+                <span class="text-sm font-semibold text-emily-dark">
+                  ${{ getPrice(rec) | number: '1.2-2' }}
+                </span>
+                @if (hasDiscount(rec)) {
+                  <span class="text-xs text-emily-taupe line-through">
+                    ${{ rec.precio_regular | number: '1.2-2' }}
+                  </span>
+                }
+              </div>
+
+              <button
+                (click)="agregarAlCarrito(rec, $event)"
+                class="w-full bg-emily-dark hover:bg-emily-taupe text-emily-white text-xs font-medium py-2 rounded-lg transition flex items-center justify-center gap-1.5"
+              >
+                <ion-icon name="bag-handle-outline"></ion-icon>
+                Agregar
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+  }
+</ion-content>

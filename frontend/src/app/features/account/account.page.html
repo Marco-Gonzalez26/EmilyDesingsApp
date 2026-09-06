@@ -1,0 +1,82 @@
+<ion-header>
+  <ion-toolbar>
+    
+    <ion-title>Cuenta</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="">
+  @if (!authService.isAuthenticated()) {
+    <div class="flex flex-col items-center justify-center py-16 px-4 text-center">
+      <ion-icon name="person-circle-outline" size="large" class="text-emily-taupe mb-4"></ion-icon>
+      <h2 class="font-serif text-2xl text-emily-dark mb-2">Bienvenido a EmilyDesigns</h2>
+      <p class="text-emily-taupe mb-6">Inicia sesión para ver tu perfil, órdenes y más.</p>
+      <ion-button [routerLink]="['/iniciar-sesion']" color="primary" expand="block" class="mb-3 w-full max-w-xs">
+        Iniciar sesión
+      </ion-button>
+      <ion-button [routerLink]="['/crear-cuenta']" fill="outline" expand="block" class="w-full max-w-xs">
+        Crear cuenta
+      </ion-button>
+    </div>
+  } @else {
+    <div class="flex flex-col items-center py-8 mb-4 bg-emily-light rounded-2xl">
+      <div class="w-20 h-20 rounded-full bg-emily-rose flex items-center justify-center text-emily-white text-3xl font-bold shadow">
+        {{ authService.currentUser()?.nombre_completo?.charAt(0) || 'U' }}
+      </div>
+      <h2 class="font-serif text-xl text-emily-dark mt-3">
+        {{ authService.currentUser()?.nombre_completo || 'Usuario' }}
+      </h2>
+      <p class="text-sm text-emily-taupe">{{ authService.currentUser()?.email }}</p>
+    </div>
+
+    <ion-list lines="full">
+      <ion-item button [routerLink]="['/perfil']">
+        <ion-icon name="person-outline" slot="start"></ion-icon>
+        <ion-label>Mi perfil</ion-label>
+      </ion-item>
+      <ion-item button [routerLink]="['/ordenes']">
+        <ion-icon name="cube-outline" slot="start"></ion-icon>
+        <ion-label>Mis órdenes</ion-label>
+      </ion-item>
+      @if (authService.isAdmin()) {
+        <ion-item button [routerLink]="['/admin']">
+          <ion-icon name="shield-checkmark-outline" slot="start"></ion-icon>
+          <ion-label>Administración</ion-label>
+        </ion-item>
+      }
+      <ion-item button (click)="openServerModal()">
+        <ion-icon name="server-outline" slot="start"></ion-icon>
+        <ion-label>Configuración del servidor</ion-label>
+      </ion-item>
+      <ion-item button (click)="logout()">
+        <ion-icon name="log-out-outline" slot="start" color="danger"></ion-icon>
+        <ion-label color="danger">Cerrar sesión</ion-label>
+      </ion-item>
+    </ion-list>
+  }
+
+  <ion-modal [isOpen]="serverModalOpen">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Configuración del servidor</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="serverModalOpen = false">
+              <ion-icon name="close" slot="icon-only"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding">
+        <ion-item>
+          <ion-label position="stacked">URL de la API</ion-label>
+          <ion-input [(ngModel)]="apiUrl" placeholder="http://192.168.x.x:8000"></ion-input>
+        </ion-item>
+        <p class="text-xs text-emily-taupe mt-2">
+          Usa 10.0.2.2 en el emulador de Android y la IP de tu computadora en un dispositivo físico.
+        </p>
+        <ion-button expand="block" class="mt-4" (click)="saveServerUrl()">Guardar</ion-button>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+</ion-content>
