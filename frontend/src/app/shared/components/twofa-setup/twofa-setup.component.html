@@ -1,0 +1,58 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Autenticación en 2 pasos</ion-title>
+    <ion-button slot="end" fill="clear" (click)="cerrar()"><ion-icon name="close"></ion-icon></ion-button>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="max-w-lg mx-auto space-y-5">
+    <p class="text-sm text-emily-taupe text-center">
+      Escanea el QR con Google Authenticator o Microsoft Authenticator
+    </p>
+
+    @if (isLoading()) {
+      <p class="text-sm text-emily-taupe text-center">Cargando estado...</p>
+    } @else if (totpEnabled()) {
+      <div class="p-4 bg-green-50 border border-green-200 rounded-xl flex items-center gap-3">
+        <ion-icon name="shield-checkmark-outline" class="text-green-600 text-xl"></ion-icon>
+        <span class="text-sm text-green-800 font-medium">2FA activado</span>
+      </div>
+      <ion-button fill="outline" color="danger" expand="block" (click)="desactivar()">Desactivar 2FA</ion-button>
+    } @else if (!showSetup()) {
+      <ion-button color="primary" expand="block" (click)="activar()" [disabled]="isGenerating()">
+        @if (isGenerating()) { Generando QR... } @else { Activar 2FA y mostrar QR }
+      </ion-button>
+    }
+
+    @if (showSetup() && secret()) {
+      <div class="space-y-4">
+        <div class="flex justify-center p-4 bg-white border rounded-xl">
+          @if (qrBase64()) {
+            <img [src]="qrBase64()" alt="QR 2FA" width="250" height="250" />
+          } @else {
+            <canvas #qrCanvas width="250" height="250"></canvas>
+          }
+        </div>
+        <p class="text-sm text-emily-taupe">Clave manual (si no escaneas):</p>
+        <p class="text-base font-mono font-bold tracking-widest bg-emily-dark text-white px-3 py-2 rounded-lg select-all break-all">{{ secret() }}</p>
+        <p class="text-sm text-emily-dark bg-emily-cream/50 border rounded-xl p-3">
+          Con este código vamos a proteger tu inicio de sesión, y puedes recuperar tu cuenta con estos códigos. Guárdalos.
+        </p>
+        @if (recoveryCodes(); as codes) {
+          <div class="bg-amber-50 border border-amber-200 rounded-xl p-4">
+            <ul class="grid grid-cols-2 gap-1 font-mono text-sm">
+              @for (c of codes; track c) { <li class="bg-white border px-2 py-1 rounded">{{ c }}</li> }
+            </ul>
+          </div>
+        }
+        <div class="flex gap-2">
+          <ion-input type="text" placeholder="Código 6 dígitos" maxlength="6" [value]="code()" (ionInput)="code.set($any($event.detail).value ?? $any($event.target).value)" class="flex-1"></ion-input>
+          <ion-button (click)="verificar()" [disabled]="isVerifying() || code().length !== 6">
+            @if (isVerifying()) { Verificando... } @else { Verificar }
+          </ion-button>
+        </div>
+      </div>
+    }
+  </div>
+</ion-content>
