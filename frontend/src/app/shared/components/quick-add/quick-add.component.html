@@ -1,0 +1,139 @@
+  <ion-header>
+    <ion-toolbar>
+      <ion-title>Agregar al Carrito</ion-title>
+      <ion-buttons slot="end">
+        <ion-button (click)="cerrar()"><ion-icon name="close"></ion-icon></ion-button>
+      </ion-buttons>
+    </ion-toolbar>
+  </ion-header>
+  <ion-content class="ion-padding">
+    @if (!producto) {
+      <div class="flex flex-col items-center justify-center py-16 gap-4">
+        <ion-spinner name="crescent"></ion-spinner>
+        <p class="text-sm text-emily-taupe">Cargando tallas y colores...</p>
+      </div>
+    } @else {
+    <div class="space-y-6">
+      <div class="flex gap-4">
+        <img
+          [src]="producto.imagen"
+          [alt]="producto.nombre"
+          class="w-24 h-24 object-cover rounded-lg bg-emily-light"
+        />
+        <div class="flex-1">
+          <h4 class="font-medium text-emily-dark mb-1">{{ producto.nombre }}</h4>
+          <div class="flex items-baseline gap-2">
+            <span class="text-xl font-bold text-emily-dark">
+              ${{ precioFinal() | number: '1.2-2' }}
+            </span>
+            @if (producto.precio_descuento) {
+              <span class="text-sm text-emily-taupe line-through">
+                ${{ producto.precio | number: '1.2-2' }}
+              </span>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-emily-dark mb-3">
+          Talla <span class="text-emily-rose">*</span>
+        </label>
+        <div class="grid grid-cols-4 gap-2">
+          @for (talla of producto.tallas_disponibles; track talla.id) {
+            <button
+              (click)="seleccionarTalla(talla.id)"
+              [disabled]="talla.stock === 0"
+              [class.ring-2]="tallaSeleccionada() === talla.id"
+              [class.ring-emily-rose]="tallaSeleccionada() === talla.id"
+              [class.bg-emily-rose]="tallaSeleccionada() === talla.id"
+              [class.text-emily-white]="tallaSeleccionada() === talla.id"
+              [class.opacity-40]="talla.stock === 0"
+              [class.cursor-not-allowed]="talla.stock === 0"
+              class="px-4 py-3 border border-emily-taupe/30 rounded-lg text-sm font-medium transition-all hover:border-emily-rose disabled:hover:border-emily-taupe/30"
+            >
+              {{ talla.nombre }}
+              @if (talla.stock === 0) {
+                <span class="block text-xs mt-1">Sin stock</span>
+              }
+            </button>
+          }
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-emily-dark mb-3">
+          Color <span class="text-emily-rose">*</span>
+        </label>
+        <div class="flex flex-wrap gap-3">
+          @for (color of producto.colores_disponibles; track color.id) {
+            <button
+              (click)="seleccionarColor(color.id)"
+              [class.ring-2]="colorSeleccionado() === color.id"
+              [class.ring-offset-2]="colorSeleccionado() === color.id"
+              [class.ring-emily-rose]="colorSeleccionado() === color.id"
+              class="group flex flex-col items-center gap-2 transition-all"
+            >
+              <div
+                class="w-12 h-12 rounded-full border-2 transition-all"
+                [class.border-emily-rose]="colorSeleccionado() === color.id"
+                [class.border-emily-taupe/30]="colorSeleccionado() !== color.id"
+                [style.background-color]="color.codigo_hex || '#cccccc'"
+              ></div>
+
+              <span class="text-xs text-emily-taupe">
+                {{ color.nombre }}
+              </span>
+            </button>
+          }
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-emily-dark mb-3"> Cantidad </label>
+        <div class="flex items-center gap-4">
+          <div class="flex items-center border border-emily-taupe/30 rounded-lg overflow-hidden">
+            <ion-button fill="clear" (click)="decrementarCantidad()" [disabled]="cantidad() <= 1">
+              <ion-icon slot="icon-only" name="remove"></ion-icon>
+            </ion-button>
+
+            <span class="px-6 py-2 font-semibold text-emily-dark">
+              {{ cantidad() }}
+            </span>
+
+            <ion-button fill="clear" (click)="incrementarCantidad()" [disabled]="cantidad() >= stockDisponible()">
+              <ion-icon slot="icon-only" name="add"></ion-icon>
+            </ion-button>
+          </div>
+
+          @if (stockDisponible() > 0) {
+            <span class="text-sm text-emily-taupe">
+              Stock disponible: {{ stockDisponible() }}
+            </span>
+          }
+        </div>
+      </div>
+
+      @if (!tallaSeleccionada() || !colorSeleccionado()) {
+        <div class="bg-emily-cream/50 border border-emily-rose/30 rounded-lg p-3">
+          <p class="text-sm text-emily-dark">
+            Por favor selecciona una talla y un color para continuar
+          </p>
+        </div>
+      }
+    </div>
+    }
+  </ion-content>
+  <ion-footer>
+    <ion-toolbar>
+      <div class="w-full flex items-center justify-between px-4 py-2">
+        <div>
+          <p class="text-sm text-emily-taupe">Total</p>
+          <p class="text-xl font-bold text-emily-dark">${{ totalPrecio() | number: '1.2-2' }}</p>
+        </div>
+        <ion-button (click)="agregarAlCarrito()" [disabled]="!puedeAgregar()" color="primary">
+          Agregar al Carrito
+        </ion-button>
+      </div>
+    </ion-toolbar>
+  </ion-footer>
