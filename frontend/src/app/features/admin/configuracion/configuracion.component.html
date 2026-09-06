@@ -1,0 +1,72 @@
+<ion-header>
+  <ion-toolbar class="flex">
+    <ion-back-button defaultHref="/admin" class="w-4 block"></ion-back-button>
+    <ion-title>Configuración — Seguridad</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding" [scrollY]="true">
+  <div class="max-w-2xl mx-auto space-y-6">
+    <div class="bg-emily-white rounded-xl p-6 shadow-sm border">
+      <h2 class="text-lg font-semibold text-emily-dark">Autenticación en 2 pasos (Google Authenticator)</h2>
+      <p class="text-sm text-emily-taupe mt-1">Obligatorio para administradores — opcional para clientes. Escanea el QR con Google Authenticator o Microsoft Authenticator.</p>
+
+      @if (isLoading()) {
+        <p class="text-sm text-emily-taupe mt-4">Cargando estado...</p>
+      } @else if (totpEnabled()) {
+        <div class="mt-4 p-4 bg-green-50 border border-green-200 rounded-xl flex items-center gap-3">
+          <ion-icon name="shield-checkmark-outline" class="text-green-600 text-xl"></ion-icon>
+          <span class="text-sm text-green-800 font-medium">2FA activado</span>
+        </div>
+        <ion-button fill="outline" color="danger" class="mt-4" (click)="desactivar()">Desactivar 2FA</ion-button>
+      } @else {
+        <ion-button color="primary" class="mt-4" (click)="activar()" [disabled]="isGenerating()">
+          @if (isGenerating()) { Generando QR... } @else { Activar 2FA y mostrar QR }
+        </ion-button>
+      }
+    </div>
+
+    @if (secret()) {
+      <ion-modal [isOpen]="!!secret()" [breakpoints]="[0, 0.95]" [initialBreakpoint]="0.95" handle="true" [backdropDismiss]="true" (ionModalDidDismiss)="secret.set(null)">
+        <ng-template>
+          <ion-header>
+            <ion-toolbar>
+              <ion-title>Activa tu 2FA</ion-title>
+              <ion-buttons slot="end">
+                <ion-button fill="clear" (click)="secret.set(null)"><ion-icon name="close"></ion-icon></ion-button>
+              </ion-buttons>
+            </ion-toolbar>
+          </ion-header>
+          <ion-content class="ion-padding">
+            <div class="space-y-4">
+              <h3 class="font-medium text-emily-dark">Escanea este QR en tu app</h3>
+              <div class="flex justify-center p-4 bg-white border rounded-xl">
+                @if (qrBase64()) {
+                  <img [src]="qrBase64()" alt="QR 2FA" width="250" height="250" />
+                } @else {
+                  <canvas #qrCanvas width="250" height="250"></canvas>
+                }
+              </div>
+              <p class="text-sm text-emily-taupe">Clave manual (si no escaneas):</p>
+              <p class="text-base font-mono font-bold tracking-widest bg-emily-dark text-white px-3 py-2 rounded-lg select-all break-all">{{ secret() }}</p>
+              <p class="text-sm text-emily-dark bg-emily-cream/50 border rounded-xl p-3">Con este código vamos a proteger tu inicio de sesión, y puedes recuperar tu cuenta con estos códigos. Guárdalos.</p>
+              @if (recoveryCodes(); as codes) {
+                <div class="bg-amber-50 border border-amber-200 rounded-xl p-4">
+                  <ul class="mt-2 grid grid-cols-2 gap-1 font-mono text-sm">
+                    @for (c of codes; track c) { <li class="bg-white border px-2 py-1 rounded">{{ c }}</li> }
+                  </ul>
+                </div>
+              }
+              <div class="flex gap-2">
+                <ion-input type="text" placeholder="Código 6 dígitos" maxlength="6" [value]="code()" (ionInput)="code.set($any($event.target).value)" class="flex-1"></ion-input>
+                <ion-button (click)="verificar()" [disabled]="isVerifying() || code().length !== 6">
+                  @if (isVerifying()) { Verificando... } @else { Verificar }
+                </ion-button>
+              </div>
+            </div>
+          </ion-content>
+        </ng-template>
+      </ion-modal>
+    }
+  </div>
+</ion-content>
