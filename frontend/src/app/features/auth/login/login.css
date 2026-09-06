@@ -1,0 +1,54 @@
+
+/* Importar fuentes de Google */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=Inter:wght@300;400;500;600&display=swap');
+
+:host {
+  display: block;
+  width: 100%;
+  height: 100vh;
+}
+
+/* Aplicar fuente serif al logo */
+h1 {
+  font-family: 'Playfair Display', serif;
+}
+
+/* Aplicar fuente sans a todo lo demás */
+body,
+input,
+button,
+p,
+a {
+  font-family: 'Inter', sans-serif;
+}
+
+/* Animación suave para el formulario */
+form {
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Estilos personalizados para inputs */
+input {
+  transition: all 0.2s ease;
+}
+
+input:focus {
+  box-shadow: 0 0 0 3px rgba(212, 165, 165, 0.15); /* emily-rose con opacidad */
+}
+
+/* Placeholder color (emily-taupe) */
+::placeholder {
+  color: #8b7f76;
+  opacity: 0.6;
+}
