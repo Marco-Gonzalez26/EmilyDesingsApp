@@ -1,0 +1,558 @@
+<ion-header>
+  <ion-toolbar class="ion-padding-horizontal">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Reportes</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+<div class="max-w-7xl mx-auto space-y-6">
+  <p class="text-emily-taupe">Análisis y exportación de datos</p>
+
+  <div class="bg-emily-white rounded-xl shadow-sm border border-emily-cream">
+    <div class="border-b border-emily-cream">
+      <div class="flex gap-2 p-4 overflow-x-auto">
+        <button
+          (click)="changeTab('ventas')"
+          [class.bg-emily-rose]="currentTab() === 'ventas'"
+          [class.text-emily-white]="currentTab() === 'ventas'"
+          [class.border-emily-rose]="currentTab() === 'ventas'"
+          class="flex items-center gap-2 px-4 py-2 border border-emily-cream rounded-lg transition-colors whitespace-nowrap"
+        >
+          <ion-icon name="chevron-up"></ion-icon>
+          <span>Ventas por Período</span>
+        </button>
+
+        <button
+          (click)="changeTab('productos')"
+          [class.bg-emily-rose]="currentTab() === 'productos'"
+          [class.text-emily-white]="currentTab() === 'productos'"
+          [class.border-emily-rose]="currentTab() === 'productos'"
+          class="flex items-center gap-2 px-4 py-2 border border-emily-cream rounded-lg transition-colors whitespace-nowrap"
+        >
+          <ion-icon name="cube-outline"></ion-icon>
+          <span>Productos Más Vendidos</span>
+        </button>
+
+        <button
+          (click)="changeTab('stock')"
+          [class.bg-emily-rose]="currentTab() === 'stock'"
+          [class.text-emily-white]="currentTab() === 'stock'"
+          [class.border-emily-rose]="currentTab() === 'stock'"
+          class="flex items-center gap-2 px-4 py-2 border border-emily-cream rounded-lg transition-colors whitespace-nowrap"
+        >
+          <ion-icon name="cube-outline"></ion-icon>
+          <span>Stock Bajo</span>
+        </button>
+
+        <button
+          (click)="changeTab('clientes')"
+          [class.bg-emily-rose]="currentTab() === 'clientes'"
+          [class.text-emily-white]="currentTab() === 'clientes'"
+          [class.border-emily-rose]="currentTab() === 'clientes'"
+          class="flex items-center gap-2 px-4 py-2 border border-emily-cream rounded-lg transition-colors whitespace-nowrap"
+        >
+          <ion-icon name="person-outline"></ion-icon>
+          <span>Mejores Clientes</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="p-6">
+      @if (currentTab() === 'ventas') {
+        <div class="space-y-6">
+          <div class="flex flex-col md:flex-row gap-4 items-end">
+            <div class="flex-1">
+              <label class="block text-sm font-medium text-emily-dark mb-2">Fecha Desde</label>
+              <input
+                type="date"
+                [(ngModel)]="fechaDesde"
+                class="w-full px-4 py-3 border border-emily-cream rounded-lg focus:ring-2 focus:ring-emily-rose focus:border-transparent transition-all"
+              />
+            </div>
+
+            <div class="flex-1">
+              <label class="block text-sm font-medium text-emily-dark mb-2">Fecha Hasta</label>
+              <input
+                type="date"
+                [(ngModel)]="fechaHasta"
+                class="w-full px-4 py-3 border border-emily-cream rounded-lg focus:ring-2 focus:ring-emily-rose focus:border-transparent transition-all"
+              />
+            </div>
+
+            <button
+              (click)="loadVentas()"
+              class="px-6 py-3 bg-emily-rose text-emily-white rounded-lg hover:bg-emily-rose/90 transition-colors whitespace-nowrap"
+            >
+              Generar Reporte
+            </button>
+
+            @if (ventasData()) {
+              <button
+                (click)="exportVentasPDF()"
+                class="flex items-center gap-2 px-6 py-3 border border-emily-cream text-emily-dark rounded-lg hover:bg-emily-light transition-colors whitespace-nowrap"
+              >
+                <ion-icon name="download-outline"></ion-icon>
+                <span>Exportar PDF</span>
+              </button>
+            }
+          </div>
+
+          @if (isLoadingVentas()) {
+            <div class="flex items-center justify-center py-12">
+              <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-emily-rose"></div>
+            </div>
+          } @else if (ventasData(); as data) {
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div class="bg-emily-cream rounded-lg p-4">
+                <p class="text-sm text-emily-taupe mb-1">Total Ventas</p>
+                <p class="text-2xl font-bold text-emily-rose">
+                  {{ formatCurrency(data.total_ventas) }}
+                </p>
+              </div>
+
+              <div class="bg-emily-cream rounded-lg p-4">
+                <p class="text-sm text-emily-taupe mb-1">Total Órdenes</p>
+                <p class="text-2xl font-bold text-emily-dark">{{ data.total_ordenes }}</p>
+              </div>
+
+              <div class="bg-emily-cream rounded-lg p-4">
+                <p class="text-sm text-emily-taupe mb-1">Ticket Promedio</p>
+                <p class="text-2xl font-bold text-emily-dark">
+                  {{ formatCurrency(data.ticket_promedio) }}
+                </p>
+              </div>
+            </div>
+
+            <div>
+              <h3 class="text-lg font-serif font-semibold text-emily-dark mb-4">
+                Órdenes del Período
+              </h3>
+
+              @if (data.ordenes.length === 0) {
+                <p class="text-center py-8 text-emily-taupe">No hay órdenes en este período</p>
+              } @else {
+                <div class="overflow-x-auto">
+                  <table class="w-full">
+                    <thead class="bg-emily-cream">
+                      <tr>
+                        <th
+                          class="px-4 py-3 text-left text-xs font-medium text-emily-taupe uppercase"
+                        >
+                          N° Orden
+                        </th>
+                        <th
+                          class="px-4 py-3 text-left text-xs font-medium text-emily-taupe uppercase"
+                        >
+                          Fecha
+                        </th>
+                        <th
+                          class="px-4 py-3 text-left text-xs font-medium text-emily-taupe uppercase"
+                        >
+                          Cliente
+                        </th>
+                        <th
+                          class="px-4 py-3 text-right text-xs font-medium text-emily-taupe uppercase"
+                        >
+                          Total
+                        </th>
+                        <th
+                          class="px-4 py-3 text-center text-xs font-medium text-emily-taupe uppercase"
+                        >
+                          Estado
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-emily-cream">
+                      @for (orden of data.ordenes; track orden.numero_orden) {
+                        <tr class="hover:bg-emily-light transition-colors">
+                          <td class="px-4 py-3 text-sm font-medium text-emily-dark">
+                            {{ orden.numero_orden }}
+                          </td>
+                          <td class="px-4 py-3 text-sm text-emily-taupe">{{ orden.fecha }}</td>
+                          <td class="px-4 py-3 text-sm text-emily-taupe">{{ orden.cliente }}</td>
+                          <td class="px-4 py-3 text-sm font-bold text-emily-rose text-right">
+                            {{ formatCurrency(orden.total) }}
+                          </td>
+                          <td class="px-4 py-3 text-center">
+                            <span
+                              class="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800"
+                            >
+                              {{ orden.estado }}
+                            </span>
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              }
+            </div>
+          } @else {
+            <div class="text-center py-12">
+              <ion-icon
+                name="document-outline"
+                class="text-emily-taupe text-5xl mx-auto mb-4"
+              ></ion-icon>
+              <p class="text-emily-taupe">Selecciona un período y genera el reporte</p>
+            </div>
+          }
+        </div>
+      }
+
+      @if (currentTab() === 'productos') {
+        <div class="space-y-6">
+          <div class="flex flex-col md:flex-row gap-4 items-end">
+            <div class="flex-1">
+              <label class="block text-sm font-medium text-emily-dark mb-2"
+                >Fecha Desde (opcional)</label
+              >
+              <input
+                type="date"
+                [(ngModel)]="fechaDesde"
+                class="w-full px-4 py-3 border border-emily-cream rounded-lg focus:ring-2 focus:ring-emily-rose focus:border-transparent transition-all"
+              />
+            </div>
+
+            <div class="flex-1">
+              <label class="block text-sm font-medium text-emily-dark mb-2"
+                >Fecha Hasta (opcional)</label
+              >
+              <input
+                type="date"
+                [(ngModel)]="fechaHasta"
+                class="w-full px-4 py-3 border border-emily-cream rounded-lg focus:ring-2 focus:ring-emily-rose focus:border-transparent transition-all"
+              />
+            </div>
+
+            <div class="w-32">
+              <label class="block text-sm font-medium text-emily-dark mb-2">Top</label>
+              <input
+                type="number"
+                [(ngModel)]="limitProductos"
+                min="5"
+                max="100"
+                class="w-full px-4 py-3 border border-emily-cream rounded-lg focus:ring-2 focus:ring-emily-rose focus:border-transparent transition-all"
+              />
+            </div>
+
+            <button
+              (click)="loadProductos()"
+              class="px-6 py-3 bg-emily-rose text-emily-white rounded-lg hover:bg-emily-rose/90 transition-colors whitespace-nowrap"
+            >
+              Generar Reporte
+            </button>
+
+            @if (productosData().length > 0) {
+              <button
+                (click)="exportProductosPDF()"
+                class="flex items-center gap-2 px-6 py-3 border border-emily-cream text-emily-dark rounded-lg hover:bg-emily-light transition-colors whitespace-nowrap"
+              >
+                <ion-icon name="download-outline"></ion-icon>
+                <span>Exportar PDF</span>
+              </button>
+            }
+          </div>
+
+          @if (isLoadingProductos()) {
+            <div class="flex items-center justify-center py-12">
+              <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-emily-rose"></div>
+            </div>
+          } @else if (productosData().length > 0) {
+            <div class="overflow-x-auto">
+              <table class="w-full">
+                <thead class="bg-emily-cream">
+                  <tr>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-emily-taupe uppercase">
+                      #
+                    </th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-emily-taupe uppercase">
+                      Producto
+                    </th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-emily-taupe uppercase">
+                      Categoría
+                    </th>
+                    <th class="px-4 py-3 text-right text-xs font-medium text-emily-taupe uppercase">
+                      Cantidad Vendida
+                    </th>
+                    <th class="px-4 py-3 text-right text-xs font-medium text-emily-taupe uppercase">
+                      Ingresos
+                    </th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-emily-cream">
+                  @for (producto of productosData(); track $index) {
+                    <tr class="hover:bg-emily-light transition-colors">
+                      <td class="px-4 py-3">
+                        <span
+                          class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emily-rose text-emily-white text-xs font-bold"
+                        >
+                          {{ $index + 1 }}
+                        </span>
+                      </td>
+                      <td class="px-4 py-3 text-sm font-medium text-emily-dark">
+                        {{ producto.producto }}
+                      </td>
+                      <td class="px-4 py-3 text-sm text-emily-taupe">{{ producto.categoria }}</td>
+                      <td class="px-4 py-3 text-sm font-bold text-emily-dark text-right">
+                        {{ producto.cantidad_vendida }}
+                      </td>
+                      <td class="px-4 py-3 text-sm font-bold text-emily-rose text-right">
+                        {{ formatCurrency(producto.ingresos) }}
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          } @else {
+            <div class="text-center py-12">
+              <ion-icon
+                name="cube-outline"
+                class="text-emily-taupe text-5xl mx-auto mb-4"
+              ></ion-icon>
+              <p class="text-emily-taupe">Genera el reporte para ver los productos más vendidos</p>
+            </div>
+          }
+        </div>
+      }
+
+      @if (currentTab() === 'stock') {
+        <div class="space-y-6">
+          <div class="flex gap-4 items-end">
+            <div class="w-48">
+              <label class="block text-sm font-medium text-emily-dark mb-2">Umbral de Stock</label>
+              <input
+                type="number"
+                [(ngModel)]="umbralStock"
+                min="0"
+                max="100"
+                class="w-full px-4 py-3 border border-emily-cream rounded-lg focus:ring-2 focus:ring-emily-rose focus:border-transparent transition-all"
+              />
+            </div>
+
+            <button
+              (click)="loadStock()"
+              class="px-6 py-3 bg-emily-rose text-emily-white rounded-lg hover:bg-emily-rose/90 transition-colors"
+            >
+              Generar Reporte
+            </button>
+
+            @if (stockData().length > 0) {
+              <button
+                (click)="exportStockPDF()"
+                class="flex items-center gap-2 px-6 py-3 border border-emily-cream text-emily-dark rounded-lg hover:bg-emily-light transition-colors"
+              >
+                <ion-icon name="download-outline"></ion-icon>
+                <span>Exportar PDF</span>
+              </button>
+            }
+          </div>
+
+          @if (isLoadingStock()) {
+            <div class="flex items-center justify-center py-12">
+              <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-emily-rose"></div>
+            </div>
+          } @else if (stockData().length > 0) {
+            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+              <p class="text-sm text-yellow-800">
+                Se encontraron <strong>{{ stockData().length }}</strong> productos con stock menor o
+                igual a {{ umbralStock() }}
+              </p>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full">
+                <thead class="bg-emily-cream">
+                  <tr>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-emily-taupe uppercase">
+                      Producto
+                    </th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-emily-taupe uppercase">
+                      Categoría
+                    </th>
+                    <th
+                      class="px-4 py-3 text-center text-xs font-medium text-emily-taupe uppercase"
+                    >
+                      Stock Disponible
+                    </th>
+                    <th
+                      class="px-4 py-3 text-center text-xs font-medium text-emily-taupe uppercase"
+                    >
+                      Stock Total
+                    </th>
+                    <th
+                      class="px-4 py-3 text-center text-xs font-medium text-emily-taupe uppercase"
+                    >
+                      Reservado
+                    </th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-emily-cream">
+                  @for (item of stockData(); track $index) {
+                    <tr class="hover:bg-emily-light transition-colors">
+                      <td class="px-4 py-3 text-sm font-medium text-emily-dark">
+                        {{ item.producto }}
+                      </td>
+                      <td class="px-4 py-3 text-sm text-emily-taupe">{{ item.categoria }}</td>
+                      <td class="px-4 py-3 text-center">
+                        <span
+                          class="px-2 py-1 rounded-full text-xs font-medium"
+                          [class.bg-red-100]="item.stock_disponible <= 5"
+                          [class.text-red-800]="item.stock_disponible <= 5"
+                          [class.bg-yellow-100]="item.stock_disponible > 5"
+                          [class.text-yellow-800]="item.stock_disponible > 5"
+                        >
+                          {{ item.stock_disponible }}
+                        </span>
+                      </td>
+                      <td class="px-4 py-3 text-sm text-emily-dark text-center">
+                        {{ item.stock_total }}
+                      </td>
+                      <td class="px-4 py-3 text-sm text-emily-taupe text-center">
+                        {{ item.stock_reservado }}
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          } @else {
+            <div class="text-center py-12">
+              <ion-icon
+                name="cube-outline"
+                class="text-emily-taupe text-5xl mx-auto mb-4"
+              ></ion-icon>
+              <p class="text-emily-taupe">Genera el reporte para ver productos con stock bajo</p>
+            </div>
+          }
+        </div>
+      }
+
+      @if (currentTab() === 'clientes') {
+        <div class="space-y-6">
+          <div class="flex flex-col md:flex-row gap-4 items-end">
+            <div class="flex-1">
+              <label class="block text-sm font-medium text-emily-dark mb-2"
+                >Fecha Desde (opcional)</label
+              >
+              <input
+                type="date"
+                [(ngModel)]="fechaDesde"
+                class="w-full px-4 py-3 border border-emily-cream rounded-lg focus:ring-2 focus:ring-emily-rose focus:border-transparent transition-all"
+              />
+            </div>
+
+            <div class="flex-1">
+              <label class="block text-sm font-medium text-emily-dark mb-2"
+                >Fecha Hasta (opcional)</label
+              >
+              <input
+                type="date"
+                [(ngModel)]="fechaHasta"
+                class="w-full px-4 py-3 border border-emily-cream rounded-lg focus:ring-2 focus:ring-emily-rose focus:border-transparent transition-all"
+              />
+            </div>
+
+            <div class="w-32">
+              <label class="block text-sm font-medium text-emily-dark mb-2">Top</label>
+              <input
+                type="number"
+                [(ngModel)]="limitClientes"
+                min="5"
+                max="100"
+                class="w-full px-4 py-3 border border-emily-cream rounded-lg focus:ring-2 focus:ring-emily-rose focus:border-transparent transition-all"
+              />
+            </div>
+
+            <button
+              (click)="loadClientes()"
+              class="px-6 py-3 bg-emily-rose text-emily-white rounded-lg hover:bg-emily-rose/90 transition-colors whitespace-nowrap"
+            >
+              Generar Reporte
+            </button>
+
+            @if (clientesData().length > 0) {
+              <button
+                (click)="exportClientesPDF()"
+                class="flex items-center gap-2 px-6 py-3 border border-emily-cream text-emily-dark rounded-lg hover:bg-emily-light transition-colors whitespace-nowrap"
+              >
+                <ion-icon name="download-outline"></ion-icon>
+                <span>Exportar PDF</span>
+              </button>
+            }
+          </div>
+
+          @if (isLoadingClientes()) {
+            <div class="flex items-center justify-center py-12">
+              <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-emily-rose"></div>
+            </div>
+          } @else if (clientesData().length > 0) {
+            <div class="overflow-x-auto">
+              <table class="w-full">
+                <thead class="bg-emily-cream">
+                  <tr>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-emily-taupe uppercase">
+                      #
+                    </th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-emily-taupe uppercase">
+                      Cliente
+                    </th>
+                    <th
+                      class="px-4 py-3 text-center text-xs font-medium text-emily-taupe uppercase"
+                    >
+                      Órdenes
+                    </th>
+                    <th class="px-4 py-3 text-right text-xs font-medium text-emily-taupe uppercase">
+                      Total Gastado
+                    </th>
+                    <th class="px-4 py-3 text-right text-xs font-medium text-emily-taupe uppercase">
+                      Ticket Promedio
+                    </th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-emily-cream">
+                  @for (cliente of clientesData(); track $index) {
+                    <tr class="hover:bg-emily-light transition-colors">
+                      <td class="px-4 py-3">
+                        <span
+                          class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emily-rose text-emily-white text-xs font-bold"
+                        >
+                          {{ $index + 1 }}
+                        </span>
+                      </td>
+                      <td class="px-4 py-3">
+                        <p class="text-sm font-medium text-emily-dark">{{ cliente.cliente }}</p>
+                        <p class="text-xs text-emily-taupe">{{ cliente.email }}</p>
+                      </td>
+                      <td class="px-4 py-3 text-sm font-bold text-emily-dark text-center">
+                        {{ cliente.total_ordenes }}
+                      </td>
+                      <td class="px-4 py-3 text-sm font-bold text-emily-rose text-right">
+                        {{ formatCurrency(cliente.total_gastado) }}
+                      </td>
+                      <td class="px-4 py-3 text-sm font-medium text-emily-dark text-right">
+                        {{ formatCurrency(cliente.ticket_promedio) }}
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          } @else {
+            <div class="text-center py-12">
+              <ion-icon
+                name="person-outline"
+                class="text-emily-taupe text-5xl mx-auto mb-4"
+              ></ion-icon>
+              <p class="text-emily-taupe">Genera el reporte para ver los mejores clientes</p>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</div>
+</ion-content>

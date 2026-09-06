@@ -1,0 +1,407 @@
+<ion-header>
+  <ion-toolbar class="ion-padding-horizontal">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/admin/productos"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ isEditMode() ? 'Editar Producto' : 'Nuevo Producto' }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+<div class="max-w-4xl mx-auto space-y-6">
+  <p class="text-emily-taupe">
+    {{
+      isEditMode()
+        ? 'Actualiza la información del producto'
+        : 'Completa los datos para crear un producto'
+    }}
+  </p>
+
+  @if (isLoading()) {
+    <div
+      class="bg-emily-white rounded-xl p-20 shadow-sm border border-emily-cream flex items-center justify-center"
+    >
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-emily-rose"></div>
+    </div>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="bg-emily-white rounded-xl shadow-sm border border-emily-cream p-6">
+        <h2 class="text-lg font-serif font-semibold text-emily-dark mb-4">Imágenes del Producto</h2>
+
+        <input
+          type="file"
+          id="fileInput"
+          multiple
+          accept="image/jpeg,image/jpg,image/png,image/webp"
+          class="hidden"
+          (change)="onFileSelected($event)"
+        />
+
+        <div
+          class="mb-6 border-2 border-dashed rounded-xl transition-all"
+          [class.border-emily-rose]="isDragging()"
+          [class.bg-emily-rose/5]="isDragging()"
+          [class.border-emily-cream]="!isDragging()"
+          (dragover)="onDragOver($event)"
+          (dragleave)="onDragLeave($event)"
+          (drop)="onDrop($event)"
+        >
+          <div class="p-8 text-center">
+            @if (isUploadingImages()) {
+              <div class="space-y-4">
+                <div
+                  class="animate-spin rounded-full h-12 w-12 border-b-2 border-emily-rose mx-auto"
+                ></div>
+                <p class="text-emily-dark font-medium">Subiendo imágenes...</p>
+                <div class="max-w-xs mx-auto">
+                  <div class="w-full bg-emily-light rounded-full h-2">
+                    <div
+                      class="bg-emily-rose h-2 rounded-full transition-all duration-300"
+                      [style.width.%]="uploadProgress()"
+                    ></div>
+                  </div>
+                  <p class="text-sm text-emily-taupe mt-2">{{ uploadProgress() }}%</p>
+                </div>
+              </div>
+            } @else {
+              <ion-icon
+                name="cloud-upload-outline"
+                class="mx-auto text-emily-taupe mb-4 text-6xl"
+              ></ion-icon>
+              <p class="text-emily-dark font-medium mb-2">Arrastra imágenes aquí o</p>
+
+              <button
+                type="button"
+                (click)="triggerFileInput()"
+                [disabled]="uploadedImages().length >= 5"
+                class="px-4 py-2 bg-emily-rose text-emily-white rounded-lg hover:bg-emily-rose/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer active:scale-95"
+              >
+                Seleccionar Archivos
+              </button>
+
+              <p class="text-xs text-emily-taupe mt-4">
+                JPG, PNG o WEBP • Máximo 5 imágenes • 5MB por imagen<br />
+                {{ 5 - uploadedImages().length }} espacio(s) disponible(s)
+              </p>
+            }
+          </div>
+        </div>
+
+        @if (uploadedImages().length > 0) {
+          <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            @for (image of uploadedImages(); track image.id; let i = $index) {
+              <div
+                class="relative group aspect-square bg-emily-light rounded-lg overflow-hidden border-2 transition-all"
+                [class.border-emily-gold]="image.es_principal"
+                [class.border-emily-cream]="!image.es_principal"
+              >
+                <img
+                  [src]="image.url_imagen"
+                  [alt]="'Imagen ' + (i + 1)"
+                  class="w-full h-full object-cover"
+                  loading="lazy"
+                />
+
+                @if (image.es_principal) {
+                  <div class="absolute top-2 left-2">
+                    <span
+                      class="px-2 py-1 bg-emily-gold text-white text-xs font-bold rounded flex items-center gap-1 shadow-lg"
+                    >
+                      <ion-icon name="star-outline"></ion-icon>
+                      Principal
+                    </span>
+                  </div>
+                }
+
+                <div
+                  class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2"
+                >
+                  @if (!image.es_principal) {
+                    <button
+                      type="button"
+                      (click)="setMainImage(image, i)"
+                      class="px-3 py-1.5 bg-emily-gold text-white text-xs font-medium rounded hover:bg-emily-gold/90 transition-colors shadow-lg flex items-center gap-1"
+                    >
+                      <ion-icon name="star-outline"></ion-icon>
+                      Hacer principal
+                    </button>
+                  }
+                  <button
+                    type="button"
+                    (click)="removeImage(image, i)"
+                    class="px-3 py-1.5 bg-red-600 text-white text-xs font-medium rounded hover:bg-red-700 transition-colors shadow-lg flex items-center gap-1"
+                  >
+                    <ion-icon name="trash-outline"></ion-icon>
+                    Eliminar
+                  </button>
+                </div>
+
+                <div
+                  class="absolute bottom-2 right-2 w-6 h-6 bg-emily-dark/80 text-white text-xs font-bold rounded-full flex items-center justify-center shadow-lg"
+                >
+                  {{ i + 1 }}
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="bg-emily-white rounded-xl shadow-sm border border-emily-cream p-6">
+        <h2 class="text-lg font-serif font-semibold text-emily-dark mb-4">Información Básica</h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <label class="text-sm font-medium text-emily-dark"> SKU </label>
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  [checked]="autoGenerateSku()"
+                  (change)="toggleAutoSku()"
+                  class="rounded border-emily-cream text-emily-rose focus:ring-emily-rose"
+                />
+                <span class="text-xs text-emily-taupe">Auto-generar</span>
+              </label>
+            </div>
+
+            <input
+              type="text"
+              formControlName="sku"
+              [placeholder]="
+                autoGenerateSku() ? 'Se generará automáticamente al guardar' : 'Ej: NIKE-0001'
+              "
+              class="w-full px-4 py-3 border border-emily-cream rounded-lg focus:ring-2 focus:ring-emily-rose focus:border-transparent transition-all disabled:bg-emily-light disabled:cursor-not-allowed disabled:text-emily-taupe"
+            />
+
+            @if (autoGenerateSku()) {
+              <p class="text-xs text-emily-taupe mt-2 flex items-center gap-1">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                El SKU se generará basado en la marca seleccionada
+              </p>
+            }
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-emily-dark mb-2">
+              Nombre <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              formControlName="nombre"
+              class="w-full px-4 py-3 border border-emily-cream rounded-lg focus:ring-2 focus:ring-emily-rose focus:border-transparent transition-all"
+              placeholder="Ej: Vestido Floral de Verano"
+            />
+            @if (form.get('nombre')?.invalid && form.get('nombre')?.touched) {
+              <p class="text-red-500 text-sm mt-2">
+                @if (form.get('nombre')?.errors?.['required']) {
+                  El nombre es requerido
+                }
+                @if (form.get('nombre')?.errors?.['maxlength']) {
+                  Máximo 255 caracteres
+                }
+              </p>
+            }
+          </div>
+
+          <div class="md:col-span-2">
+            <label class="block text-sm font-medium text-emily-dark mb-2"> Descripción </label>
+            <textarea
+              formControlName="descripcion"
+              rows="4"
+              class="w-full px-4 py-3 border border-emily-cream rounded-lg focus:ring-2 focus:ring-emily-rose focus:border-transparent transition-all resize-none"
+              placeholder="Descripción detallada del producto..."
+            ></textarea>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-emily-dark mb-2"> Categoría </label>
+            <select
+              formControlName="categoria_id"
+              class="w-full px-4 py-3 border border-emily-cream rounded-lg focus:ring-2 focus:ring-emily-rose focus:border-transparent transition-all"
+            >
+              <option [value]="null">Sin categoría</option>
+              @for (cat of categories(); track cat.id) {
+                <option [value]="cat.id">{{ cat.nombre }}</option>
+              }
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-emily-dark mb-2"> Marca </label>
+            <select
+              formControlName="marca_id"
+              class="w-full px-4 py-3 border border-emily-cream rounded-lg focus:ring-2 focus:ring-emily-rose focus:border-transparent transition-all"
+            >
+              <option [value]="null">Sin marca</option>
+              @for (brand of brands(); track brand.id) {
+                <option [value]="brand.id">{{ brand.nombre }}</option>
+              }
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-emily-white rounded-xl shadow-sm border border-emily-cream p-6">
+        <h2 class="text-lg font-serif font-semibold text-emily-dark mb-4">Precios</h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label class="block text-sm font-medium text-emily-dark mb-2">
+              Precio Regular <span class="text-red-500">*</span>
+            </label>
+            <div class="relative">
+              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-emily-taupe">$</span>
+              <input
+                type="number"
+                step="0.01"
+                min="0.01"
+                formControlName="precio_regular"
+                class="w-full pl-8 pr-4 py-3 border border-emily-cream rounded-lg focus:ring-2 focus:ring-emily-rose focus:border-transparent transition-all"
+                placeholder="0.00"
+              />
+            </div>
+            @if (form.get('precio_regular')?.invalid && form.get('precio_regular')?.touched) {
+              <p class="text-red-500 text-sm mt-2">
+                @if (form.get('precio_regular')?.errors?.['required']) {
+                  El precio es requerido
+                }
+                @if (form.get('precio_regular')?.errors?.['min']) {
+                  El precio debe ser mayor a 0
+                }
+              </p>
+            }
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-emily-dark mb-2">
+              Precio con Descuento (opcional)
+            </label>
+            <div class="relative">
+              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-emily-taupe">$</span>
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                formControlName="precio_descuento"
+                class="w-full pl-8 pr-4 py-3 border border-emily-cream rounded-lg focus:ring-2 focus:ring-emily-rose focus:border-transparent transition-all"
+                placeholder="0.00"
+              />
+            </div>
+            @if (form.get('precio_descuento')?.errors?.['invalidDiscount']) {
+              <p class="text-red-500 text-sm mt-2">
+                El precio de descuento debe ser menor al precio regular
+              </p>
+            }
+            @if (form.get('precio_descuento')?.value) {
+              <p class="text-green-600 text-sm mt-2">
+                Descuento:
+                {{
+                  (
+                    (1 - form.get('precio_descuento')?.value / form.get('precio_regular')?.value) *
+                    100
+                  ).toFixed(0)
+                }}%
+              </p>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-emily-white rounded-xl shadow-sm border border-emily-cream p-6">
+        <h2 class="text-lg font-serif font-semibold text-emily-dark mb-4">Características</h2>
+
+        <div class="space-y-4">
+          <div class="flex items-center justify-between p-4 bg-emily-cream rounded-lg">
+            <div>
+              <p class="font-medium text-emily-dark">Producto Nuevo</p>
+              <p class="text-sm text-emily-taupe">Mostrar badge "Nuevo" en el producto</p>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" formControlName="es_nuevo" class="sr-only peer" />
+              <div
+                class="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-emily-rose/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emily-rose"
+              ></div>
+            </label>
+          </div>
+
+          <div class="flex items-center justify-between p-4 bg-emily-cream rounded-lg">
+            <div>
+              <p class="font-medium text-emily-dark">En Oferta</p>
+              <p class="text-sm text-emily-taupe">Mostrar badge "Oferta" en el producto</p>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" formControlName="es_oferta" class="sr-only peer" />
+              <div
+                class="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-emily-rose/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emily-rose"
+              ></div>
+            </label>
+          </div>
+
+          <div class="flex items-center justify-between p-4 bg-emily-cream rounded-lg">
+            <div>
+              <p class="font-medium text-emily-dark">Producto Destacado</p>
+              <p class="text-sm text-emily-taupe">Mostrar en sección destacados del home</p>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" formControlName="es_destacado" class="sr-only peer" />
+              <div
+                class="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-emily-rose/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emily-rose"
+              ></div>
+            </label>
+          </div>
+
+          <div class="flex items-center justify-between p-4 bg-emily-cream rounded-lg">
+            <div>
+              <p class="font-medium text-emily-dark">Estado</p>
+              <p class="text-sm text-emily-taupe">¿El producto está activo y visible?</p>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" formControlName="activo" class="sr-only peer" />
+              <div
+                class="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-emily-rose/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emily-rose"
+              ></div>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="bg-emily-white rounded-xl shadow-sm border border-emily-cream p-6 flex gap-3 justify-end sticky bottom-4"
+      >
+        <button
+          type="button"
+          (click)="cancelar()"
+          class="px-6 py-3 rounded-lg border border-emily-cream text-emily-dark hover:bg-emily-light transition-colors"
+          [disabled]="isSubmitting()"
+        >
+          Cancelar
+        </button>
+
+        <button
+          type="submit"
+          class="px-6 py-3 rounded-lg bg-emily-rose text-emily-white hover:bg-emily-rose/90 transition-colors flex items-center gap-2 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+          [disabled]="form.invalid || isSubmitting() || uploadedImages().length === 0"
+        >
+          @if (isSubmitting()) {
+            <div
+              class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"
+            ></div>
+            <span>Guardando...</span>
+          } @else {
+            <ion-icon name="checkmark"></ion-icon>
+            <span>{{ isEditMode() ? 'Actualizar' : 'Crear' }} Producto</span>
+          }
+        </button>
+      </div>
+    </form>
+  }
+</div>
+</ion-content>

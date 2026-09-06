@@ -1,0 +1,53 @@
+<ion-header>
+  <ion-toolbar class="ion-padding-horizontal">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Dashboard</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="space-y-6">
+
+    <div class="bg-emily-white rounded-xl shadow-sm border border-emily-cream">
+
+      <div class="p-6 border-b border-emily-cream">
+        <h1 class="text-3xl font-serif font-bold text-emily-dark">Dashboard</h1>
+        <p class="text-emily-taupe mt-1">Análisis y métricas de Emily Designs</p>
+      </div>
+
+      <div class="flex overflow-x-auto">
+        @for (tab of tabs; track tab.id) {
+          <button
+            (click)="selectTab(tab.id)"
+            [class.bg-emily-rose]="isTabActive()(tab.id)"
+            [class.text-emily-white]="isTabActive()(tab.id)"
+            [class.text-emily-dark]="!isTabActive()(tab.id)"
+            [class.hover:bg-emily-light]="!isTabActive()(tab.id)"
+            class="flex items-center gap-2 px-6 py-4 font-medium transition-colors whitespace-nowrap border-b-2"
+            [class.border-emily-rose]="isTabActive()(tab.id)"
+            [class.border-transparent]="!isTabActive()(tab.id)"
+          >
+            <ion-icon [name]="tab.icon"></ion-icon>
+            <span>{{ tab.label }}</span>
+          </button>
+        }
+      </div>
+    </div>
+
+    <div id="dashboard-content">
+      @if (activeTab() === 'general') {
+        <app-general-tab />
+      } @else if (activeTab() === 'productos') {
+        <app-products-tab />
+      } @else if (activeTab() === 'clientes') {
+        <app-clients-tab />
+      } @else if (activeTab() === 'ventas') {
+        <app-orders-tab />
+      } @else if (activeTab() === 'analisis') {
+        <app-analysis-tab />
+      }
+    </div>
+  </div>
+</ion-content>

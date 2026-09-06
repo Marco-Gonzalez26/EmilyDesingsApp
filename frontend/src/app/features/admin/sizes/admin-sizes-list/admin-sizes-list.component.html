@@ -1,0 +1,253 @@
+<ion-header>
+  <ion-toolbar class="ion-padding-horizontal">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Tallas</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="space-y-6">
+    <div class="flex items-center justify-end">
+      <button
+        (click)="navigateToCreate()"
+        class="flex items-center gap-2 px-4 py-2 bg-emily-rose text-emily-white rounded-lg hover:bg-emily-rose/90 transition-colors shadow-sm"
+      >
+        <ion-icon name="add"></ion-icon>
+        <span>Nueva Talla</span>
+      </button>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="bg-emily-white rounded-xl p-4 shadow-sm border border-emily-cream">
+      <div class="relative">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <ion-icon name="search-outline" class="text-emily-taupe"></ion-icon>
+        </div>
+        <input
+          type="text"
+          [value]="searchTerm()"
+          (input)="onSearch($event)"
+          placeholder="Buscar por nombre "
+          class="w-full pl-10 pr-4 py-2 border border-emily-cream rounded-lg focus:ring-2 focus:ring-emily-rose focus:border-transparent transition-all"
+        />
+      </div>
+    </div>
+
+    <!-- Info Banner -->
+    <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-start gap-3">
+      <svg class="w-5 h-5 text-blue-600 mt-0.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+        <path
+          fill-rule="evenodd"
+          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+          clip-rule="evenodd"
+        />
+      </svg>
+      <div>
+        <p class="text-sm font-medium text-blue-900">Ordenamiento de tallas</p>
+        <p class="text-sm text-blue-700 mt-1">
+          Usa los botones de flechas para reordenar las tallas. El orden se refleja en el selector de
+          productos.
+        </p>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="bg-emily-white rounded-xl shadow-sm border border-emily-cream overflow-hidden">
+      @if (isLoading()) {
+        <div class="flex items-center justify-center py-20">
+          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-emily-rose"></div>
+        </div>
+      } @else if (filteredSizes().length === 0) {
+        <div class="text-center py-20">
+          <svg
+            class="mx-auto h-12 w-12 text-emily-taupe"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
+            />
+          </svg>
+          <p class="mt-4 text-emily-taupe">
+            @if (searchTerm()) {
+              No se encontraron tallas con "{{ searchTerm() }}"
+            } @else {
+              No hay tallas registradas
+            }
+          </p>
+          @if (!searchTerm()) {
+            <button
+              (click)="navigateToCreate()"
+              class="mt-4 px-4 py-2 bg-emily-rose text-emily-white rounded-lg hover:bg-emily-rose/90 transition-colors"
+            >
+              Crear primera talla
+            </button>
+          }
+        </div>
+      } @else {
+        <!-- Table Content -->
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead class="bg-emily-cream">
+              <tr>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-emily-taupe uppercase tracking-wider"
+                >
+                  Orden
+                </th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-emily-taupe uppercase tracking-wider"
+                >
+                  Nombre
+                </th>
+                <th
+                  class="px-6 py-3 text-center text-xs font-medium text-emily-taupe uppercase tracking-wider"
+                >
+                  Estado
+                </th>
+                <th
+                  class="px-6 py-3 text-right text-xs font-medium text-emily-taupe uppercase tracking-wider"
+                >
+                  Acciones
+                </th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-emily-cream">
+              @for (size of paginatedSizes; track size.id; let i = $index) {
+                <tr class="hover:bg-emily-light transition-colors">
+                  <!-- Orden -->
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center gap-2">
+                      <span
+                        class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-emily-sage text-emily-white text-sm font-bold"
+                      >
+                        {{ size.orden }}
+                      </span>
+                      <div class="flex flex-col gap-1">
+                        <button
+                          (click)="moveUp(size, i)"
+                          [disabled]="i === 0"
+                          class="p-1 text-emily-taupe hover:text-emily-dark hover:bg-emily-light rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                          title="Mover arriba"
+                        >
+                          <ion-icon name="chevron-up"></ion-icon>
+                        </button>
+                        <button
+                          (click)="moveDown(size, i)"
+                          [disabled]="i === paginatedSizes.length - 1"
+                          class="p-1 text-emily-taupe hover:text-emily-dark hover:bg-emily-light rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                          title="Mover abajo"
+                        >
+                          <ion-icon name="chevron-down"></ion-icon>
+                        </button>
+                      </div>
+                    </div>
+                  </td>
+
+                  <!-- Nombre -->
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="text-sm font-medium text-emily-dark">{{ size.nombre }}</span>
+                  </td>
+
+                  <!-- Estado -->
+                  <td class="px-6 py-4 whitespace-nowrap text-center">
+                    @if (size.activo) {
+                      <span
+                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"
+                      >
+                        Activo
+                      </span>
+                    } @else {
+                      <span
+                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
+                      >
+                        Inactivo
+                      </span>
+                    }
+                  </td>
+
+                  <!-- Acciones -->
+                  <td class="px-6 py-4 whitespace-nowrap text-right">
+                    <div class="flex items-center justify-end gap-2">
+                      <button
+                        (click)="navigateToEdit(size)"
+                        class="p-2 text-emily-taupe hover:text-emily-dark hover:bg-emily-light rounded-lg transition-colors"
+                        title="Editar"
+                      >
+                        <ion-icon name="create-outline"></ion-icon>
+                      </button>
+                      <button
+                        (click)="openDeleteConfirm(size)"
+                        class="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
+                        title="Eliminar"
+                      >
+                        <ion-icon name="trash-outline"></ion-icon>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        @if (totalPages > 1) {
+          <div class="px-6 py-4 border-t border-emily-cream flex items-center justify-between">
+            <div class="text-sm text-emily-taupe">
+              Mostrando {{ (currentPage() - 1) * itemsPerPage() + 1 }} a
+              {{ Math.min(currentPage() * itemsPerPage(), filteredSizes().length) }} de
+              {{ filteredSizes().length }} tallas
+            </div>
+
+            <div class="flex gap-2">
+              <button
+                (click)="previousPage()"
+                [disabled]="currentPage() === 1"
+                class="px-3 py-1 rounded-lg border border-emily-cream text-emily-dark hover:bg-emily-light transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Anterior
+              </button>
+
+              @for (page of [].constructor(totalPages); track $index) {
+                <button
+                  (click)="changePage($index + 1)"
+                  [class.bg-emily-rose]="currentPage() === $index + 1"
+                  [class.text-emily-white]="currentPage() === $index + 1"
+                  [class.border-emily-rose]="currentPage() === $index + 1"
+                  class="px-3 py-1 rounded-lg border border-emily-cream text-emily-dark hover:bg-emily-light transition-colors"
+                >
+                  {{ $index + 1 }}
+                </button>
+              }
+
+              <button
+                (click)="nextPage()"
+                [disabled]="currentPage() === totalPages"
+                class="px-3 py-1 rounded-lg border border-emily-cream text-emily-dark hover:bg-emily-light transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Siguiente
+              </button>
+            </div>
+          </div>
+        }
+      }
+    </div>
+  </div>
+
+  <app-confirm-dialog
+    [isOpen]="isConfirmOpen()"
+    [title]="'¿Eliminar talla?'"
+    [message]="'¿Estás seguro de que deseas eliminar esta talla ?'"
+    [confirmText]="'Eliminar'"
+    [cancelText]="'Cancelar'"
+    [type]="'danger'"
+    (confirm)="confirmDelete()"
+    (cancel)="closeDeleteConfirm()"
+  />
+</ion-content>
