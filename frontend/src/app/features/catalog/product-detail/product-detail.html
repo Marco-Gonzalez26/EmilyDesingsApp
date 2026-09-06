@@ -1,0 +1,278 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/catalogo"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Producto</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content >
+@if (isLoading()) {
+  <div class="bg-emily-light flex items-center justify-center">
+    <div class="text-center space-y-4">
+      <div
+        class="w-12 h-12 border-4 border-emily-cream border-t-emily-rose rounded-full animate-spin mx-auto"
+      ></div>
+      <p class="text-emily-taupe text-sm">Cargando producto...</p>
+    </div>
+  </div>
+}
+
+@if (!isLoading() && product()) {
+  <div class="bg-emily-light">
+    <div class="bg-emily-white border-b border-emily-cream px-6 md:px-12 py-3">
+      <div class="max-w-6xl mx-auto flex items-center gap-2 text-xs text-emily-taupe">
+        <a routerLink="/" class="hover:text-emily-dark transition">Inicio</a>
+        <span>›</span>
+        <a routerLink="/catalogo" class="hover:text-emily-dark transition">Catálogo</a>
+        <span>›</span>
+        <span class="text-emily-gold font-medium">{{ product()!.nombre }}</span>
+      </div>
+    </div>
+
+    <div class="max-w-6xl mx-auto px-4 md:px-6 py-10">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+        <div class="space-y-3 lg:sticky lg:top-24">
+          <div class="relative rounded-2xl overflow-hidden bg-emily-cream">
+            <img
+              [src]="selectedImage()"
+              [alt]="product()!.nombre"
+              class="h-3/4 w-full object-cover transition-all duration-500"
+            />
+
+            <div class="absolute top-3 left-3 flex flex-col gap-1.5">
+              @if (product()!.es_nuevo) {
+                <span
+                  class="bg-emily-sage text-emily-white text-xs px-2.5 py-1 rounded-full font-medium"
+                >
+                  Nuevo
+                </span>
+              }
+              @if (hasDiscount(product()!)) {
+                <span
+                  class="bg-emily-rose text-emily-white text-xs px-2.5 py-1 rounded-full font-medium"
+                >
+                  -{{ getDiscountPercent(product()!) }}%
+                </span>
+              }
+            </div>
+
+            @if (product()!.imagenes.length > 1) {
+              <div class="absolute inset-x-0 bottom-0 flex justify-between items-center p-3">
+                <button
+                  (click)="prevImage()"
+                  class="p-2 bg-emily-white/80 backdrop-blur-sm rounded-full text-emily-dark hover:bg-emily-white transition"
+                >
+                  <ion-icon name="chevron-back"></ion-icon>
+                </button>
+                <div class="flex gap-1.5">
+                  @for (img of product()!.imagenes; track img.id; let i = $index) {
+                    <div
+                      class="w-1.5 h-1.5 rounded-full transition"
+                      [class]="i === selectedImageIndex() ? 'bg-emily-dark' : 'bg-emily-white/60'"
+                    ></div>
+                  }
+                </div>
+                <button
+                  (click)="nextImage()"
+                  class="p-2 bg-emily-white/80 backdrop-blur-sm rounded-full text-emily-dark hover:bg-emily-white transition"
+                >
+                  <ion-icon name="chevron-forward"></ion-icon>
+                </button>
+              </div>
+            }
+          </div>
+
+          @if (product()!.imagenes.length > 1) {
+            <div class="grid grid-cols-4 gap-2">
+              @for (img of product()!.imagenes; track img.id; let i = $index) {
+                <button
+                  (click)="selectImage(i)"
+                  class="aspect-square rounded-xl overflow-hidden border-2 transition"
+                  [class]="
+                    i === selectedImageIndex()
+                      ? 'border-emily-gold'
+                      : 'border-transparent hover:border-emily-taupe/40'
+                  "
+                >
+                  <img
+                    [src]="img.url_imagen"
+                    [alt]="product()!.nombre"
+                    class="w-full h-full object-cover"
+                  />
+                </button>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="space-y-6">
+          <div>
+            <p class="text-xs font-semibold tracking-widest uppercase text-emily-gold mb-2">
+              Emily Designs
+            </p>
+            <h1 class="font-serif text-3xl md:text-4xl text-emily-dark leading-tight mb-3">
+              {{ product()!.nombre }}
+            </h1>
+            @if (product()!.descripcion) {
+              <p class="text-sm text-emily-taupe leading-relaxed">
+                {{ product()!.descripcion }}
+              </p>
+            }
+          </div>
+
+          <div class="flex items-center gap-3 py-4 border-y border-emily-cream">
+            <span class="text-3xl font-semibold text-emily-dark">
+              ${{ getPrice(product()!) | number: '1.2-2' }}
+            </span>
+            @if (hasDiscount(product()!)) {
+              <span class="text-lg text-emily-taupe line-through">
+                ${{ product()!.precio_regular | number: '1.2-2' }}
+              </span>
+              <span
+                class="bg-emily-rose/20 text-emily-rose text-xs font-semibold px-2 py-1 rounded-lg"
+              >
+                -{{ getDiscountPercent(product()!) }}% OFF
+              </span>
+            }
+          </div>
+
+          <div>
+            <div class="flex justify-between items-center mb-3">
+              <p class="text-sm font-semibold text-emily-dark">Talla</p>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              @for (talla of tallasDisponibles(); track talla.id) {
+                <button
+                  (click)="selectTalla(talla.id)"
+                  class="min-w-11 px-3 py-2 rounded-lg text-sm font-medium border-2 transition"
+                  [class]="
+                    selectedTalla() === talla.id
+                      ? 'border-emily-dark bg-emily-dark text-emily-white'
+                      : 'border-emily-cream bg-emily-white text-emily-taupe hover:border-emily-taupe hover:text-emily-dark'
+                  "
+                >
+                  {{ getTallaDisplay(talla) }}
+                </button>
+              }
+            </div>
+          </div>
+
+          <div>
+            <p class="text-sm font-semibold text-emily-dark mb-3">
+              Color
+              @if (selectedColor()) {
+                <span class="font-normal text-emily-taupe ml-2"
+                  >— {{ selectedColor()?.nombre }}</span
+                >
+              }
+            </p>
+            <div class="flex gap-3">
+              @for (color of coloresDisponibles(); track color.id) {
+                <button
+                  (click)="selectColor(color)"
+                  class="w-8 h-8 rounded-full transition-transform hover:scale-110 relative border-2 border-emily-taupe"
+                  [style.backgroundColor]="color.codigo_hexadecimal || '#ccc'"
+                  [title]="color.nombre"
+                >
+                  @if (selectedColor()?.id === color.id) {
+                    <span
+                      class="absolute inset-0 rounded-full ring-2 ring-offset-2 ring-emily-gold"
+                    ></span>
+                  }
+                </button>
+              }
+            </div>
+          </div>
+
+          <div class="flex items-center gap-4">
+            <p class="text-sm font-semibold text-emily-dark">Cantidad</p>
+            <div
+              class="flex items-center border-2 border-emily-cream rounded-xl overflow-hidden bg-emily-white"
+            >
+              <button
+                (click)="decreaseQty()"
+                class="w-10 h-10 flex items-center justify-center text-emily-taupe hover:bg-emily-cream hover:text-emily-dark transition"
+              >
+                <ion-icon name="remove"></ion-icon>
+              </button>
+              <span class="w-12 text-center text-sm font-semibold text-emily-dark">
+                {{ quantity() }}
+              </span>
+              <button
+                (click)="increaseQty()"
+                class="w-10 h-10 flex items-center justify-center text-emily-taupe hover:bg-emily-cream hover:text-emily-dark transition"
+              >
+                <ion-icon name="add"></ion-icon>
+              </button>
+            </div>
+            @if (stockDisponible() > 0) {
+              <span class="text-xs text-emily-sage font-medium"
+                >✓ {{ stockDisponible() }} disponibles</span
+              >
+            } @else if (selectedTalla() && selectedColor()) {
+              <span class="text-xs text-emily-rose font-medium">✗ Sin stock</span>
+            }
+          </div>
+
+          <div class="flex gap-3">
+            <button
+              (click)="addToCart()"
+              class="flex-1 bg-emily-dark hover:bg-emily-taupe text-emily-white font-semibold py-3.5 px-6 rounded-xl transition flex items-center justify-center gap-2"
+            >
+              <ion-icon name="cart-outline"></ion-icon>
+              Añadir al Carrito
+            </button>
+            <button
+              (click)="toggleFavorite()"
+              class="w-14 h-14 border-2 rounded-xl flex items-center justify-center transition"
+              [class]="
+                isFavorite()
+                  ? 'border-emily-rose bg-emily-rose/10 text-emily-rose'
+                  : 'border-emily-cream bg-emily-white text-emily-taupe hover:border-emily-rose hover:text-emily-rose'
+              "
+            >
+              <ion-icon [name]="isFavorite() ? 'heart' : 'heart-outline'"></ion-icon>
+            </button>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 pt-2">
+            <div class="flex items-center gap-2 bg-emily-light rounded-xl px-3 py-2.5"></div>
+            <div class="flex items-center gap-2 bg-emily-light rounded-xl px-3 py-2.5"></div>
+            <div class="flex items-center gap-2 bg-emily-light rounded-xl px-3 py-2.5">
+              <ion-icon name="shield-checkmark-outline" class="text-emily-gold shrink-0"></ion-icon>
+              <span class="text-xs text-emily-taupe">Pago seguro</span>
+            </div>
+            <div class="flex items-center gap-2 bg-emily-light rounded-xl px-3 py-2.5">
+              <ion-icon name="star-outline" class="text-emily-gold shrink-0"></ion-icon>
+              <span class="text-xs text-emily-taupe">Producto auténtico</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      @if (relatedProducts().length > 0) {
+        <div class="mt-16">
+          <div class="flex items-center gap-4 mb-8">
+            <h2 class="font-serif text-2xl text-emily-dark whitespace-nowrap">
+              Nuestras Recomendaciones solo para ti
+            </h2>
+            <div class="flex-1 h-px bg-emily-cream"></div>
+          </div>
+
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            @for (related of relatedProducts(); track related.id) {
+              <app-product-card
+                [product]="related"
+                [isFavorite]="isRelatedFavorite(related.id)"
+                (favoriteToggled)="toggleRelatedFavorite($event)"
+                (addToCartRequested)="addRelatedToCart($event)"
+              />
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+}
+</ion-content>
