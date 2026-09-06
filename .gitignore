@@ -1,0 +1,43 @@
+# Frontend 
+frontend/node_modules/
+frontend/www/
+frontend/android/app/build/
+frontend/android/build/
+frontend/android/.gradle/
+frontend/android/.kotlin/
+frontend/android/.idea/
+frontend/android/local.properties
+frontend/*.apk
+frontend/.env
+frontend/.vscode/
+
+# Backend 
+backend/venv/
+backend/__pycache__/
+backend/*.pyc
+backend/.env
+backend/app/models/modelo_recomendacion.joblib
+# Backend - tooling & cache
+backend/.venv/
+backend/.pytest_cache/
+backend/.agents/
+backend/.claude/
+backend/skills-lock.json
+
+# Frontend - build & cache
+frontend/.angular/
+frontend/dist/
+frontend/.tmp/
+
+# Python - cache
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/*.pyd
+
+# Docs - PDF export (local delivery, not versioned)
+docs/*.pdf
+
+# General
+.DS_Store
+*.log
