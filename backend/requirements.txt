@@ -1,0 +1,79 @@
+# FastAPI y servidor
+fastapi>=0.109.0
+uvicorn[standard]>=0.27.0
+python-multipart>=0.0.6
+pydantic>=2.5.3
+pydantic-settings>=2.1.0
+
+# Deep Learning - PyTorch (para DeepLabV3)
+torch>=2.1.0
+torchvision>=0.16.0
+
+# Computer Vision
+mediapipe>=0.10.9
+opencv-python>=4.9.0
+pillow>=10.0.0
+
+# Data Augmentation
+albumentations>=1.3.0
+
+# Machine Learning y procesamiento
+numpy>=1.24.0
+pandas>=2.1.0
+scikit-learn==1.6.1  # pinned for modelo_recomendacion.joblib (NearestNeighbors/SVD) compatibility
+scipy>=1.11.0
+
+# TensorFlow
+tensorflow>=2.15.0
+
+# Visualización
+matplotlib>=3.8.0
+seaborn>=0.13.0
+tqdm>=4.66.0
+
+# Base de datos
+sqlalchemy>=2.0.0
+psycopg2-binary>=2.9.0
+
+# Seguridad y autenticación
+passlib[bcrypt]>=1.7.4
+bcrypt==4.0.1  # pinned: passlib incompatible with bcrypt>=4.1 (hashpw signature change)
+python-jose[cryptography]>=3.3.0
+
+# Migraciones de BD
+alembic>=1.13.0
+
+# Utilidades
+jinja2>=3.1.0
+weasyprint>=60.0
+python-dotenv>=1.0.0
+joblib>=1.3.0
+
+# Tests unitarios
+pytest>=7.4.0
+httpx>=0.26.0
+
+# Emails
+fastapi-mail>=1.4.0
+
+#  Stripe
+stripe>=7.0.0
+
+# IA
+openai>=1.0.0
+
+# Segmentacion de imagenes
+rembg>=2.0.0
+
+reportlab>=4.0.0
+
+onnxruntime>=1.17.0
+
+ultralytics>=8.0.0
+
+# Autenticación de 2FA
+pyotp==2.9.0
+qrcode[pil]==8.2
+cryptography==47.0.0
+slowapi==0.1.10
+limits==5.8.0
