@@ -1,0 +1,38 @@
+  <ion-header>
+    <ion-toolbar>
+      <ion-title>Términos y Condiciones — LOPDP Ecuador</ion-title>
+      <ion-buttons slot="end">
+        <ion-button fill="clear" (click)="cerrar()"><ion-icon name="close"></ion-icon></ion-button>
+      </ion-buttons>
+    </ion-toolbar>
+  </ion-header>
+  <ion-content class="ion-padding">
+    <div class="max-w-2xl mx-auto space-y-5 text-sm leading-relaxed text-emily-dark">
+      <p class="text-xs text-emily-taupe">Última actualización: septiembre 2026 — Emily Designs, Quevedo, Ecuador</p>
+
+      <h3 class="font-semibold text-base">1. Responsable del tratamiento</h3>
+      <p>Emily Designs (Quevedo, Ecuador) trata tus datos personales con domicilio en Quevedo. Contacto: soporte de la app o el administrador (<code>pruebaAdmin@gmail.com</code>).</p>
+
+      <h3 class="font-semibold text-base">2. Datos recabados</h3>
+      <p>Nombre, cédula/RUC, email, teléfono, dirección, ciudad, credenciales hasheadas, preferencias de estilo (hasta 5 de 12 estilos), tallas, colores, rango de precio (onboarding) y actividad (interacciones, favoritos, carrito, pedidos) para personalizar recomendaciones con IA híbrida (KNN + SVD).</p>
+
+      <h3 class="font-semibold text-base">3. Finalidad y base legal (LOPDP art. 7)</h3>
+      <p>Gestión de cuenta, pedidos y envíos, y personalización de recomendaciones en “Para Ti” (catálogo de 50 productos). Base legal: tu <strong>consentimiento expreso</strong> al marcar la casilla; sin él no se crea la cuenta (bloqueante).</p>
+
+      <h3 class="font-semibold text-base">4. Conservación</h3>
+      <p>Conservamos tus datos mientras tu cuenta esté activa o lo exija la ley. Puedes revocar el consentimiento eliminando tu cuenta en Perfil o solicitando supresión; al eliminar, tus datos se anonimizan salvo obligaciones legales.</p>
+
+      <h3 class="font-semibold text-base">5. Derechos ARCO (LOPDP art. 12-17)</h3>
+      <p>Acceso, rectificación, actualización, oposición, eliminación y portabilidad. Ejerce enviando tu solicitud desde el email registrado; respondemos en los plazos legales.</p>
+
+      <h3 class="font-semibold text-base">6. Destinatarios y transferencias</h3>
+      <p>No vendemos tus datos. Solo encargados de tratamiento (hosting, pagos) con medidas de seguridad. Sin transferencias internacionales fuera de los casos legales.</p>
+
+      <h3 class="font-semibold text-base">7. Medidas de seguridad</h3>
+      <p>Cifrado en tránsito, hash de contraseñas (bcrypt), control de acceso por rol (cliente/administrador) y campo <code>acepta_terminos</code> trazable (usuarios existentes: <code>true</code>; nuevos: <code>false</code> hasta aceptar; admin-creados: <code>true</code>).</p>
+
+      <p class="text-xs text-emily-taupe border-t pt-4">Al continuar confirmas haber leído esta información y otorgas consentimiento libre, informado y expreso conforme a la Ley Orgánica de Protección de Datos Personales del Ecuador.</p>
+
+      <ion-button expand="block" color="primary" (click)="cerrar()">Entendido</ion-button>
+    </div>
+  </ion-content>

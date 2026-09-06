@@ -1,0 +1,31 @@
+:host {
+  display: block;
+}
+
+ion-tab-bar {
+  height: 70px;
+  padding-bottom: env(safe-area-inset-bottom);
+  border-top: 1px solid rgba(139, 127, 118, 0.15);
+  background: #fefefa;
+}
+
+ion-tab-button {
+  --color: rgba(139, 127, 118, 0.8);
+  --color-selected: #c9a961;
+}
+
+ion-tab-button ion-icon {
+  font-size: 26px;
+}
+
+ion-tab-button ion-label {
+  font-family: 'Playfair Display', serif;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+ion-tab-button ion-badge {
+  font-size: 10px;
+  min-width: 18px;
+  height: 18px;
+}

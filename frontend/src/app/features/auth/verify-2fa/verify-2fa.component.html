@@ -1,0 +1,15 @@
+<ion-header><ion-toolbar>
+  <ion-buttons slot="start"><ion-back-button defaultHref="/iniciar-sesion"></ion-back-button></ion-buttons>
+  <ion-title>Verificar 2FA</ion-title>
+</ion-toolbar></ion-header>
+<ion-content class="ion-padding">
+  <div class="max-w-md mx-auto space-y-4 text-center">
+    <h2 class="text-lg font-semibold">Ingresa tu código de 6 dígitos</h2>
+    <p class="text-sm text-emily-taupe">Google Authenticator / Microsoft Authenticator</p>
+    <ion-input type="text" placeholder="123456" maxlength="8" [value]="code()" (ionInput)="code.set($any($event.detail).value ?? $any($event.target).value)"></ion-input>
+    <ion-button expand="block" (click)="verificar()" [disabled]="isVerifying() || (code().length!==6 && code().length!==8)">
+      @if (isVerifying()) { <ion-spinner name="crescent"></ion-spinner> } @else { Verificar }
+    </ion-button>
+    <p class="text-xs text-emily-taupe">También puedes usar un código de recuperación Hex8</p>
+  </div>
+</ion-content>

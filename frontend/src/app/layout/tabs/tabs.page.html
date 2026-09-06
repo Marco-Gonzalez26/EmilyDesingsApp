@@ -1,0 +1,37 @@
+<ion-tabs>
+
+  <ion-tab-bar slot="bottom">
+    <ion-tab-button tab="inicio" href="/inicio">
+      <ion-icon name="home-sharp"></ion-icon>
+      <ion-label>Inicio</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button tab="para-ti" href="/para-ti">
+      <ion-icon name="sparkles-outline"></ion-icon>
+      <ion-label>Para Ti</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button tab="catalogo" href="/catalogo">
+      <ion-icon name="grid-outline"></ion-icon>
+      <ion-label>Catálogo</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button tab="carrito" href="/carrito">
+      <ion-icon name="cart-outline"></ion-icon>
+      <ion-label>Carrito</ion-label>
+      @if (cartCount() > 0) {
+      <ion-badge color="primary">{{ cartCount() }}</ion-badge>
+      }
+    </ion-tab-button>
+
+    <ion-tab-button tab="cuenta" href="/cuenta">
+      <ion-icon name="person-outline"></ion-icon>
+      <ion-label>Cuenta</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button tab="favoritos" href="/favoritos">
+      <ion-icon name="heart-outline"></ion-icon>
+      <ion-label>Favoritos</ion-label>
+    </ion-tab-button>
+  </ion-tab-bar>
+</ion-tabs>
