@@ -1,0 +1,24 @@
+:host {
+  display: block;
+}
+
+/* Suavizar todas las transiciones */
+* {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Efecto parallax sutil en el hero */
+.hero-section {
+  will-change: transform;
+}
+
+/* Animación sutil en hover de las cards de valores */
+.value-card {
+  will-change: transform, background-color;
+}
+
+/* Mejora visual de las imágenes */
+img {
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
