@@ -1,0 +1,60 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Confirmando pago</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="max-w-md mx-auto flex items-center justify-center min-h-full">
+    @if (isLoading()) {
+      <div class="text-center">
+        <ion-spinner name="crescent" color="primary"></ion-spinner>
+        <p class="text-emily-taupe mt-3">Confirmando tu pago...</p>
+      </div>
+    }
+
+    @if (!isLoading() && orden()) {
+      <div class="w-full text-center">
+        <div class="bg-emily-white rounded-2xl p-8 shadow-lg">
+          <div class="w-16 h-16 bg-emily-sage/20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <ion-icon name="checkmark-circle" size="large" class="text-emily-sage"></ion-icon>
+          </div>
+
+          <h1 class="font-serif text-2xl text-emily-dark mb-2">¡Pago Exitoso!</h1>
+          <p class="text-emily-taupe mb-6">Tu orden ha sido confirmada</p>
+
+          <div class="bg-emily-light rounded-xl p-4 mb-6">
+            <p class="text-xs text-emily-taupe mb-1">Número de Orden</p>
+            <p class="text-lg font-semibold text-emily-dark">{{ orden()!.numero_orden }}</p>
+          </div>
+
+          <div class="space-y-2 text-sm text-emily-taupe mb-6">
+            <div class="flex justify-between">
+              <span>Subtotal</span>
+              <span class="text-emily-dark font-medium">${{ orden()!.subtotal | number: '1.2-2' }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span>Envío</span>
+              <span class="text-emily-dark font-medium">${{ orden()!.costo_envio | number: '1.2-2' }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span>Impuestos</span>
+              <span class="text-emily-dark font-medium">${{ orden()!.impuestos | number: '1.2-2' }}</span>
+            </div>
+            <div class="flex justify-between pt-2 border-t border-emily-cream">
+              <span class="font-semibold text-emily-dark">Total</span>
+              <span class="font-bold text-emily-dark">${{ orden()!.total | number: '1.2-2' }}</span>
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <ion-button expand="block" color="dark" routerLink="/">Volver al inicio</ion-button>
+            <ion-button expand="block" fill="outline" color="medium" [routerLink]="['/ordenes', orden()!.id]">
+              Ver detalle de orden
+            </ion-button>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</ion-content>

@@ -1,0 +1,211 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/carrito"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Finalizar Compra</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="max-w-4xl mx-auto">
+    <div class="flex items-center justify-center mb-6">
+      <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2">
+          <div
+            class="w-9 h-9 rounded-full flex items-center justify-center font-semibold"
+            [class]="
+              step() >= 1 ? 'bg-emily-dark text-emily-white' : 'bg-emily-cream text-emily-taupe'
+            "
+          >
+            @if (step() > 1) {
+              <ion-icon name="checkmark" size="small"></ion-icon>
+            } @else {
+              1
+            }
+          </div>
+          <span class="text-xs font-medium" [class]="step() === 1 ? 'text-emily-dark' : 'text-emily-taupe'">
+            Datos de envío
+          </span>
+        </div>
+
+        <div class="w-10 h-0.5 bg-emily-cream"></div>
+
+        <div class="flex items-center gap-2">
+          <div
+            class="w-9 h-9 rounded-full flex items-center justify-center font-semibold"
+            [class]="
+              step() === 2 ? 'bg-emily-dark text-emily-white' : 'bg-emily-cream text-emily-taupe'
+            "
+          >
+            2
+          </div>
+          <span class="text-xs font-medium" [class]="step() === 2 ? 'text-emily-dark' : 'text-emily-taupe'">
+            Pago
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div class="lg:col-span-2">
+        @if (step() === 1) {
+          <ion-item-divider>
+            <ion-label class="font-serif text-xl text-emily-dark">Información de Envío</ion-label>
+          </ion-item-divider>
+
+          <form [formGroup]="shippingForm" class="space-y-3">
+            <ion-item>
+              <ion-label position="stacked">Nombre completo *</ion-label>
+              <ion-input type="text" formControlName="nombre" placeholder="Juan Pérez"></ion-input>
+            </ion-item>
+            @if (shippingForm.get('nombre')?.invalid && shippingForm.get('nombre')?.touched) {
+              <p class="text-xs text-emily-rose px-2 -mt-1">Este campo es requerido</p>
+            }
+
+            <ion-item>
+              <ion-label position="stacked">Cédula/RUC *</ion-label>
+              <ion-input type="text" formControlName="cedula" placeholder="1234567890 o 1234567890001"></ion-input>
+            </ion-item>
+            @if (shippingForm.get('cedula')?.invalid && shippingForm.get('cedula')?.touched) {
+              <p class="text-xs text-emily-rose px-2 -mt-1">
+                Ingresa una cédula (10 dígitos) o RUC (13 dígitos) válido
+              </p>
+            }
+
+            <ion-item>
+              <ion-label position="stacked">Teléfono *</ion-label>
+              <ion-input type="tel" formControlName="telefono" placeholder="0987654321"></ion-input>
+            </ion-item>
+            @if (shippingForm.get('telefono')?.invalid && shippingForm.get('telefono')?.touched) {
+              <p class="text-xs text-emily-rose px-2 -mt-1">
+                Ingresa un teléfono válido de 10 dígitos
+              </p>
+            }
+
+            <ion-item>
+              <ion-label position="stacked">Dirección *</ion-label>
+              <ion-input type="text" formControlName="direccion" placeholder="Av. Principal 123"></ion-input>
+            </ion-item>
+            @if (shippingForm.get('direccion')?.invalid && shippingForm.get('direccion')?.touched) {
+              <p class="text-xs text-emily-rose px-2 -mt-1">Este campo es requerido</p>
+            }
+
+            <div class="grid grid-cols-2 gap-3">
+              <ion-item>
+                <ion-label position="stacked">Ciudad *</ion-label>
+                <ion-input type="text" formControlName="ciudad" placeholder="Quevedo"></ion-input>
+              </ion-item>
+              <ion-item>
+                <ion-label position="stacked">Provincia *</ion-label>
+                <ion-input type="text" formControlName="provincia" placeholder="Los Ríos"></ion-input>
+              </ion-item>
+            </div>
+            <p class="text-xs text-emily-rose px-2 -mt-1">
+              @if (shippingForm.get('ciudad')?.invalid && shippingForm.get('ciudad')?.touched) { Ciudad requerida }
+              @if (shippingForm.get('provincia')?.invalid && shippingForm.get('provincia')?.touched) { Provincia requerida }
+            </p>
+
+            <ion-item>
+              <ion-label position="stacked">Código Postal *</ion-label>
+              <ion-input type="text" formControlName="codigoPostal" placeholder="120501"></ion-input>
+            </ion-item>
+            @if (shippingForm.get('codigoPostal')?.invalid && shippingForm.get('codigoPostal')?.touched) {
+              <p class="text-xs text-emily-rose px-2 -mt-1">Este campo es requerido</p>
+            }
+
+            <ion-button expand="block" color="dark" (click)="nextStep()" class="mt-4">
+              Continuar al pago
+              <ion-icon slot="end" name="arrow-forward"></ion-icon>
+            </ion-button>
+          </form>
+        }
+
+        @if (step() === 2) {
+          <ion-item-divider>
+            <ion-label class="font-serif text-xl text-emily-dark">Método de Pago</ion-label>
+          </ion-item-divider>
+
+          <div class="border-2 border-emily-rose bg-emily-rose/5 rounded-xl p-4">
+            <div class="flex items-center gap-3 mb-2">
+              <div class="w-10 h-10 bg-emily-rose/20 rounded-full flex items-center justify-center">
+                <ion-icon name="card" class="text-emily-rose"></ion-icon>
+              </div>
+              <div>
+                <p class="font-semibold text-emily-dark">Stripe Checkout</p>
+                <p class="text-xs text-emily-taupe">Pago seguro con tarjeta</p>
+              </div>
+            </div>
+            <p class="text-xs text-emily-taupe">
+              Serás redirigido a Stripe para completar tu pago de forma segura.
+            </p>
+          </div>
+
+          <div class="flex gap-3 mt-6">
+            <ion-button expand="block" fill="outline" color="medium" (click)="prevStep()">
+              <ion-icon slot="start" name="arrow-back"></ion-icon>
+              Volver
+            </ion-button>
+            <ion-button expand="block" color="primary" (click)="procesarPago()" [disabled]="isProcessing()">
+              @if (isProcessing()) {
+                <ion-spinner name="crescent" slot="start"></ion-spinner>
+                Procesando...
+              } @else {
+                Proceder al pago
+              }
+            </ion-button>
+          </div>
+        }
+      </div>
+
+      <div class="lg:col-span-1">
+        <div class="bg-emily-white rounded-2xl p-5">
+          <h2 class="font-serif text-xl text-emily-dark mb-4">Resumen de Compra</h2>
+
+          <div class="space-y-3 mb-4">
+            @for (item of cartService.items(); track item.id) {
+              <div class="flex gap-3">
+                <img
+                  [src]="cartService.getProductImage(item)"
+                  [alt]="item.producto?.nombre"
+                  class="w-14 h-18 object-cover rounded-lg bg-emily-cream"
+                />
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-medium text-emily-dark truncate">
+                    {{ item.producto?.nombre }}
+                  </p>
+                  <p class="text-xs text-emily-taupe">Cant: {{ item.cantidad }}</p>
+                  <p class="text-sm font-semibold text-emily-dark">
+                    ${{ cartService.getItemTotal(item) | number: '1.2-2' }}
+                  </p>
+                </div>
+              </div>
+            }
+          </div>
+
+          <div class="space-y-3 py-4 border-t border-emily-cream">
+            <div class="flex justify-between text-sm">
+              <span class="text-emily-taupe">Subtotal</span>
+              <span class="text-emily-dark font-medium">${{ cartService.subtotal() | number: '1.2-2' }}</span>
+            </div>
+            <div class="flex justify-between text-sm">
+              <span class="text-emily-taupe">Impuestos (12%)</span>
+              <span class="text-emily-dark font-medium">${{ impuestos | number: '1.2-2' }}</span>
+            </div>
+            <div class="flex justify-between text-sm">
+              <span class="text-emily-taupe">Envío</span>
+              <span class="font-medium" [class]="cartService.envio() === 0 ? 'text-emily-sage' : 'text-emily-dark'">
+                {{ cartService.envio() === 0 ? 'Gratis' : '$' + cartService.envio() }}
+              </span>
+            </div>
+          </div>
+
+          <div class="flex justify-between items-center pt-4 border-t border-emily-cream">
+            <span class="font-semibold text-emily-dark text-lg">Total</span>
+            <span class="font-bold text-emily-dark text-xl">${{ total | number: '1.2-2' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ion-content>
