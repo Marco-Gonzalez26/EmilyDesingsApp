@@ -21,7 +21,7 @@
 
 ## 2. Elementos de Configuración controlados
 
-- `backend/main.py:1` con 22 routers, `backend/app/models/models.py` con `Usuario` y `TotpRecoveryCode`, `backend/app/ml/inference.py:1` con híbrido content y SVD, `backend/requirements.txt` con `pyotp`, `qrcode`, `slowapi`, `cryptography`
+- `backend/main.py:1` con 19 routers, `backend/app/models/models.py` con `Usuario` y `TotpRecoveryCode`, `backend/app/ml/inference.py:1` con híbrido content y SVD, `backend/requirements.txt` con `pyotp`, `qrcode`, `slowapi`, `cryptography`
 - `frontend/capacitor.config.ts:1`, `frontend/src/app/app.routes.ts:1`, `frontend/src/app/core/services/` con 21 servicios, `frontend/android/` sin generados, `backend/app/ml/artifacts/modelo_recomendacion_v1.2.joblib` versionado por reproducibilidad
 
 ## 3. Acuerdos
