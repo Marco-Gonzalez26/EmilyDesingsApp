@@ -7,6 +7,23 @@ from uuid import UUID
 from app.schemas.recommendation_schema import RecomendacionResponse
 
 
+def validar_password_segura(v: str) -> str:
+    """Política: mínimo 8, 1 mayúscula, 1 minúscula, 1 número y 1 especial"""
+    import re
+
+    if len(v) < 8:
+        raise ValueError("La contraseña debe tener mínimo 8 caracteres")
+    if not re.search(r"[A-Z]", v):
+        raise ValueError("La contraseña debe tener al menos 1 mayúscula")
+    if not re.search(r"[a-z]", v):
+        raise ValueError("La contraseña debe tener al menos 1 minúscula")
+    if not re.search(r"[0-9]", v):
+        raise ValueError("La contraseña debe tener al menos 1 número")
+    if not re.search(r"[!@#$%^&*]", v):
+        raise ValueError("La contraseña debe tener al menos 1 caracter especial (!@#$%^&*)")
+    return v
+
+
 class UsuarioBase(BaseModel):
     """Esquema base de usuario"""
 
@@ -33,6 +50,11 @@ class UsuarioCreate(UsuarioBase):
         if v is not True:
             raise ValueError("Debes aceptar los Términos y Condiciones y la LOPDP")
         return v
+
+    @field_validator("password")
+    @classmethod
+    def validar_password(cls, v):
+        return validar_password_segura(v)
 
 
 class UsuarioUpdate(BaseModel):
@@ -62,7 +84,7 @@ class UsuarioCreateAdmin(BaseModel):
     """Crear usuario desde admin (acepta_terminos siempre true)"""
 
     email: str = Field(..., min_length=3, max_length=255)
-    password: str = Field(..., min_length=6)
+    password: str = Field(..., min_length=8)
     nombre_completo: Optional[str] = Field(None, max_length=200)
     telefono: str = Field(..., min_length=7, max_length=20, description="Teléfono requerido")
     direccion: str = Field(..., min_length=3, max_length=500, description="Dirección requerida")
@@ -81,13 +103,18 @@ class UsuarioCreateAdmin(BaseModel):
             raise ValueError("Rol debe ser cliente o administrador")
         return v
 
+    @field_validator("password")
+    @classmethod
+    def validar_password(cls, v):
+        return validar_password_segura(v)
+
 
 class CambiarPasswordRequest(BaseModel):
     """Cambiar contraseña (con contraseña actual)"""
 
     email: str = Field(..., description="Email del usuario")
     password_actual: str = Field(..., description="Contraseña actual")
-    password_nueva: str = Field(..., min_length=6, description="Nueva contraseña")
+    password_nueva: str = Field(..., min_length=8, description="Nueva contraseña")
     password_confirmacion: str = Field(
         ..., description="Confirmación de nueva contraseña"
     )
@@ -97,6 +124,11 @@ class CambiarPasswordRequest(BaseModel):
         if "password_nueva" in values.data and v != values.data["password_nueva"]:
             raise ValueError("Las contraseñas no coinciden")
         return v
+
+    @field_validator("password_nueva")
+    @classmethod
+    def validar_password_nueva(cls, v):
+        return validar_password_segura(v)
 
 
 class ProductoBase(BaseModel):
