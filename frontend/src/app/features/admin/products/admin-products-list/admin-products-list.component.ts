@@ -99,7 +99,7 @@ export class AdminProductsListComponent implements OnInit {
         this.products.set(response.productos);
         this.totalProducts.set(response.total);
         this.isLoading.set(false);
-        console.log({ products: this.products() });
+
       },
       error: (error) => {
         console.error('Error cargando productos:', error);

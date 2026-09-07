@@ -56,7 +56,6 @@ export class ProductDetailComponent implements OnInit {
     this.inventario().forEach((inv) => {
       if (inv.color) uniqueColores.set(inv.color.id, inv.color);
     });
-    console.log({ uniqueColores });
     return Array.from(uniqueColores.values());
   });
 
