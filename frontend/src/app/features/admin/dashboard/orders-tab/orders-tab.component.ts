@@ -1,11 +1,12 @@
 import {
   Component,
   OnInit,
+  OnDestroy,
+  ElementRef,
   signal,
   inject,
   PLATFORM_ID,
   afterNextRender,
-  OnDestroy,
 } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
@@ -31,8 +32,11 @@ interface MesDisponible {
 export class OrdersTabComponent implements OnInit, OnDestroy {
   private platformId = inject(PLATFORM_ID);
   private dashboardService = inject(DashboardService);
+  private elRef = inject(ElementRef);
 
   private ventasMesChart?: Chart;
+  private observer?: IntersectionObserver;
+  private ultimosDatosChart?: { labels: string[]; valores: number[] };
 
   kpis = signal<any>(null);
   metricas = signal<any>(null);
@@ -45,6 +49,7 @@ export class OrdersTabComponent implements OnInit, OnDestroy {
       afterNextRender(() => {
         this.generarMesesDisponibles();
         this.cargarDatos();
+        this.observarVisibilidad();
       });
     }
   }
@@ -56,10 +61,36 @@ export class OrdersTabComponent implements OnInit, OnDestroy {
     }
   }
 
+  private observarVisibilidad(): void {
+    this.observer = new IntersectionObserver(
+      (entries) => {
+
+        entries.forEach((entry) => {
+                  console.log(
+                    'IntersectionObserver:',
+                    entry.isIntersecting,
+                    entry.target,
+                  );
+          if (entry.isIntersecting) {
+            if (this.ventasMesChart) {
+              this.ventasMesChart.resize();
+            } else if (this.ultimosDatosChart) {
+              this.crearVentasMesChart(
+                this.ultimosDatosChart.labels,
+                this.ultimosDatosChart.valores,
+              );
+            }
+          }
+        });
+      },
+      { threshold: 0.1 },
+    );
+    this.observer.observe(this.elRef.nativeElement);
+  }
+
   private generarMesesDisponibles(): void {
     const meses: MesDisponible[] = [];
     const hoy = new Date();
-
     const mesesNombres = [
       'Ene',
       'Feb',
@@ -79,15 +110,13 @@ export class OrdersTabComponent implements OnInit, OnDestroy {
       const fecha = new Date(hoy.getFullYear(), hoy.getMonth() - i, 1);
       const year = fecha.getFullYear();
       const month = fecha.getMonth() + 1;
-
       meses.push({
         value: `${year}-${String(month).padStart(2, '0')}`,
         label: `${mesesNombres[fecha.getMonth()]} ${year}`,
-        year: year,
-        month: month,
+        year,
+        month,
       });
     }
-
     this.mesesDisponibles.set(meses);
   }
 
@@ -102,10 +131,17 @@ export class OrdersTabComponent implements OnInit, OnDestroy {
       next: (datos) => {
         this.kpis.set(datos.kpis);
         this.metricas.set(datos.metricas);
+        this.ultimosDatosChart = {
+          labels: datos.ventasMes.labels,
+          valores: datos.ventasMes.valores,
+        };
 
         if (isPlatformBrowser(this.platformId)) {
           setTimeout(() => {
-            this.crearVentasMesChart(datos.ventasMes.labels, datos.ventasMes.valores);
+            this.crearVentasMesChart(
+              datos.ventasMes.labels,
+              datos.ventasMes.valores,
+            );
           }, 100);
         }
 
@@ -126,7 +162,9 @@ export class OrdersTabComponent implements OnInit, OnDestroy {
     if (mesSeleccionado === 'todos') {
       this.cargarDatos();
     } else {
-      const mesData = this.mesesDisponibles().find((m) => m.value === mesSeleccionado);
+      const mesData = this.mesesDisponibles().find(
+        (m) => m.value === mesSeleccionado,
+      );
       if (mesData) {
         this.cargarDatosMesEspecifico(mesData.year, mesData.month);
       }
@@ -152,11 +190,27 @@ export class OrdersTabComponent implements OnInit, OnDestroy {
 
   private crearVentasMesChart(labels: string[], valores: number[]): void {
     const ctx = document.getElementById('ventasMesChart') as HTMLCanvasElement;
+    console.log('crearVentasMesChart llamado', {
+      ctx,
+      clientWidth: ctx?.clientWidth,
+      labels,
+      valores,
+    });
     if (!ctx) return;
 
-    if (this.ventasMesChart) {
-      this.ventasMesChart.destroy();
+    if (ctx.clientWidth === 0) {
+      console.log('El canvas está oculto');
+      this.ultimosDatosChart = { labels, valores };
+      return;
     }
+
+    const chartExistente = Chart.getChart(ctx);
+    if (chartExistente) {
+      chartExistente.destroy();
+    }
+    this.ventasMesChart = undefined;
+
+    this.ultimosDatosChart = { labels, valores };
 
     const config: ChartConfiguration<'bar'> = {
       type: 'bar',
@@ -168,7 +222,8 @@ export class OrdersTabComponent implements OnInit, OnDestroy {
             data: valores,
             backgroundColor: '#D4A5A5',
             borderRadius: 8,
-            barThickness: 50,
+            
+
           },
         ],
       },
@@ -219,11 +274,8 @@ export class OrdersTabComponent implements OnInit, OnDestroy {
 
   exportarPDF(): void {
     document.body.classList.add('printing-dashboard');
-
     this.ocultarElementosParaPDF(true);
-
     window.print();
-
     setTimeout(() => {
       document.body.classList.remove('printing-dashboard');
       this.ocultarElementosParaPDF(false);
@@ -231,23 +283,26 @@ export class OrdersTabComponent implements OnInit, OnDestroy {
   }
 
   private ocultarElementosParaPDF(ocultar: boolean): void {
-    const elementosAOcultar = ['.no-print', 'button', 'aside', '.dashboard-tabs'];
-
+    const elementosAOcultar = [
+      '.no-print',
+      'button',
+      'aside',
+      '.dashboard-tabs',
+    ];
     elementosAOcultar.forEach((selector) => {
       document.querySelectorAll(selector).forEach((el) => {
         const htmlEl = el as HTMLElement;
-        if (ocultar) {
-          htmlEl.style.display = 'none';
-        } else {
-          htmlEl.style.display = '';
-        }
+        htmlEl.style.display = ocultar ? 'none' : '';
       });
     });
   }
+
   calcularProgreso(valor: number, multiplicador: number): number {
     return Math.min((valor || 0) * multiplicador, 100);
   }
+
   ngOnDestroy(): void {
     this.ventasMesChart?.destroy();
+    this.observer?.disconnect();
   }
 }
