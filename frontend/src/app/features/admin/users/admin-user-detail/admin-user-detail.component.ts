@@ -32,21 +32,15 @@ export class AdminUserDetailComponent implements OnInit {
 
   usuario = signal<UserDetail | null>(null);
   ordenes = signal<any[]>([]);
-  analisis = signal<any[]>([]);
 
   isLoading = signal(true);
   isLoadingOrdenes = signal(false);
-  isLoadingAnalisis = signal(false);
 
-  currentTab = signal<'info' | 'ordenes' | 'analisis'>('info');
+  currentTab = signal<'info' | 'ordenes'>('info');
 
   ordenesPage = signal(1);
   ordenesTotal = signal(0);
   ordenesLimit = signal(10);
-
-  analisisPage = signal(1);
-  analisisTotal = signal(0);
-  analisisLimit = signal(10);
 
   userInitials = computed(() => {
     const user = this.usuario();
@@ -106,33 +100,8 @@ export class AdminUserDetailComponent implements OnInit {
     });
   }
 
-  loadAnalisis(usuarioId: string): void {
-    this.isLoadingAnalisis.set(true);
-
-    const skip = (this.analisisPage() - 1) * this.analisisLimit();
-
-    this.usuarioService.getUsuarioAnalisis(usuarioId, skip, this.analisisLimit()).subscribe({
-      next: (response) => {
-        this.analisis.set(response.analisis);
-        this.analisisTotal.set(response.total);
-        this.isLoadingAnalisis.set(false);
-      },
-      error: (error) => {
-        console.error('Error cargando análisis:', error);
-        this.isLoadingAnalisis.set(false);
-      },
-    });
-  }
-
-  changeTab(tab: 'info' | 'ordenes' | 'analisis'): void {
+  changeTab(tab: 'info' | 'ordenes'): void {
     this.currentTab.set(tab);
-
-    const user = this.usuario();
-    if (!user) return;
-
-    if (tab === 'analisis' && this.analisis().length === 0) {
-      this.loadAnalisis(user.id);
-    }
   }
 
   editUsuario(): void {

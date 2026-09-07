@@ -129,6 +129,7 @@ export class AdminBrandsListComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error eliminando marca:', error);
+        this.closeDeleteConfirm();
         this.toastService.error('No se pudo eliminar la marca');
       },
     });

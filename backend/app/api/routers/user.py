@@ -161,3 +161,19 @@ def update_user_admin(
 ):
     """Actualizar usuario (SOLO ADMIN)"""
     return user_service.update_user_profile(db, UUID(user_id), data)
+
+
+@router.patch("/admin/{user_id}/estado", response_model=UsuarioResponse)
+def toggle_user_activo_admin(
+    user_id: str,
+    activo: bool,
+    db: Session = Depends(get_db),
+    current_user: Usuario = Depends(get_current_admin_user),
+):
+    """Activar o desactivar un usuario (SOLO ADMIN, no a sí mismo)"""
+    if str(current_user.id) == user_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No puedes desactivar tu propia cuenta",
+        )
+    return user_service.set_user_activo(db, UUID(user_id), activo)

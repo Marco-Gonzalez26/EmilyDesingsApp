@@ -484,6 +484,7 @@
 <!-- Modal de Confirmación Delete -->
 <app-confirm-dialog
   [isOpen]="isConfirmOpen()"
+  (isOpenChange)="isConfirmOpen.set($event)"
   [title]="'¿Eliminar variante?'"
   [message]="
     '¿Estás seguro de que deseas eliminar esta variante de inventario? Esta acción no se puede deshacer.'

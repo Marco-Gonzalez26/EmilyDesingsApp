@@ -206,6 +206,7 @@
   <!-- Modal de Confirmación -->
   <app-confirm-dialog
     [isOpen]="isConfirmOpen()"
+    (isOpenChange)="isConfirmOpen.set($event)"
     [title]="'¿Eliminar color?'"
     [message]="'¿Estás seguro de que deseas desactivar este color?'"
     [confirmText]="'Eliminar'"

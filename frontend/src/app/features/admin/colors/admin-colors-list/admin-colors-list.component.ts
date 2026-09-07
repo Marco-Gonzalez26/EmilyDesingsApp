@@ -132,6 +132,7 @@ export class AdminColorsListComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error eliminando color:', error);
+        this.closeDeleteConfirm();
         this.toastService.error('No se pudo eliminar el color');
       },
     });

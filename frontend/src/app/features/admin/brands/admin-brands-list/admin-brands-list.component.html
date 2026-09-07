@@ -209,6 +209,7 @@
 
   <app-confirm-dialog
     [isOpen]="isConfirmOpen()"
+    (isOpenChange)="isConfirmOpen.set($event)"
     [title]="'¿Eliminar marca?'"
     [message]="'¿Estás seguro de que desea desactivarla marca?'"
     [confirmText]="'Desactivar'"
