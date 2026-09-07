@@ -1,6 +1,6 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
+import type { SegmentValue } from '@ionic/core';
 import { GeneralTabComponent } from './genera-tab/general-tab.component';
 import { ProductsTabComponent } from './products-tab/products-tab.component';
 import { ClientsTabComponent } from './clients-tab/clients-tab.component';
@@ -14,6 +14,11 @@ import {
   IonMenuButton,
   IonTitle,
   IonToolbar,
+  IonSegment,
+  IonSegmentButton,
+  IonSegmentContent,
+  IonSegmentView,
+  IonLabel,
 } from '@ionic/angular/standalone';
 
 type TabId = 'general' | 'productos' | 'clientes' | 'ventas' | 'analisis';
@@ -27,8 +32,19 @@ interface Tab {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-
-  imports: [IonHeader, IonToolbar, IonTitle, IonButtons, IonMenuButton, IonContent, IonIcon,
+  imports: [
+    IonLabel,
+    IonSegmentButton,
+    IonHeader,
+    IonToolbar,
+    IonTitle,
+    IonButtons,
+    IonMenuButton,
+    IonContent,
+    IonIcon,
+    IonSegment,
+    IonSegmentContent,
+    IonSegmentView,
     CommonModule,
     GeneralTabComponent,
     ProductsTabComponent,
@@ -37,6 +53,7 @@ interface Tab {
     AnalysisTabComponent,
   ],
   templateUrl: './dashboard.component.html',
+  styleUrls: ['./dashboard.component.css'],
 })
 export class AdminDashboardComponent {
   activeTab = signal<TabId>('general');
@@ -46,12 +63,22 @@ export class AdminDashboardComponent {
     { id: 'productos', label: 'Productos', icon: 'cube-outline' },
     { id: 'clientes', label: 'Clientes', icon: 'people-outline' },
     { id: 'ventas', label: 'Ventas', icon: 'cash-outline' },
-    { id: 'analisis', label: 'Productos Recomendados', icon: 'sparkles-outline' },
+    {
+      id: 'analisis',
+      label: 'Productos Recomendados',
+      icon: 'sparkles-outline',
+    },
   ];
 
-  isTabActive = computed(() => (tabId: TabId) => this.activeTab() === tabId);
+  selectTab(tabId: SegmentValue | undefined): void {
+    if (tabId == null) return;
+    this.activeTab.set(tabId as TabId);
+  }
 
-  selectTab(tabId: TabId): void {
-    this.activeTab.set(tabId);
+  onSegmentViewScroll(event: CustomEvent): void {
+    // Este evento se dispara mientras el usuario hace swipe.
+    // Si quieres sincronizar el segment mientras desliza (no solo al soltar):
+    const { currentX, isManualScroll } = event.detail;
+    // opcional: lógica adicional si la necesitas
   }
 }
