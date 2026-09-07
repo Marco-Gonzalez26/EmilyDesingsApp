@@ -167,6 +167,7 @@ export class AdminProductsListComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error eliminando producto:', error);
+        this.closeDeleteConfirm();
         this.toastService.error('No se pudo eliminar el producto');
       },
     });

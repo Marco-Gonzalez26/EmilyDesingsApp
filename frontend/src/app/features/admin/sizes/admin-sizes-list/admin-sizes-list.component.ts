@@ -177,6 +177,7 @@ export class AdminSizesListComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error eliminando talla:', error);
+        this.closeDeleteConfirm();
         this.toastService.error('No se pudo eliminar la talla');
       },
     });

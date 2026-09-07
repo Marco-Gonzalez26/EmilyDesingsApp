@@ -129,6 +129,7 @@ export class AdminCategoriesListComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error eliminando categoría:', error);
+        this.closeDeleteConfirm();
         this.toastService.error('No se pudo eliminar la categoría');
       },
     });

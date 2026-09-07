@@ -242,6 +242,7 @@
 
   <app-confirm-dialog
     [isOpen]="isConfirmOpen()"
+    (isOpenChange)="isConfirmOpen.set($event)"
     [title]="'¿Eliminar talla?'"
     [message]="'¿Estás seguro de que deseas eliminar esta talla ?'"
     [confirmText]="'Eliminar'"
