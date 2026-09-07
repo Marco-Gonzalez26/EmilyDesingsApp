@@ -56,18 +56,20 @@ from slowapi.middleware import SlowAPIMiddleware
 from fastapi.responses import JSONResponse
 from fastapi import Request
 from app.db.config import check_db_connection
-from app.ml.inference import load_model
+from app.ml import inference
+import logging
 import os
+
+logger = logging.getLogger(__name__)
 
 ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "http://localhost:4200").split(",")
 
 
 async def lifespan(app: FastAPI):
-    print(">>> LIFESPAN STARTED")
+    logger.info("LIFESPAN STARTED")
     check_db_connection()
-    print(">>> ANTES DE load_model")
-    load_model()
-    print(">>> DESPUES DE load_model, artifact es None:", inference.get_artifact() is None if False else "usa la variable correcta aquí")
+    inference.load_model()
+    logger.info("Artifact es None: %s", inference.get_artifact() is None)
     yield
 
 

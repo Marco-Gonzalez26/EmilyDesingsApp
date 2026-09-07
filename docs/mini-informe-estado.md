@@ -1,6 +1,6 @@
 # Mini-informe de Estado — Emily Designs, máx. 10 líneas
 
-**Baseline:** `v1.1.0` en `cb687be` — FastAPI+Postgres+PyTorch híbrido, Ionic Capacitor Android, 22 routers, admin panel, flujo compra, 2FA TOTP y zona de usuario.
+**Baseline:** `v1.1.0` en `cb687be` — FastAPI+Postgres+PyTorch híbrido, Ionic Capacitor Android, 19 routers, admin panel, flujo compra, 2FA TOTP y zona de usuario.
 **Cambios aprobados:** features #1 a #27 con smart commits, releases `v1.0.0` `d331aba` y `v1.1.0` `cb687be`, rama `docs/gcs-deliverables` en curso para `v1.2.0`.
 **EC afectados:** `app/api/routers/interacciones.py:1`, `app/utils/crypto.py:1`, `features/favorites/favorites.page.ts:1`, `shared/components/twofa-setup/twofa-setup.component.ts:1`.
 **Problema frecuente:** modelo `Usuario` sin columna `totp_secret_encrypted` mapeada con commit que no persistía, más instancias `uvicorn` duplicadas en puerto 8000.
