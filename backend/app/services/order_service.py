@@ -387,12 +387,12 @@ def get_all_ordenes_admin(
     if fecha_hasta:
         query = query.filter(Orden.fecha_orden <= fecha_hasta)
 
-    # Búsqueda por número de orden o email
+    # Búsqueda por número de orden, email o nombre completo
     if search:
         query = query.join(Usuario).filter(
             (Orden.numero_orden.ilike(f"%{search}%"))
             | (Usuario.email.ilike(f"%{search}%"))
-            | (Usuario.nombre.ilike(f"%{search}%"))
+            | (Usuario.nombre_completo.ilike(f"%{search}%"))
         )
 
     total = query.count()

@@ -51,7 +51,10 @@ def login(credentials: UserLogin, db: Session = Depends(get_db), request: Reques
     if getattr(user, "totp_enabled", False):
         temp = create_access_token({"sub": str(user.id), "type": "2fa_temp"}, expires_delta=__import__('datetime').timedelta(minutes=5))
         return {"requires2FA": True, "tempToken": temp, "detail": "2FA requerido"}
-    # por ahora opcional para admin (no bloquea) — para doc futuro se re-activa 428
+    if user.rol == 'administrador' and not getattr(user, "totp_enabled", False):
+        # admin nuevo sin 2FA: entra solo a configurarlo, operaciones siguen en 428
+        temp = create_access_token({"sub": str(user.id), "type": "setup_2fa"}, expires_delta=__import__('datetime').timedelta(minutes=10))
+        return {"requiresSetup2FA": True, "tempToken": temp, "detail": "Admin requiere 2FA, activa en Admin Configuración"}
     return {**auth_service.create_user_token(user), "user": UsuarioResponse.model_validate(user)}
 
 @router.post("/2fa/verify-login")
