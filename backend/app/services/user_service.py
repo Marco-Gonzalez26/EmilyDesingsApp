@@ -149,6 +149,28 @@ def deactivate_user_account(db: Session, user_id: UUID) -> bool:
     return True
 
 
+def set_user_activo(db: Session, user_id: UUID, activo: bool) -> Usuario:
+    """
+    Activar o desactivar un usuario (SOLO ADMIN, desde panel)
+
+    Args:
+        db: Sesión de base de datos
+        user_id: UUID del usuario
+        activo: nuevo estado
+
+    Returns:
+        Usuario actualizado
+    """
+    usuario = get_user_by_id(db, user_id)
+
+    usuario.activo = activo
+
+    db.commit()
+    db.refresh(usuario)
+
+    return usuario
+
+
 def get_all_users(
     db: Session,
     skip: int = 0,
@@ -435,7 +457,27 @@ def get_cliente_ordenes_admin(
     total = query.count()
     ordenes = query.order_by(Orden.fecha_orden.desc()).offset(skip).limit(limit).all()
 
-    return ordenes, total
+    # DTOs serializables: ORM crudo rompe JSON (UUID/Decimal/datetime)
+    resultado = [
+        {
+            "id": str(o.id),
+            "numero_orden": o.numero_orden,
+            "estado": o.estado,
+            "total": float(o.total) if o.total is not None else 0,
+            "fecha_orden": o.fecha_orden.isoformat() if o.fecha_orden else None,
+            "items": [
+                {
+                    "id": str(i.id),
+                    "nombre_producto": i.nombre_producto,
+                    "cantidad": i.cantidad,
+                }
+                for i in (o.items or [])
+            ],
+        }
+        for o in ordenes
+    ]
+
+    return resultado, total
 
 
 def create_user_admin(db: Session, data: UsuarioCreateAdmin) -> Usuario:

@@ -112,13 +112,6 @@
               }}</span>
             </div>
 
-            <div class="flex items-center justify-between">
-              <span class="text-sm text-emily-taupe">Análisis IA</span>
-              <span class="text-base font-medium text-emily-dark">{{
-                user.estadisticas.total_analisis
-              }}</span>
-            </div>
-
             @if (user.estadisticas.ultima_orden) {
               <div class="pt-4 border-t border-emily-cream">
                 <p class="text-xs text-emily-taupe mb-1">Última orden</p>
@@ -155,15 +148,6 @@
                 class="px-4 py-2 border border-emily-cream rounded-lg transition-colors"
               >
                 Órdenes ({{ user.estadisticas.total_ordenes }})
-              </button>
-              <button
-                (click)="changeTab('analisis')"
-                [class.bg-emily-rose]="currentTab() === 'analisis'"
-                [class.text-emily-white]="currentTab() === 'analisis'"
-                [class.border-emily-rose]="currentTab() === 'analisis'"
-                class="px-4 py-2 border border-emily-cream rounded-lg transition-colors"
-              >
-                Análisis IA ({{ user.estadisticas.total_analisis }})
               </button>
             </div>
           </div>
@@ -265,44 +249,6 @@
               }
             }
 
-            @if (currentTab() === 'analisis') {
-              @if (isLoadingAnalisis()) {
-                <div class="flex items-center justify-center py-12">
-                  <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-emily-rose"></div>
-                </div>
-              } @else if (analisis().length === 0) {
-                <div class="text-center py-12">
-                  <ion-icon
-                    name="camera-outline"
-                    class="text-emily-taupe text-5xl mx-auto mb-4"
-                  ></ion-icon>
-                  <p class="text-emily-taupe">No hay análisis morfológicos registrados</p>
-                </div>
-              } @else {
-                <div class="space-y-4">
-                  @for (analisis of analisis(); track analisis.id) {
-                    <div class="border border-emily-cream rounded-lg p-4">
-                      <div class="flex items-center justify-between">
-                        <div>
-                          <p class="font-semibold text-emily-dark">
-                            {{ analisis.tipo_cuerpo_detectado }}
-                          </p>
-                          <p class="text-sm text-emily-taupe">
-                            {{ formatDate(analisis.fecha_analisis) }}
-                          </p>
-                        </div>
-                        <div class="text-right">
-                          <p class="text-sm text-emily-taupe">Confianza</p>
-                          <p class="text-lg font-bold text-emily-dark">
-                            {{ (analisis.confianza * 100).toFixed(0) }}%
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  }
-                </div>
-              }
-            }
           </div>
         </div>
       </div>

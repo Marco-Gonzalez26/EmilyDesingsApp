@@ -199,13 +199,26 @@
                 </td>
 
                 <td class="px-6 py-4 text-center">
-                  <button
-                    (click)="viewUsuarioDetail(usuario.id)"
-                    class="inline-flex items-center gap-1 px-3 py-2 text-sm text-emily-rose hover:bg-emily-rose/10 rounded-lg transition-colors"
-                  >
-                    <ion-icon name="eye-outline"></ion-icon>
-                    <span>Ver Detalle</span>
-                  </button>
+                  <div class="inline-flex items-center gap-2">
+                    <button
+                      (click)="viewUsuarioDetail(usuario.id)"
+                      class="inline-flex items-center gap-1 px-3 py-2 text-sm text-emily-rose hover:bg-emily-rose/10 rounded-lg transition-colors"
+                    >
+                      <ion-icon name="eye-outline"></ion-icon>
+                      <span>Ver Detalle</span>
+                    </button>
+                    <button
+                      (click)="openToggleConfirm(usuario)"
+                      class="inline-flex items-center gap-1 px-3 py-2 text-sm rounded-lg transition-colors"
+                      [class.text-green-700]="usuario.activo === false"
+                      [class.hover:bg-green-50]="usuario.activo === false"
+                      [class.text-red-700]="usuario.activo !== false"
+                      [class.hover:bg-red-50]="usuario.activo !== false"
+                    >
+                      <ion-icon [name]="usuario.activo === false ? 'checkmark-circle' : 'close-circle'"></ion-icon>
+                      <span>{{ usuario.activo === false ? 'Activar' : 'Desactivar' }}</span>
+                    </button>
+                  </div>
                 </td>
               </tr>
             }
@@ -257,4 +270,16 @@
     }
   </div>
 </div>
+
+<app-confirm-dialog
+  [isOpen]="isConfirmOpen()"
+  (isOpenChange)="isConfirmOpen.set($event)"
+  [title]="pendingActivo() ? '¿Activar usuario?' : '¿Desactivar usuario?'"
+  [message]="pendingActivo() ? 'El usuario podrá volver a iniciar sesión.' : 'El usuario no podrá iniciar sesión hasta reactivarlo.'"
+  [confirmText]="pendingActivo() ? 'Activar' : 'Desactivar'"
+  [cancelText]="'Cancelar'"
+  [type]="'warning'"
+  (confirm)="confirmToggle()"
+  (cancel)="closeToggleConfirm()"
+/>
 </ion-content>
