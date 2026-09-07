@@ -207,6 +207,7 @@
 
   <app-confirm-dialog
     [isOpen]="isConfirmOpen()"
+    (isOpenChange)="isConfirmOpen.set($event)"
     [title]="'¿Eliminar categoría?'"
     [message]="'¿Está seguro de que desea desactivar esta categoría?'"
     [confirmText]="'Eliminar'"

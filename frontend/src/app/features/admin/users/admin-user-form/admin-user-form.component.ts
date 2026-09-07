@@ -42,10 +42,10 @@ export class AdminUserFormComponent implements OnInit {
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       nombre_completo: ['', [Validators.required, Validators.minLength(2)]],
-      telefono: ['', [Validators.pattern(/^[0-9]{10}$/)]],
-      direccion: [''],
+      telefono: ['', [Validators.required, Validators.pattern(/^[0-9]{7,15}$/)]],
+      direccion: ['', [Validators.required, Validators.minLength(3)]],
       cedula_ruc: ['', [Validators.pattern(/^[0-9]{10,13}$/)]],
-      ciudad: ['', Validators.required],
+      ciudad: ['', [Validators.required, Validators.minLength(2)]],
       rol: ['cliente', Validators.required],
     });
   }
@@ -58,6 +58,11 @@ export class AdminUserFormComponent implements OnInit {
 
       this.form.get('password')?.clearValidators();
       this.form.get('password')?.updateValueAndValidity();
+      // en edición no se exige completar: solo formato si hay valor
+      this.form.get('telefono')?.setValidators([Validators.pattern(/^[0-9]{7,15}$/)]);
+      this.form.get('telefono')?.updateValueAndValidity();
+      this.form.get('direccion')?.setValidators([Validators.minLength(3)]);
+      this.form.get('direccion')?.updateValueAndValidity();
       this.loadUsuario(id);
     }
   }

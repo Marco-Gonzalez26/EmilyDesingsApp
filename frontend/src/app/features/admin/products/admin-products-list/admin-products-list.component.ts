@@ -99,7 +99,7 @@ export class AdminProductsListComponent implements OnInit {
         this.products.set(response.productos);
         this.totalProducts.set(response.total);
         this.isLoading.set(false);
-        console.log({ products: this.products() });
+
       },
       error: (error) => {
         console.error('Error cargando productos:', error);
@@ -167,6 +167,7 @@ export class AdminProductsListComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error eliminando producto:', error);
+        this.closeDeleteConfirm();
         this.toastService.error('No se pudo eliminar el producto');
       },
     });

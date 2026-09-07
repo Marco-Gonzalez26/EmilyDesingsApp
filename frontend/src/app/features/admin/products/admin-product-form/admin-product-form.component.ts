@@ -117,7 +117,6 @@ export class AdminProductFormComponent implements OnInit {
 
     this.productService.getProductById(id).subscribe({
       next: (product) => {
-        console.log({ product });
         this.form.patchValue({
           sku: product.sku,
           nombre: product.nombre,

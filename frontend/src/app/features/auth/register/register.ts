@@ -90,7 +90,6 @@ export class RegisterComponent implements OnInit {
 
     this.authService.register(registerData).subscribe({
       next: (response) => {
-        console.log('Registro exitoso:', response);
         this.isLoading = false;
         localStorage.setItem('onboardingPendiente', 'true');
         this.router.navigate(['/inicio'], { state: { showOnboarding: true } });

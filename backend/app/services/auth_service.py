@@ -74,8 +74,7 @@ def create_user(db: Session, user: UsuarioCreate) -> Usuario:
 
 
 def _is_admin_blocked_without_2fa(user: Usuario) -> bool:
-    # por ahora opcional (no bloquea) — para doc futuro obligatorio
-    return False
+    return user.rol == 'administrador' and not getattr(user, 'totp_enabled', False)
 
 
 def authenticate_user(db: Session, credentials: UserLogin) -> Usuario:

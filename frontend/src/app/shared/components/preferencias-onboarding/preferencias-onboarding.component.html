@@ -47,6 +47,59 @@
         <p class="text-center text-xs text-emily-taupe">{{ seleccionados().size }}/5 seleccionados</p>
       }
 
+      <div class="rounded-2xl border border-emily-cream">
+        <button type="button" (click)="showTallas.set(!showTallas())" class="w-full flex items-center justify-between px-4 py-3">
+          <span class="text-sm font-medium text-emily-dark">Tallas que usas <span class="text-emily-taupe font-normal">(opcional)</span></span>
+          <ion-icon [name]="showTallas() ? 'chevron-up' : 'chevron-down'" class="text-emily-taupe"></ion-icon>
+        </button>
+        @if (showTallas()) {
+          <div class="flex flex-wrap gap-2 px-4 pb-4 justify-center">
+            @for (t of tallas(); track t.id) {
+              <button
+                (click)="toggleTalla(t.id)"
+                [class.bg-emily-dark]="tallasSel().has(t.id)"
+                [class.text-emily-white]="tallasSel().has(t.id)"
+                [class.border-emily-dark]="tallasSel().has(t.id)"
+                [class.bg-emily-white]="!tallasSel().has(t.id)"
+                [class.text-emily-dark]="!tallasSel().has(t.id)"
+                class="px-4 py-2 rounded-full border border-emily-taupe/30 text-sm font-medium transition-all"
+              >
+                {{ t.nombre }}
+              </button>
+            }
+            @if (tallas().length === 0) {
+              <p class="text-xs text-emily-taupe">Sin tallas disponibles</p>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="rounded-2xl border border-emily-cream">
+        <button type="button" (click)="showColores.set(!showColores())" class="w-full flex items-center justify-between px-4 py-3">
+          <span class="text-sm font-medium text-emily-dark">Colores que te gustan <span class="text-emily-taupe font-normal">(opcional)</span></span>
+          <ion-icon [name]="showColores() ? 'chevron-up' : 'chevron-down'" class="text-emily-taupe"></ion-icon>
+        </button>
+        @if (showColores()) {
+          <div class="flex flex-wrap gap-3 px-4 pb-4 justify-center">
+            @for (c of colores(); track c.id) {
+              <button (click)="toggleColor(c.id)" class="flex flex-col items-center gap-1">
+                <span
+                  class="w-10 h-10 rounded-full border-2 transition-all"
+                  [class.border-emily-dark]="coloresSel().has(c.id)"
+                  [class.ring-2]="coloresSel().has(c.id)"
+                  [class.ring-emily-dark]="coloresSel().has(c.id)"
+                  [style.background-color]="c.codigo_hexadecimal || '#cccccc'"
+                ></span>
+                <span class="text-[11px] text-emily-taupe">{{ c.nombre }}</span>
+              </button>
+            }
+            @if (colores().length === 0) {
+              <p class="text-xs text-emily-taupe">Sin colores disponibles</p>
+            }
+          </div>
+        }
+      </div>
+
       <div class="bg-emily-cream/50 rounded-2xl p-4 border border-emily-rose/10">
         <label class="block text-sm font-medium text-emily-dark mb-2">Rango de precio preferido</label>
         <p class="text-xs text-emily-taupe mb-3">${{ precioMin() }} — ${{ precioMax() }}</p>

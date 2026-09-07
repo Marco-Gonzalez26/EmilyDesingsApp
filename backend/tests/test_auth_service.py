@@ -70,10 +70,12 @@ class TestCreateUser:
     def test_crea_usuario_correctamente(self, mock_valida, mock_get, mock_hash, db):
         user_data = UsuarioCreate(
             email="nuevo@example.com",
-            password="password123",
+            password="Prueba123@",
             nombre_completo="Nuevo Usuario",
             telefono="0991234567",
             direccion="Calle 123",
+            ciudad="Quevedo",
+            acepta_terminos=True,
             rol="cliente",
             cedula_ruc="1234567890",
         )
@@ -90,8 +92,12 @@ class TestCreateUser:
         mock_get.return_value = usuario_activo
         user_data = UsuarioCreate(
             email="test@example.com",
-            password="password123",
+            password="Prueba123@",
             nombre_completo="Test",
+            telefono="0991234567",
+            direccion="Calle 123",
+            ciudad="Quevedo",
+            acepta_terminos=True,
             rol="cliente",
         )
 
@@ -105,8 +111,12 @@ class TestCreateUser:
     def test_lanza_error_si_cedula_invalida(self, mock_valida, mock_get, db):
         user_data = UsuarioCreate(
             email="nuevo@example.com",
-            password="password123",
+            password="Prueba123@",
             nombre_completo="Test",
+            telefono="0991234567",
+            direccion="Calle 123",
+            ciudad="Quevedo",
+            acepta_terminos=True,
             rol="cliente",
             cedula_ruc="000",
         )
@@ -124,14 +134,14 @@ class TestAuthenticateUser:
     @patch("app.services.auth_service.get_user_by_email")
     def test_autentica_usuario_correcto(self, mock_get, mock_verify, db, usuario_activo):
         mock_get.return_value = usuario_activo
-        credentials = UserLogin(email="test@example.com", password="password123")
+        credentials = UserLogin(email="test@example.com", password="Prueba123@")
 
         result = authenticate_user(db, credentials)
         assert result == usuario_activo
 
     @patch("app.services.auth_service.get_user_by_email", return_value=None)
     def test_lanza_error_si_email_no_existe(self, mock_get, db):
-        credentials = UserLogin(email="noexiste@example.com", password="password123")
+        credentials = UserLogin(email="noexiste@example.com", password="Prueba123@")
 
         with pytest.raises(HTTPException) as exc:
             authenticate_user(db, credentials)
@@ -141,7 +151,7 @@ class TestAuthenticateUser:
     @patch("app.services.auth_service.get_user_by_email")
     def test_lanza_error_si_password_incorrecto(self, mock_get, mock_verify, db, usuario_activo):
         mock_get.return_value = usuario_activo
-        credentials = UserLogin(email="test@example.com", password="wrongpassword")
+        credentials = UserLogin(email="test@example.com", password="Wrongpass1@")
 
         with pytest.raises(HTTPException) as exc:
             authenticate_user(db, credentials)
@@ -151,7 +161,7 @@ class TestAuthenticateUser:
     @patch("app.services.auth_service.get_user_by_email")
     def test_lanza_error_si_usuario_inactivo(self, mock_get, mock_verify, db, usuario_inactivo):
         mock_get.return_value = usuario_inactivo
-        credentials = UserLogin(email="test@example.com", password="password123")
+        credentials = UserLogin(email="test@example.com", password="Prueba123@")
 
         with pytest.raises(HTTPException) as exc:
             authenticate_user(db, credentials)

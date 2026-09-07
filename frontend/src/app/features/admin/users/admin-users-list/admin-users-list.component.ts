@@ -6,6 +6,7 @@ import { Router, RouterLink } from '@angular/router';
 import { UsuarioAdminService } from '../../../../core/services/user.service';
 import { ToastService } from '../../../../core/services/toast.service';
 import { User, UserFilters, UserListItem } from '@shared/models/user';
+import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import {
   IonButtons,
   IonContent,
@@ -21,7 +22,7 @@ import {
 @Component({
   selector: 'app-admin-usuarios-list',
   standalone: true,
-  imports: [IonHeader, IonToolbar, IonTitle, IonButtons, IonMenuButton, IonContent, IonIcon, IonRouterLink, IonRouterLinkWithHref, CommonModule, FormsModule, RouterLink],
+  imports: [IonHeader, IonToolbar, IonTitle, IonButtons, IonMenuButton, IonContent, IonIcon, IonRouterLink, IonRouterLinkWithHref, CommonModule, FormsModule, RouterLink, ConfirmDialogComponent],
   templateUrl: './admin-users-list.component.html',
   styleUrl: './admin-users-list.component.css',
 })
@@ -116,6 +117,39 @@ export class AdminUsersListComponent implements OnInit {
 
   viewUsuarioDetail(usuarioId: string): void {
     this.router.navigate(['/admin/usuarios', usuarioId]);
+  }
+
+  isConfirmOpen = signal(false);
+  private usuarioObjetivo = signal<UserListItem | null>(null);
+  pendingActivo = signal(true);
+
+  openToggleConfirm(usuario: UserListItem): void {
+    this.usuarioObjetivo.set(usuario);
+    this.pendingActivo.set(usuario.activo === false);
+    this.isConfirmOpen.set(true);
+  }
+
+  closeToggleConfirm(): void {
+    this.isConfirmOpen.set(false);
+    this.usuarioObjetivo.set(null);
+  }
+
+  confirmToggle(): void {
+    const usuario = this.usuarioObjetivo();
+    if (!usuario) return;
+    const activo = this.pendingActivo();
+    this.usuarioService.toggleActivo(usuario.id, activo).subscribe({
+      next: () => {
+        this.closeToggleConfirm();
+        this.loadUsuarios();
+        this.toastService.success(activo ? 'Usuario activado' : 'Usuario desactivado');
+      },
+      error: (error) => {
+        console.error('Error cambiando estado:', error);
+        this.closeToggleConfirm();
+        this.toastService.error(error.error?.detail || 'No se pudo cambiar el estado');
+      },
+    });
   }
 
   refreshList(): void {

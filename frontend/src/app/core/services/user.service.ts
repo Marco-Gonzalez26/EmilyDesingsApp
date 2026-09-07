@@ -50,18 +50,6 @@ export class UsuarioAdminService {
     );
   }
 
-  getUsuarioAnalisis(
-    usuarioId: string,
-    skip = 0,
-    limit = 10,
-  ): Observable<{
-    analisis: any[];
-    total: number;
-  }> {
-    return this.api.get(
-      `/api/usuarios/admin/clientes/${usuarioId}/analisis?skip=${skip}&limit=${limit}`,
-    );
-  }
   createUsuario(data: {
     email: string;
     password: string;
@@ -84,5 +72,9 @@ export class UsuarioAdminService {
     },
   ): Observable<any> {
     return this.api.put(`/api/usuarios/admin/${usuarioId}/actualizar`, data);
+  }
+
+  toggleActivo(usuarioId: string, activo: boolean): Observable<any> {
+    return this.api.patch(`/api/usuarios/admin/${usuarioId}/estado?activo=${activo}`, {});
   }
 }

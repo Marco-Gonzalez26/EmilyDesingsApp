@@ -118,7 +118,9 @@ export class GeneralTabComponent implements OnInit {
   }
 
   private crearVentasMesChart(labels: string[], valores: number[]): void {
-    const ctx = document.getElementById('ventasMesChart') as HTMLCanvasElement;
+    const ctx = document.getElementById(
+      'ventasMesChartGeneral',
+    ) as HTMLCanvasElement;
     if (!ctx) return;
 
     const config: ChartConfiguration<'bar'> = {

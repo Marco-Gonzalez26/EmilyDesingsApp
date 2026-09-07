@@ -302,6 +302,7 @@
 
 <app-confirm-dialog
   [isOpen]="isConfirmOpen()"
+  (isOpenChange)="isConfirmOpen.set($event)"
   [title]="'¿Eliminar producto?'"
   [message]="'¿Está seguro de que desea eliminar este producto?'"
   [confirmText]="'Eliminar'"

@@ -348,6 +348,7 @@ export class AdminProductInventoryComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error eliminando inventario:', error);
+        this.closeDeleteConfirm();
         this.toastService.error(error.error?.detail || 'No se pudo eliminar el inventario');
       },
     });

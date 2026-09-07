@@ -1,0 +1,31 @@
+ion-segment {
+  --background: transparent;
+}
+
+ion-segment-button {
+  --color: var(--ion-color-emily-dark, #3a3a3a);
+  --color-checked: var(--ion-color-emily-white, #fff);
+  --background-checked: var(--ion-color-emily-rose, #d98ea1);
+  --indicator-color: transparent;
+  text-transform: none;
+  font-weight: 500;
+  min-width: auto;
+  flex: 0 0 auto;
+}
+
+ion-segment-button::part(indicator-background) {
+  background: var(--ion-color-emily-rose, #d98ea1);
+}
+
+ion-segment-button.segment-button-checked {
+  border-radius: 8px;
+}
+
+:host ::ng-deep ion-segment::-webkit-scrollbar {
+  display: none;
+}
+
+:host ::ng-deep ion-segment {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
