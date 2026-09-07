@@ -19,8 +19,6 @@ export class OrdenService {
   constructor(private api: ApiService) {}
 
   crearOrden(data: OrdenCreate): Observable<Orden> {
-    console.log('ORDEN CREATE', { data });
-    
     return this.api.post<Orden>('/api/ordenes/', data);
   }
 

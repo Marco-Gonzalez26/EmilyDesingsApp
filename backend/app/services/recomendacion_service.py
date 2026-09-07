@@ -34,12 +34,10 @@ def get_recomendaciones(db: Session, usuario_id: UUID, k: int = 15) -> List[dict
         .group_by(Producto.categoria_id)
         .all()
     )
-    print("""Por categoria:
-    {}
-""".format(por_categoria))
+    logger.debug(f"Por categoria: {por_categoria}")
 
     results = inference.hybrid_recommend(usuario_id, db, k=k)
-    print("Usuarios en la base de datos:", db.query(Usuario).count())
+    logger.debug(f"Usuarios en la base de datos: {db.query(Usuario).count()}")
 
     algo = "hibrido"
 

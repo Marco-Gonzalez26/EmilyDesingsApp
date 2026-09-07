@@ -33,19 +33,17 @@ _artifact: Optional[dict] = None
 def load_model():
     """Load the recommendation artifact once at startup."""
     global _artifact
-    print(">>> load_model() EJECUTANDO")
+    logger.debug("load_model() ejecutando")
     model_path = os.getenv(
         "RECOMMENDATION_MODEL_PATH",
         os.path.join(os.path.dirname(__file__), "artifacts", "modelo_recomendacion.joblib"),
     )
-    print(">>> model_path resuelto:", model_path)
-    print(">>> existe?:", os.path.exists(model_path))
     if not os.path.exists(model_path):
         logger.warning(f"Recommendation model not found at {model_path}. Cold-start only.")
         _artifact = None
         return
     _artifact = joblib.load(model_path)
-    print(">>> CARGADO OK. version:", _artifact.get("version"), "| vida_media_dias:", _artifact.get("vida_media_dias"))
+    logger.debug(f"Cargado OK. version: {_artifact.get('version')} | vida_media_dias: {_artifact.get('vida_media_dias')}")
     logger.info(
         f"Recommendation model loaded (version={_artifact.get('version')}, "
         f"fecha={_artifact.get('fecha_entrenamiento')})"
