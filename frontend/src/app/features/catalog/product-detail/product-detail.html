@@ -119,6 +119,16 @@
                 {{ product()!.descripcion }}
               </p>
             }
+
+            @if (productEstilos().length > 0) {
+              <div class="flex flex-wrap gap-1.5 mt-3">
+                @for (estilo of productEstilos(); track estilo.id) {
+                  <span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-emily-cream text-emily-taupe">
+                    {{ estilo.nombre }}
+                  </span>
+                }
+              </div>
+            }
           </div>
 
           <div class="flex items-center gap-3 py-4 border-y border-emily-cream">
@@ -218,10 +228,13 @@
           <div class="flex gap-3">
             <button
               (click)="addToCart()"
-              class="flex-1 bg-emily-dark hover:bg-emily-taupe text-emily-white font-semibold py-3.5 px-6 rounded-xl transition flex items-center justify-center gap-2"
+              [disabled]="stockDisponible() <= 0"
+              [class]="stockDisponible() <= 0
+                ? 'flex-1 bg-emily-taupe/40 text-emily-white/60 font-semibold py-3.5 px-6 rounded-xl cursor-not-allowed flex items-center justify-center gap-2'
+                : 'flex-1 bg-emily-dark hover:bg-emily-taupe text-emily-white font-semibold py-3.5 px-6 rounded-xl transition flex items-center justify-center gap-2'"
             >
               <ion-icon name="cart-outline"></ion-icon>
-              Añadir al Carrito
+              {{ stockDisponible() <= 0 ? 'Sin stock' : 'Añadir al Carrito' }}
             </button>
             <button
               (click)="toggleFavorite()"

@@ -40,6 +40,7 @@ export class ProductDetailComponent implements OnInit {
   product = signal<Product | null>(null);
   relatedProducts = signal<Product[]>([]);
   inventario = signal<Inventario[]>([]);
+  productEstilos = signal<{ id: string; nombre: string }[]>([]);
   isLoading = signal(true);
   isMainFavorite(): boolean {
     const product = this.product();
@@ -105,6 +106,10 @@ export class ProductDetailComponent implements OnInit {
     this.productoService.getProductById(id).subscribe({
       next: (product) => {
         this.product.set(product);
+        const productAny = product as any;
+        if (productAny.estilos?.length) {
+          this.productEstilos.set(productAny.estilos);
+        }
         this.loadInventario(id);
         this.loadRelated(product);
         this.isLoading.set(false);

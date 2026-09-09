@@ -7,12 +7,14 @@ import { forkJoin } from 'rxjs';
 import { ProductoService } from '../../../../core/services/product.service';
 import { CategoryService } from '../../../../core/services/category.service';
 import { BrandService } from '../../../../core/services/brand.service';
+import { StyleService } from '../../../../core/services/style.service';
 import { CloudinaryService } from '../../../../core/services/cloudinary.service';
 import { ToastService } from '../../../../core/services/toast.service';
 import { CloudinaryUploadResult } from '@app/shared/models/cloudinary';
 import { Product, ProductImage } from '@app/shared/models/product';
 import { Category } from '@app/shared/models/category';
 import { Brand } from '@app/shared/models/brand';
+import { Estilo } from '@app/shared/models/style';
 import {
   IonBackButton,
   IonButtons,
@@ -38,6 +40,7 @@ export class AdminProductFormComponent implements OnInit {
   private productService = inject(ProductoService);
   private categoryService = inject(CategoryService);
   private brandService = inject(BrandService);
+  private styleService = inject(StyleService);
   private cloudinaryService = inject(CloudinaryService);
   private toastService = inject(ToastService);
 
@@ -54,6 +57,8 @@ export class AdminProductFormComponent implements OnInit {
 
   categories = signal<Category[]>([]);
   brands = signal<Brand[]>([]);
+  estilos = signal<Estilo[]>([]);
+  selectedEstilos = signal<string[]>([]);
   uploadedImages = signal<ProductImage[]>([]);
 
   constructor() {
@@ -82,6 +87,7 @@ export class AdminProductFormComponent implements OnInit {
   ngOnInit(): void {
     this.loadCategories();
     this.loadBrands();
+    this.loadEstilos();
 
     const id = this.route.snapshot.paramMap.get('id');
 
@@ -112,6 +118,13 @@ export class AdminProductFormComponent implements OnInit {
     });
   }
 
+  loadEstilos(): void {
+    this.styleService.getEstilos(true).subscribe({
+      next: (data) => this.estilos.set(data),
+      error: (error) => console.error('Error cargando estilos:', error),
+    });
+  }
+
   loadProduct(id: string): void {
     this.isLoading.set(true);
 
@@ -133,6 +146,12 @@ export class AdminProductFormComponent implements OnInit {
 
         if (product.imagenes) {
           this.uploadedImages.set(product.imagenes);
+        }
+
+        // Cargar estilos asignados al producto
+        const productAny = product as any;
+        if (productAny.estilos?.length) {
+          this.selectedEstilos.set(productAny.estilos.map((e: any) => e.id));
         }
 
         this.isLoading.set(false);
@@ -399,6 +418,7 @@ export class AdminProductFormComponent implements OnInit {
 
         forkJoin(imageRequests).subscribe({
           next: () => {
+            this.assignEstilos(product.id);
             this.toastService.success('Producto creado exitosamente');
 
             setTimeout(() => {
@@ -428,6 +448,7 @@ export class AdminProductFormComponent implements OnInit {
 
     this.productService.updateProduct(id, this.form.value).subscribe({
       next: () => {
+        this.assignEstilos(id);
         this.toastService.success('Producto actualizado exitosamente');
 
         setTimeout(() => {
@@ -448,5 +469,24 @@ export class AdminProductFormComponent implements OnInit {
 
   cancelar(): void {
     this.router.navigate(['/admin/productos']);
+  }
+
+  toggleEstilo(estiloId: string): void {
+    this.selectedEstilos.update((ids) =>
+      ids.includes(estiloId) ? ids.filter((id) => id !== estiloId) : [...ids, estiloId],
+    );
+  }
+
+  isEstiloSelected(estiloId: string): boolean {
+    return this.selectedEstilos().includes(estiloId);
+  }
+
+  private assignEstilos(productoId: string): void {
+    const estiloIds = this.selectedEstilos();
+    if (estiloIds.length === 0) return;
+
+    this.styleService.assignEstilosToProduct(productoId, estiloIds).subscribe({
+      error: (err) => console.error('Error asignando estilos:', err),
+    });
   }
 }

@@ -250,6 +250,28 @@
       </div>
 
       <div class="bg-emily-white rounded-xl shadow-sm border border-emily-cream p-6">
+        <h2 class="text-lg font-serif font-semibold text-emily-dark mb-4">Estilos</h2>
+        <p class="text-sm text-emily-taupe mb-3">Selecciona los estilos que aplican a este producto</p>
+        <div class="flex flex-wrap gap-2">
+          @for (estilo of estilos(); track estilo.id) {
+            <button
+              type="button"
+              (click)="toggleEstilo(estilo.id)"
+              class="px-3 py-1.5 rounded-full text-sm font-medium border-2 transition-colors"
+              [class]="isEstiloSelected(estilo.id)
+                ? 'border-emily-rose bg-emily-rose/10 text-emily-rose'
+                : 'border-emily-cream bg-emily-white text-emily-taupe hover:border-emily-taupe'"
+            >
+              {{ estilo.nombre }}
+            </button>
+          }
+          @if (estilos().length === 0) {
+            <p class="text-sm text-emily-taupe">No hay estilos disponibles</p>
+          }
+        </div>
+      </div>
+
+      <div class="bg-emily-white rounded-xl shadow-sm border border-emily-cream p-6">
         <h2 class="text-lg font-serif font-semibold text-emily-dark mb-4">Precios</h2>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
