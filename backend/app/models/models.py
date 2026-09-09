@@ -324,6 +324,9 @@ class Inventario(Base):
         CheckConstraint(
             "stock_reservado >= 0", name="inventario_stock_reservado_check"
         ),
+        CheckConstraint(
+            "stock_reservado <= stock", name="inventario_reserva_check"
+        ),
         UniqueConstraint(
             "producto_id",
             "talla_id",
