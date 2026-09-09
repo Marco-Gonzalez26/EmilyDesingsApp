@@ -92,6 +92,19 @@ def get_recomendaciones(db: Session, usuario_id: UUID, k: int = 15) -> List[dict
             }
         )
 
+        # dedup: una fila por día/usuario/producto para conteo limpio en dashboard
+        ya_existe = (
+            db.query(RecomendacionIA.id)
+            .filter(
+                RecomendacionIA.usuario_id == usuario_id,
+                RecomendacionIA.producto_id == producto_id,
+                func.date(RecomendacionIA.fecha_generacion) == datetime.utcnow().date(),
+            )
+            .first()
+        )
+        if ya_existe:
+            continue
+
         row = RecomendacionIA(
             usuario_id=usuario_id,
             producto_id=producto_id,
