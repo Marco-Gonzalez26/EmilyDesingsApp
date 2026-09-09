@@ -1,0 +1,56 @@
+@if (total() > 1) {
+  <div class="flex justify-center items-center gap-1 mt-10">
+    <button
+      (click)="first()"
+      [disabled]="current() === 1"
+      aria-label="Primera página"
+      class="w-9 h-9 flex items-center justify-center rounded-lg border border-emily-taupe/30 text-emily-taupe hover:border-emily-dark hover:text-emily-dark transition disabled:opacity-40 disabled:cursor-not-allowed"
+    >
+      <ion-icon name="chevron-back"></ion-icon>
+      <ion-icon name="chevron-back" class="-ml-4"></ion-icon>
+    </button>
+    <button
+      (click)="prev()"
+      [disabled]="current() === 1"
+      aria-label="Página anterior"
+      class="w-9 h-9 flex items-center justify-center rounded-lg border border-emily-taupe/30 text-emily-taupe hover:border-emily-dark hover:text-emily-dark transition disabled:opacity-40 disabled:cursor-not-allowed"
+    >
+      <ion-icon name="chevron-back"></ion-icon>
+    </button>
+
+    @for (page of pages(); track $index) {
+      <button
+        (click)="go(page)"
+        [disabled]="page === '...'"
+        class="w-9 h-9 rounded-lg text-sm font-medium transition"
+        [class]="
+          page === current()
+            ? 'bg-emily-dark text-emily-white'
+            : page === '...'
+              ? 'text-emily-taupe cursor-default'
+              : 'border border-emily-taupe/30 text-emily-taupe hover:border-emily-dark hover:text-emily-dark'
+        "
+      >
+        {{ page }}
+      </button>
+    }
+
+    <button
+      (click)="next()"
+      [disabled]="current() === total()"
+      aria-label="Página siguiente"
+      class="w-9 h-9 flex items-center justify-center rounded-lg border border-emily-taupe/30 text-emily-taupe hover:border-emily-dark hover:text-emily-dark transition disabled:opacity-40 disabled:cursor-not-allowed"
+    >
+      <ion-icon name="chevron-forward"></ion-icon>
+    </button>
+    <button
+      (click)="last()"
+      [disabled]="current() === total()"
+      aria-label="Última página"
+      class="w-9 h-9 flex items-center justify-center rounded-lg border border-emily-taupe/30 text-emily-taupe hover:border-emily-dark hover:text-emily-dark transition disabled:opacity-40 disabled:cursor-not-allowed"
+    >
+      <ion-icon name="chevron-forward"></ion-icon>
+      <ion-icon name="chevron-forward" class="-ml-4"></ion-icon>
+    </button>
+  </div>
+}
