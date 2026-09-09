@@ -26,6 +26,7 @@ export class TabsPage implements OnInit {
   private modalCtrl = inject(ModalController);
   private api = inject(ApiService);
   private router = inject(Router);
+  private _onboardingChecked = false;
 
   constructor(
     private authService: AuthService,
@@ -48,10 +49,22 @@ export class TabsPage implements OnInit {
   }
 
   private async checkOnboarding(): Promise<void> {
+    if (this._onboardingChecked) return;
+    this._onboardingChecked = true;
+
     const state = history.state as { showOnboarding?: boolean };
     const pendingFlag = localStorage.getItem('onboardingPendiente') === 'true';
 
     if (state?.showOnboarding || pendingFlag) {
+      const alreadyDismissed = localStorage.getItem('onboarding_seen') === 'true';
+      if (alreadyDismissed) {
+        localStorage.removeItem('onboardingPendiente');
+        return;
+      }
+
+      const top = await this.modalCtrl.getTop();
+      if (top) return;
+
       const shouldShow = await new Promise<boolean>((resolve) => {
         this.api.get('/api/preferencias/mis-preferencias').subscribe({
           next: (pref) => {
@@ -79,6 +92,7 @@ export class TabsPage implements OnInit {
       const { role } = await modal.onWillDismiss();
       if (role === 'confirm') {
         localStorage.removeItem('onboardingPendiente');
+        localStorage.setItem('onboarding_seen', '1');
         this.toastService.success('¡Preferencias guardadas! Descubre tu Para Ti');
         this.router.navigate(['/catalogo']);
       }
