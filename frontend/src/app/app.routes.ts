@@ -21,6 +21,8 @@ import { AdminColorsListComponent } from './features/admin/colors/admin-colors-l
 import { AdminColorFormComponent } from './features/admin/colors/admin-color-form/admin-color-form.component';
 import { AdminSizesListComponent } from './features/admin/sizes/admin-sizes-list/admin-sizes-list.component';
 import { AdminSizeFormComponent } from './features/admin/sizes/admin-size-form/admin-size-form.component';
+import { AdminStylesListComponent } from './features/admin/styles/admin-styles-list/admin-styles-list.component';
+import { AdminStyleFormComponent } from './features/admin/styles/admin-style-form/admin-style-form.component';
 import { AdminProductsListComponent } from './features/admin/products/admin-products-list/admin-products-list.component';
 import { AdminProductFormComponent } from './features/admin/products/admin-product-form/admin-product-form.component';
 import { AdminInventoryListComponent } from './features/admin/inventories/admin-inventories-list/admin-inventories-list.component';
@@ -105,6 +107,14 @@ export const routes: Routes = [
           { path: '', component: AdminSizesListComponent },
           { path: 'nueva', component: AdminSizeFormComponent },
           { path: 'editar/:id', component: AdminSizeFormComponent },
+        ],
+      },
+      {
+        path: 'estilos',
+        children: [
+          { path: '', component: AdminStylesListComponent },
+          { path: 'nuevo', component: AdminStyleFormComponent },
+          { path: 'editar/:id', component: AdminStyleFormComponent },
         ],
       },
       {

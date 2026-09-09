@@ -53,15 +53,32 @@ export class AdminLayoutComponent {
     { label: 'Ir a la web', icon: 'globe-outline', route: '/catalogo' },
     { label: 'Dashboard', icon: 'grid-outline', route: '/admin' },
     { label: 'Productos', icon: 'cube-outline', route: '/admin/productos' },
-    { label: 'Categorías', icon: 'grid-outline', route: '/admin/categorias' },
+    { label: 'Categorías', icon: 'bookmarks-outline', route: '/admin/categorias' },
     { label: 'Marcas', icon: 'pricetag-outline', route: '/admin/marcas' },
     { label: 'Colores', icon: 'image-outline', route: '/admin/colores' },
     { label: 'Tallas', icon: 'resize-outline', route: '/admin/tallas' },
-    { label: 'Inventario', icon: 'bag-handle-outline', route: '/admin/inventario' },
-    { label: 'Órdenes', icon: 'document-text-outline', route: '/admin/ordenes' },
+    { label: 'Estilos', icon: 'color-palette-outline', route: '/admin/estilos' },
+    {
+      label: 'Inventario',
+      icon: 'bag-handle-outline',
+      route: '/admin/inventario',
+    },
+    {
+      label: 'Órdenes',
+      icon: 'document-text-outline',
+      route: '/admin/ordenes',
+    },
     { label: 'Usuarios', icon: 'people-outline', route: '/admin/usuarios' },
-    { label: 'Reportes', icon: 'folder-open-outline', route: '/admin/reportes' },
-    { label: 'Configuración', icon: 'settings-outline', route: '/admin/configuracion' },
+    {
+      label: 'Reportes',
+      icon: 'folder-open-outline',
+      route: '/admin/reportes',
+    },
+    {
+      label: 'Configuración',
+      icon: 'settings-outline',
+      route: '/admin/configuracion',
+    },
   ];
 
   logout(): void {
