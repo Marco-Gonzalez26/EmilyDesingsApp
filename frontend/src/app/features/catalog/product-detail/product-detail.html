@@ -227,12 +227,12 @@
               (click)="toggleFavorite()"
               class="w-14 h-14 border-2 rounded-xl flex items-center justify-center transition"
               [class]="
-                isFavorite()
+                isMainFavorite()
                   ? 'border-emily-rose bg-emily-rose/10 text-emily-rose'
                   : 'border-emily-cream bg-emily-white text-emily-taupe hover:border-emily-rose hover:text-emily-rose'
               "
             >
-              <ion-icon [name]="isFavorite() ? 'heart' : 'heart-outline'"></ion-icon>
+              <ion-icon [name]="isMainFavorite() ? 'heart' : 'heart-outline'"></ion-icon>
             </button>
           </div>
 

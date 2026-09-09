@@ -41,7 +41,11 @@ export class ProductDetailComponent implements OnInit {
   relatedProducts = signal<Product[]>([]);
   inventario = signal<Inventario[]>([]);
   isLoading = signal(true);
-  isFavorite = signal(false);
+  isMainFavorite(): boolean {
+    const product = this.product();
+    if (!product) return false;
+    return this.favoritesService.isFavorite(product.id);
+  }
 
   tallasDisponibles = computed(() => {
     const uniqueTallas = new Map<string, Talla>();
@@ -109,9 +113,7 @@ export class ProductDetailComponent implements OnInit {
           this.api.post('/api/interacciones', { producto_id: id, tipo_interaccion: 'clic' }).subscribe({ error: () => {} });
         }
         if (this.authService.isLoggedIn()) {
-          this.isFavorite.set(this.favoritesService.isFavorite(id));
-        } else {
-          this.isFavorite.set(false);
+          this.favoritesService.loadFavorites().subscribe();
         }
       },
       error: () => {
@@ -152,9 +154,6 @@ export class ProductDetailComponent implements OnInit {
         },
         error: () => this.loadRelatedByCategory(product),
       });
-      if (this.authService.isLoggedIn()) {
-        this.favoritesService.loadFavorites().subscribe();
-      }
       return;
     }
     this.loadRelatedByCategory(product);
@@ -272,12 +271,8 @@ export class ProductDetailComponent implements OnInit {
       this.toastService.warn('Inicia sesión para guardar favoritos');
       return;
     }
-    this.isFavorite.update((v) => !v);
     this.favoritesService.toggle(product.id).subscribe({
-      error: () => {
-        this.isFavorite.update((v) => !v);
-        this.toastService.error('No se pudo actualizar el favorito');
-      },
+      error: () => this.toastService.error('No se pudo actualizar el favorito'),
     });
   }
 

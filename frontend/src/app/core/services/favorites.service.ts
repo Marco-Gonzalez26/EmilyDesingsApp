@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { Observable, tap } from 'rxjs';
+import { EMPTY, Observable, finalize, tap } from 'rxjs';
 import { ApiService } from './api.service';
 
 export interface Favorito {
@@ -29,7 +29,14 @@ export class FavoritesService {
     return this.favoriteIds().has(productId);
   }
 
+  private pending = new Set<string>();
+
   toggle(productId: string): Observable<Favorito> {
+    // ignora doble-tap con petición en vuelo: evita respuestas fuera de orden
+    if (this.pending.has(productId)) {
+      return EMPTY;
+    }
+    this.pending.add(productId);
     // update optimista: el corazón cambia al instante, revierte si falla
     const wasFavorite = this.favoriteIds().has(productId);
     const optimistic = new Set(this.favoriteIds());
@@ -44,14 +51,17 @@ export class FavoritesService {
       this.favoriteIds.set(favs);
     };
 
+    const done = () => this.pending.delete(productId);
     if (wasFavorite) {
       return this.api.delete<void>(`/api/favoritos/${productId}`).pipe(
         tap({ error: () => revert() }),
+        finalize(done),
       ) as unknown as Observable<Favorito>;
     }
 
     return this.api.post<Favorito>('/api/favoritos', { producto_id: productId }).pipe(
       tap({ error: () => revert() }),
+      finalize(done),
     );
   }
 }
