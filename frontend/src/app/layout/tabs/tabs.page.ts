@@ -49,13 +49,16 @@ export class TabsPage implements OnInit {
   }
 
   private async checkOnboarding(): Promise<void> {
-    if (this._onboardingChecked) return;
-    this._onboardingChecked = true;
-
     const state = history.state as { showOnboarding?: boolean };
     const pendingFlag = localStorage.getItem('onboardingPendiente') === 'true';
 
-    if (!state?.showOnboarding && !pendingFlag) return;
+    if (!state?.showOnboarding && !pendingFlag) {
+      this._onboardingChecked = false;
+      return;
+    }
+
+    if (this._onboardingChecked) return;
+    this._onboardingChecked = true;
 
     const top = await this.modalCtrl.getTop();
     if (top) return;
@@ -73,6 +76,7 @@ export class TabsPage implements OnInit {
 
     if (hasPrefs) {
       localStorage.removeItem('onboardingPendiente');
+      this._onboardingChecked = false;
       return;
     }
 
@@ -86,6 +90,7 @@ export class TabsPage implements OnInit {
     await modal.present();
     const { role } = await modal.onWillDismiss();
     localStorage.removeItem('onboardingPendiente');
+    this._onboardingChecked = false;
     if (role === 'confirm') {
       this.toastService.success('¡Preferencias guardadas! Descubre tu Para Ti');
       this.router.navigate(['/catalogo']);

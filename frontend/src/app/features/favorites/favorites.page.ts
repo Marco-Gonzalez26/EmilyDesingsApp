@@ -1,8 +1,8 @@
-import { Component, signal, inject } from '@angular/core';
+import { Component, OnInit, signal, inject, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-import { forkJoin, of } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { RouterModule, NavigationEnd, Router } from '@angular/router';
+import { forkJoin, of, Subscription } from 'rxjs';
+import { catchError, filter, map } from 'rxjs/operators';
 import { ProductoService } from '../../core/services/product.service';
 import { FavoritesService } from '../../core/services/favorites.service';
 import { ToastService } from '../../core/services/toast.service';
@@ -27,7 +27,7 @@ import {
   templateUrl: './favorites.page.html',
   styleUrl: './favorites.page.css',
 })
-export class FavoritesPage {
+export class FavoritesPage implements OnInit, OnDestroy {
   products = signal<Product[]>([]);
   isLoading = signal(true);
 
@@ -35,14 +35,25 @@ export class FavoritesPage {
   private favoritesService = inject(FavoritesService);
   private toastService = inject(ToastService);
   private quickAddService = inject(QuickAddService);
+  private router = inject(Router);
   authService = inject(AuthService);
+  private sub?: Subscription;
 
-  ionViewWillEnter(): void {
+  ngOnInit(): void {
+    this.sub = this.router.events.pipe(filter((e) => e instanceof NavigationEnd)).subscribe(() => {
+      if (this.router.url === '/favoritos' && this.authService.isLoggedIn()) {
+        this.loadFavorites();
+      }
+    });
     if (this.authService.isLoggedIn()) {
       this.loadFavorites();
     } else {
       this.isLoading.set(false);
     }
+  }
+
+  ngOnDestroy(): void {
+    this.sub?.unsubscribe();
   }
 
   loadFavorites(): void {
