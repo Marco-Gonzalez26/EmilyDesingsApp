@@ -1,134 +1,156 @@
 <ion-header>
   <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/inicio"></ion-back-button>
+    </ion-buttons>
     <ion-title>Sobre Nosotros</ion-title>
   </ion-toolbar>
 </ion-header>
 <ion-content class="ion-padding">
-<section #founderSection class="relative bg-emily-white py-20 md:py-32 px-6 md:px-8">
-  <div class="max-w-7xl mx-auto">
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-      <div class="founder-image relative">
-        <div class=" rounded-2xl overflow-hidden shadow-2xl">
-          <img
-            src="/sobre-nosotros.png"
-            alt="Mayra Mera - Dueña de Emily Designs"
-            class="w-full h-full object-contain"
-          />
-        </div>
-        <div
-          class="absolute -bottom-6 -right-6 bg-gradient-to-br from-emily-rose to-emily-gold text-emily-white p-8 rounded-2xl shadow-xl max-w-xs"
-        >
-          <p class="text-sm font-semibold uppercase tracking-wide mb-2">Visionaria e Inspiración</p>
-          <p class="text-2xl font-serif font-bold">Mayra Mera</p>
-        </div>
-      </div>
-
-      <div class="founder-content space-y-6">
-        <div
-          class="inline-block bg-emily-rose/10 text-emily-rose px-4 py-2 rounded-full text-sm font-semibold"
-        >
-          La Inspiración
-        </div>
-        <h2 class="text-4xl md:text-5xl font-serif font-bold text-emily-dark">
-          Una Visión de Estilo Personal
-        </h2>
-        <div class="space-y-4 text-lg text-emily-taupe leading-relaxed">
-          <p>
-            Emily Chiriboga siempre creyó que la moda va más allá de las tendencias pasajeras. Con
-            raíces en Quevedo y una pasión por el diseño atemporal, Emily inspiró a su mamá Mayra
-            Mera a fundar esta boutique con una misiÃƒÂ³n clara: ayudar a cada mujer a descubrir y
-            celebrar su estilo único
-          </p>
-          <p>
-            Su filosofía se basa en la idea de que la verdadera elegancia surge cuando te sientes
-            auténtica y cómoda en tu propia piel. Cada prenda en nuestra colección es cuidadosamente
-            seleccionada para reflejar esta visión.
-          </p>
-          <p class="text-emily-rose font-semibold italic">
-            "La moda no se trata de seguir reglas, se trata de encontrar lo que te hace sentir
-            imparable" Mayra Mera
-          </p>
-        </div>
-</div>
-  </div>
-  </div>
-</section>
-
-<section #missionSection class="relative bg-emily-cream py-20 md:py-32 px-6 md:px-8 rounded">
-  <div class="max-w-5xl mx-auto text-center">
-    <div
-      class="inline-block bg-emily-rose/10 text-emily-rose px-4 py-2 rounded-full text-sm font-semibold uppercase tracking-wide mb-6 "
-    >
-      Nuestra Misión
-    </div>
-    <h2 class="text-4xl md:text-5xl font-serif font-bold text-emily-dark mb-8">
-      Empoderamiento a través del Estilo
-    </h2>
-    <div class="bg-emily-white rounded-3xl shadow-2xl p-8 md:p-12 border-t-4 border-emily-rose">
-      <p class="text-xl md:text-2xl text-emily-dark leading-relaxed mb-6">
-        Nuestra misión es transformar la experiencia de compra de moda en un viaje de
-        autodescubrimiento y confianza. Creemos que cuando una mujer se siente bien con lo que
-        viste, puede conquistar el mundo.
-      </p>
-      <p class="text-lg text-emily-taupe leading-relaxed">
-        Ofrecemos más que ropa: brindamos asesoramiento personalizado y recomendaciones con IA
-        curadas que realzan tu belleza natural. Cada pieza está pensada para que te sientas
-        poderosa, elegante y completamente tú misma.
-      </p>
-    </div>
-  </div>
-</section>
-
-<section #visionSection class="relative bg-emily-white py-20 md:py-32 px-6 md:px-8 ">
-  <div class="max-w-5xl mx-auto text-center">
-    <div
-      class="inline-block bg-emily-gold/10 text-emily-gold px-4 py-2 rounded-full text-sm font-semibold uppercase tracking-wide mb-6"
-    >
-      Nuestra Visión
-    </div>
-    <h2 class="text-4xl md:text-5xl font-serif font-bold text-emily-dark mb-8">
-      El Futuro de la Moda Personal
-    </h2>
-    <div
-      class="bg-gradient-to-br from-emily-rose/5 to-emily-gold/5 rounded-3xl shadow-2xl p-8 md:p-12 border-2 border-emily-rose/20"
-    >
-      <p class="text-xl md:text-2xl text-emily-dark leading-relaxed mb-6">
-        Aspiramos a convertirnos en el referente de moda personalizada en Ecuador, donde cada mujer
-        pueda encontrar su identidad de estilo respaldada por tecnología innovadora y atención
-        humana excepcional.
-      </p>
-      <p class="text-lg text-emily-taupe leading-relaxed">
-        Visualizamos un futuro donde la inteligencia artificial y las recomendaciones
-        personalizadas se unan con el toque personal de nuestros estilistas para crear
-        experiencias únicas. Queremos expandir nuestro impacto, llegando a más mujeres y
-        ayudándolas a descubrir su poder a través del estilo auténtico.
-      </p>
-    </div>
-  </div>
-</section>
-
-<section #valuesSection class="relative bg-emily-dark py-20 md:py-32 px-6 md:px-8 mt-20 rounded">
-  <div class="max-w-7xl mx-auto">
-    <div class="text-center mb-16">
+  <section
+    #founderSection
+    class="relative bg-emily-white py-20 md:py-32 px-6 md:px-8"
+  >
+    <div class="max-w-7xl mx-auto">
       <div
-        class="inline-block bg-emily-white/10 backdrop-blur-sm text-emily-white px-4 py-2 rounded-full text-sm font-semibold uppercase tracking-wide mb-6"
+        class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center"
       >
-        Nuestros Valores
-      </div>
-      <h2 class="text-4xl md:text-5xl font-serif font-bold text-emily-white mb-4">
-        Los Pilares de Nuestra Filosofía
-      </h2>
-      <p class="text-lg text-emily-white/80 max-w-3xl mx-auto">
-        Estos son los principios que guían cada decisión que tomamos
-      </p>
-    </div>
+        <div class="founder-image relative">
+          <div class="rounded-2xl overflow-hidden shadow-2xl">
+            <img
+              src="/sobre-nosotros.png"
+              alt="Mayra Mera - Dueña de Emily Designs"
+              class="w-full h-full object-contain"
+            />
+          </div>
+          <div
+            class="absolute -bottom-6 -right-6 bg-gradient-to-br from-emily-rose to-emily-gold text-emily-white p-8 rounded-2xl shadow-xl max-w-xs"
+          >
+            <p class="text-sm font-semibold uppercase tracking-wide mb-2">
+              Visionaria e Inspiración
+            </p>
+            <p class="text-2xl font-serif font-bold">Mayra Mera</p>
+          </div>
+        </div>
 
-    <div
-      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
-      #valuesSection
-      id="valuesSection"
-    >
-      @for (value of values; track value.title) {
+        <div class="founder-content space-y-6">
+          <div
+            class="inline-block bg-emily-rose/10 text-emily-rose px-4 py-2 rounded-full text-sm font-semibold"
+          >
+            La fundadora
+          </div>
+          <h2 class="text-4xl md:text-5xl font-serif font-bold text-emily-dark">
+            Una tienda con nombre propio
+          </h2>
+          <div class="space-y-4 text-lg text-emily-taupe leading-relaxed">
+            <p>
+                          <p>
+              Emily Chiriboga creció mirando a su mamá vestirse: nada de modas prestadas, solo lo
+              que le quedaba bien. Años después, esa costumbre se volvió una tienda. Mayra Mera
+              fundó Emily Designs en Quevedo con una misión concreta: que cada mujer encuentre su
+              estilo sin pedir permiso.
+            </p>
+            <p>
+                    <p>
+              La regla de la casa sigue igual desde el primer día. Cada prenda pasa por las manos
+              de Mayra antes de publicarse, en tallas XS a XL. Si no les queda bien a ellas, no
+              se vende.
+            </p>  </p>
+            <p class="text-emily-rose font-semibold italic">
+              "La moda no se trata de seguir reglas, se trata de encontrar lo
+              que te hace sentir 
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section
+    #missionSection
+    class="relative bg-emily-cream py-20 md:py-32 px-6 md:px-8 rounded"
+  >
+    <div class="max-w-5xl mx-auto text-center">
+      <div
+        class="inline-block bg-emily-rose/10 text-emily-rose px-4 py-2 rounded-full text-sm font-semibold uppercase tracking-wide mb-6"
+      >
+        Nuestra Misión
+      </div>
+      <h2
+        class="text-4xl md:text-5xl font-serif font-bold text-emily-dark mb-8"
+      >
+        Comprar sin adivinar
+      </h2>
+      <div
+        class="bg-emily-white rounded-3xl shadow-2xl p-8 md:p-12 border-t-4 border-emily-rose"
+      >
+        <p class="text-xl md:text-2xl text-emily-dark leading-relaxed mb-6">
+          La misión es simple: que entrar a comprar no se sienta como un examen. Cuando algo
+          te queda bien, se nota en cómo caminas. Eso buscan.
+        </p>
+        <p class="text-lg text-emily-taupe leading-relaxed">
+          Además de la ropa, la tienda asesora con recomendaciones según lo que ya miraste.
+          Cada pieza está pensada para que salgas vestida, no confundida.
+      </div>
+    </div>
+  </section>
+
+  <section
+    #visionSection
+    class="relative bg-emily-white py-20 md:py-32 px-6 md:px-8"
+  >
+    <div class="max-w-5xl mx-auto text-center">
+      <div
+        class="inline-block bg-emily-gold/10 text-emily-gold px-4 py-2 rounded-full text-sm font-semibold uppercase tracking-wide mb-6"
+      >
+        Nuestra Visión
+      </div>
+      <h2
+        class="text-4xl md:text-5xl font-serif font-bold text-emily-dark mb-8"
+      >
+        Seguir siendo de barrio, vender en todo el país
+      </h2>
+      <div
+        class="bg-gradient-to-br from-emily-rose/5 to-emily-gold/5 rounded-3xl shadow-2xl p-8 md:p-12 border-2 border-emily-rose/20"
+      >
+        <p class="text-xl md:text-2xl text-emily-dark leading-relaxed mb-6">
+          Quieren ser la referencia de moda personalizada en Ecuador sin dejar de ser la tienda
+          de Quevedo donde te atienden por tu nombre.
+        <p class="text-lg text-emily-taupe leading-relaxed">
+          Visualizamos un f            <p>
+              La inteligencia artificial ayuda a recomendar, pero la última palabra la tiene Mayra.
+              El plan es llegar a más mujeres manteniendo eso: trato de tienda pequeña con alcance
+              de tienda grande.
+            </p>   </div>
+  </section>
+
+  <section
+    #valuesSection
+    class="relative bg-emily-dark py-20 md:py-32 px-6 md:px-8 mt-20 rounded"
+  >
+    <div class="max-w-7xl mx-auto">
+      <div class="text-center mb-16">
+        <div
+          class="inline-block bg-emily-white/10 backdrop-blur-sm text-emily-white px-4 py-2 rounded-full text-sm font-semibold uppercase tracking-wide mb-6"
+        >
+          Nuestros Valores
+        </div>
+        <h2
+          class="text-4xl md:text-5xl font-serif font-bold text-emily-white mb-4"
+        >
+          Los Pilares de Nuestra Filosofía
+        </h2>
+        <p class="text-lg text-emily-white/80 max-w-3xl mx-auto">
+          Lo que se negocia y lo que no
+        </p>
+      </div>
+
+      <div
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
+        #valuesSection
+        id="valuesSection"
+      >
+        @for (value of values; track value.title) {
         <div
           class="value-card group bg-emily-white/5 backdrop-blur-sm border border-emily-white/10 rounded-2xl p-8 hover:bg-emily-white/10 hover:border-emily-rose transition-all duration-500 hover:-translate-y-2"
         >
@@ -146,28 +168,29 @@
             {{ value.description }}
           </p>
         </div>
-      }
+        }
+      </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<section class="relative bg-emily-white py-20 md:py-32 px-6 md:px-8">
-  <div class="max-w-4xl mx-auto text-center">
-    <h2 class="text-4xl md:text-5xl font-serif font-bold text-emily-dark mb-6">
-      ¿Lista para Descubrir tu Estilo?
-    </h2>
-    <p class="text-xl text-emily-taupe mb-10 leading-relaxed">
-      Únete a las cientos de mujeres que ya descubrieron su confianza a través de nuestras
-      recomendaciones personalizadas con IA.
-    </p>
-    <div class="flex flex-col sm:flex-row gap-4 justify-center">
-      <a
-        routerLink="/para-ti"
-        class="inline-block bg-gradient-to-r from-emily-rose to-emily-gold text-emily-white px-10 py-5 rounded-xl font-semibold text-lg shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 hover:cursor-pointer"
+  <section class="relative bg-emily-white py-20 md:py-32 px-6 md:px-8">
+    <div class="max-w-4xl mx-auto text-center">
+      <h2
+        class="text-4xl md:text-5xl font-serif font-bold text-emily-dark mb-6"
       >
-        Descubrir Mi Estilo
-      </a>
+        ¿Empezamos por lo tuyo?
+      </h2>
+      <p class="text-xl text-emily-taupe mb-10 leading-relaxed">
+              Hay 237 piezas ya publicadas. Tu estilo está entre ellas.
+            </p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a
+          routerLink="/para-ti"
+          class="inline-block bg-gradient-to-r from-emily-rose to-emily-gold text-emily-white px-10 py-5 rounded-xl font-semibold text-lg shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 hover:cursor-pointer"
+        >
+          Descubrir Mi Estilo
+        </a>
+      </div>
     </div>
-  </div>
-</section>
+  </section>
 </ion-content>
