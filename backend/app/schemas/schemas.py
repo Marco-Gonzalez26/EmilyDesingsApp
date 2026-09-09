@@ -228,6 +228,19 @@ class ProductoDetailResponse(ProductoResponse):
     administrador_id: Optional[UUID] = None
     estilos: List[EstiloSimple] = []
 
+    @field_validator('estilos', mode='before')
+    @classmethod
+    def map_estilos(cls, v):
+        if not v:
+            return []
+        result = []
+        for item in v:
+            if hasattr(item, 'estilo') and item.estilo is not None:
+                result.append(EstiloSimple.model_validate(item.estilo))
+            elif isinstance(item, dict) and 'nombre' in item:
+                result.append(item)
+        return result
+
     model_config = ConfigDict(from_attributes=True)
 
 
