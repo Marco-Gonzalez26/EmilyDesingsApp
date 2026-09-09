@@ -55,22 +55,42 @@ from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
 from fastapi.responses import JSONResponse
 from fastapi import Request
-from app.db.config import check_db_connection
+from app.db.config import check_db_connection, get_db
 from app.ml import inference
 import logging
 import os
+import asyncio
 
 logger = logging.getLogger(__name__)
 
 ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "http://localhost:4200").split(",")
 
+_clean_task_handle = None
+
+async def _reservation_cleaner():
+    """Tarea periódica: libera reservas de carritos inactivos cada 30 min."""
+    from app.services.cart_service import liberar_reservas_vencidas
+    while True:
+        await asyncio.sleep(30 * 60)  # cada 30 minutos
+        try:
+            db = next(get_db())
+            liberados = liberar_reservas_vencidas(db)
+            if liberados:
+                logger.info("Reservas vencidas liberadas: %d", liberados)
+            db.close()
+        except Exception as e:
+            logger.error("Error limpiando reservas vencidas: %s", e)
+
 
 async def lifespan(app: FastAPI):
+    global _clean_task_handle
     logger.info("LIFESPAN STARTED")
     check_db_connection()
     inference.load_model()
     logger.info("Artifact es None: %s", inference.get_artifact() is None)
+    _clean_task_handle = asyncio.create_task(_reservation_cleaner())
     yield
+    _clean_task_handle.cancel()
 
 
 limiter = Limiter(key_func=get_remote_address)

@@ -253,6 +253,7 @@ async def confirmar_pago_stripe(db: Session, session_id: str, user: Usuario) -> 
                     Inventario.talla_id == item.talla_id,
                     Inventario.color_id == item.color_id,
                 )
+                .with_for_update()
                 .first()
             )
 

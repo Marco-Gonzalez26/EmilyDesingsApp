@@ -1,6 +1,8 @@
+from datetime import datetime, timedelta
 from sqlalchemy.orm import Session, joinedload
 from fastapi import HTTPException, status
 from uuid import UUID
+import logging
 
 from app.models.models import Carrito, CarritoItem, Producto, Inventario
 
@@ -52,7 +54,7 @@ def add_item(
             status_code=status.HTTP_404_NOT_FOUND, detail="Producto no encontrado"
         )
 
-    # Verificar stock disponible
+    # Bloqueo pesimista: evita que dos usuarios reserven la última unidad a la vez
     inventario = (
         db.query(Inventario)
         .filter(
@@ -60,6 +62,7 @@ def add_item(
             Inventario.talla_id == talla_id,
             Inventario.color_id == color_id,
         )
+        .with_for_update()
         .first()
     )
 
@@ -266,3 +269,55 @@ def get_total(db: Session, usuario_id: UUID) -> dict:
         "total": round(total, 2),
         "cantidad_items": sum(item.cantidad for item in carrito.items),
     }
+
+
+logger = logging.getLogger(__name__)
+
+# TTL de reserva: carritos sin actividad por más de 24h pierden su reserva
+RESERVA_TTL_HORAS = 24
+
+
+def liberar_reservas_vencidas(db: Session) -> int:
+    """
+    Libera stock_reservado de carritos inactivos (>24h sin update).
+    Retorna la cantidad de items liberados.
+    """
+    cutoff = datetime.utcnow() - timedelta(hours=RESERVA_TTL_HORAS)
+
+    carritos_vencidos = (
+        db.query(Carrito)
+        .filter(Carrito.activo == True, Carrito.updated_at < cutoff)
+        .all()
+    )
+
+    liberados = 0
+    for carrito in carritos_vencidos:
+        items = (
+            db.query(CarritoItem)
+            .filter(CarritoItem.carrito_id == carrito.id)
+            .all()
+        )
+        for item in items:
+            inventario = (
+                db.query(Inventario)
+                .filter(
+                    Inventario.producto_id == item.producto_id,
+                    Inventario.talla_id == item.talla_id,
+                    Inventario.color_id == item.color_id,
+                )
+                .with_for_update()
+                .first()
+            )
+            if inventario and inventario.stock_reservado >= item.cantidad:
+                inventario.stock_reservado -= item.cantidad
+            elif inventario:
+                inventario.stock_reservado = 0
+            liberados += 1
+
+        db.query(CarritoItem).filter(CarritoItem.carrito_id == carrito.id).delete()
+
+    if liberados > 0:
+        db.commit()
+        logger.info("Liberadas %d reservas de %d carritos vencidos", liberados, len(carritos_vencidos))
+
+    return liberados
