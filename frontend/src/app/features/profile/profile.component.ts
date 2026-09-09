@@ -314,7 +314,21 @@ export class ProfileComponent implements OnInit {
 
     this.isSubmitting.set(true);
 
-    this.profileService.updateProfile(this.profileForm.value).subscribe({
+    const form = this.profileForm.value;
+    const original = this.user();
+    const payload: Record<string, any> = {
+      nombre_completo: form.nombre_completo,
+      telefono: form.telefono,
+      direccion: form.direccion,
+    };
+
+    const currentCedula = (original?.['cedula_ruc'] ?? '').trim();
+    const formCedula = (form['cedula_ruc'] ?? '').trim();
+    if (formCedula && formCedula !== currentCedula) {
+      payload['cedula_ruc'] = formCedula;
+    }
+
+    this.profileService.updateProfile(payload).subscribe({
       next: (user) => {
         this.user.set(user);
         this.toastService.success('Perfil actualizado correctamente');

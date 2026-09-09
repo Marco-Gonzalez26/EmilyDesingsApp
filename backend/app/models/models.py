@@ -40,7 +40,7 @@ class Usuario(Base):
     fecha_ultimo_acceso = Column(DateTime)
     rol = Column(String(20), server_default="'cliente'")
     activo = Column(Boolean, default=True)
-    cedula_ruc = Column(String(13), nullable=True)
+    cedula_ruc = Column(String(13), nullable=True, unique=True)
     acepta_terminos = Column(Boolean, nullable=False, server_default=text("false"), default=False)
     totp_secret_encrypted = Column(Text, nullable=True)
     totp_enabled = Column(Boolean, nullable=False, server_default=text("false"), default=False)
