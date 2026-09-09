@@ -11,6 +11,7 @@ import { Product, ProductFilters } from '@app/shared/models/product';
 import { Category } from '@app/shared/models/category';
 import { Brand } from '@app/shared/models/brand';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
+import { PaginatorComponent } from '../../../../shared/components/paginator/paginator.component';
 import {
   IonButtons,
   IonContent,
@@ -24,7 +25,7 @@ import {
 @Component({
   selector: 'app-admin-products-list',
   standalone: true,
-  imports: [IonHeader, IonToolbar, IonTitle, IonButtons, IonMenuButton, IonContent, IonIcon, CommonModule, FormsModule, ConfirmDialogComponent],
+  imports: [IonHeader, IonToolbar, IonTitle, IonButtons, IonMenuButton, IonContent, IonIcon, CommonModule, FormsModule, ConfirmDialogComponent, PaginatorComponent],
   templateUrl: './admin-products-list.component.html',
   styleUrl: './admin-products-list.component.css',
 })
@@ -174,7 +175,7 @@ export class AdminProductsListComponent implements OnInit {
   }
 
   changePage(page: number): void {
-    this.currentPage.set(page);
+    this.currentPage.set(Math.min(Math.max(page, 1), Math.max(this.totalPages(), 1)));
     this.loadProducts();
   }
 

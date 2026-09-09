@@ -9,6 +9,7 @@ import { TallaService } from '../../../../core/services/size.service';
 import { ColorService } from '../../../../core/services/color.service';
 import { ToastService } from '../../../../core/services/toast.service';
 import { InventoryWithDetails, InventoryFilters } from '@app/shared/models/inventory';
+import { PaginatorComponent } from '../../../../shared/components/paginator/paginator.component';
 import { Product } from '@app/shared/models/product';
 import { Talla } from '@app/shared/models/size';
 import { Color } from '@app/shared/models/color';
@@ -25,7 +26,7 @@ import {
 @Component({
   selector: 'app-admin-inventory-list',
   standalone: true,
-  imports: [IonHeader, IonToolbar, IonTitle, IonButtons, IonMenuButton, IonContent, IonIcon, CommonModule, FormsModule],
+  imports: [IonHeader, IonToolbar, IonTitle, IonButtons, IonMenuButton, IonContent, IonIcon, CommonModule, FormsModule, PaginatorComponent],
   templateUrl: './admin-inventories-list.component.html',
   styleUrl: './admin-inventories-list.component.css',
 })
@@ -156,7 +157,7 @@ export class AdminInventoryListComponent implements OnInit {
   }
 
   changePage(page: number): void {
-    this.currentPage.set(page);
+    this.currentPage.set(Math.min(Math.max(page, 1), Math.max(this.totalPages(), 1)));
     this.loadInventarios();
   }
 

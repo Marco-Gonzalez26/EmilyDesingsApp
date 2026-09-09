@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 import { OrdenService } from '../../../../core/services/order.service';
 import { ToastService } from '../../../../core/services/toast.service';
 import { Orden, OrderEstado, OrderFilters } from '@app/shared/models/order';
+import { PaginatorComponent } from '../../../../shared/components/paginator/paginator.component';
 import {
   IonButtons,
   IonContent,
@@ -19,7 +20,7 @@ import {
 @Component({
   selector: 'app-admin-orders-list',
   standalone: true,
-  imports: [IonHeader, IonToolbar, IonTitle, IonButtons, IonMenuButton, IonContent, IonIcon, CommonModule, FormsModule],
+  imports: [IonHeader, IonToolbar, IonTitle, IonButtons, IonMenuButton, IonContent, IonIcon, CommonModule, FormsModule, PaginatorComponent],
   templateUrl: './admin-orders-list.component.html',
   styleUrl: './admin-orders-list.component.css',
 })
@@ -147,7 +148,7 @@ export class AdminOrdersListComponent implements OnInit {
   }
 
   changePage(page: number): void {
-    this.currentPage.set(page);
+    this.currentPage.set(Math.min(Math.max(page, 1), Math.max(this.totalPages(), 1)));
     this.loadOrders();
   }
 
