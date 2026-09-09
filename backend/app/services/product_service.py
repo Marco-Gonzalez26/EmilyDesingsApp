@@ -25,7 +25,7 @@ def get_producto_by_id(db: Session, producto_id: UUID) -> Producto:
     """
     producto = (
         db.query(Producto)
-        .options(joinedload(Producto.imagenes))
+        .options(joinedload(Producto.imagenes), joinedload(Producto.estilos))
         .filter(Producto.id == producto_id)
         .first()
     )

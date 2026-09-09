@@ -102,22 +102,30 @@ def actualizar_estilo(
     return estilo
 
 
-def eliminar_estilo(db: Session, estilo_id: UUID) -> bool:
+def eliminar_estilo(db: Session, estilo_id: UUID) -> tuple[bool, int]:
     """
-    Elimina un estilo
+    Elimina un estilo si no tiene productos asociados.
 
     Returns:
-        True si se eliminó, False si no existía
+        (True, 0) si se eliminó
+        (False, count) si tiene productos vinculados (count = cantidad)
+        (False, 0) si no existía
     """
+    from app.models.models import ProductoEstilo
+
     estilo = obtener_estilo_por_id(db, estilo_id)
 
     if not estilo:
-        return False
+        return False, 0
+
+    count = db.query(ProductoEstilo).filter(ProductoEstilo.estilo_id == estilo_id).count()
+    if count > 0:
+        return False, count
 
     db.delete(estilo)
     db.commit()
 
-    return True
+    return True, 0
 
 
 def toggle_activo_estilo(db: Session, estilo_id: UUID) -> Optional[Estilo]:

@@ -203,6 +203,13 @@ class ImagenProductoResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+class EstiloSimple(BaseModel):
+    """Estilo simplificado para listados en producto"""
+    id: UUID
+    nombre: str
+    model_config = ConfigDict(from_attributes=True)
+
+
 class ProductoResponse(ProductoBase):
     """Esquema de respuesta de producto"""
 
@@ -219,9 +226,7 @@ class ProductoDetailResponse(ProductoResponse):
     """Respuesta detallada de producto con más información"""
 
     administrador_id: Optional[UUID] = None
-
-    # categoria: Optional[CategoriaResponse] = None
-    # marca: Optional[MarcaResponse] = None
+    estilos: List[EstiloSimple] = []
 
     model_config = ConfigDict(from_attributes=True)
 

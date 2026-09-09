@@ -104,10 +104,16 @@ def eliminar_estilo_existente(
     current_admin: Usuario = Depends(get_current_admin_user),
 ):
     """
-    Elimina un estilo
-    NOTA: Esto puede afectar preferencias de usuarios
+    Elimina un estilo si no tiene productos asociados.
+    Si tiene productos vinculados, retorna 409 con el conteo.
     """
-    eliminado = eliminar_estilo(db, estilo_id)
+    eliminado, count = eliminar_estilo(db, estilo_id)
+
+    if not eliminado and count > 0:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=f"El estilo está en uso por {count} producto(s). Desasigna o desactiva el estilo primero.",
+        )
 
     if not eliminado:
         raise HTTPException(

@@ -298,5 +298,53 @@ def obtener_variantes_producto(producto_id: UUID, db: Session = Depends(get_db))
         "imagen_principal": imagen_principal,
         **variantes,
     }
+
+
+@router.put("/{producto_id}/estilos", response_model=ProductoDetailResponse)
+def actualizar_estilos_producto(
+    producto_id: UUID,
+    estilo_ids: List[UUID],
+    db: Session = Depends(get_db),
+    current_admin: Usuario = Depends(get_current_admin_user),
+):
+    """
+    Reemplaza los estilos asignados a un producto.
+
+    - **estilo_ids**: lista de UUIDs de estilos a asignar
+    """
+    from app.models.models import ProductoEstilo, Estilo
+    from fastapi import HTTPException
+
+    producto = product_service.get_producto_by_id(db, producto_id)
+
+    # Validar que todos los estilos existan
+    estilos_existentes = db.query(Estilo).filter(Estilo.id.in_(estilo_ids)).all()
+    if len(estilos_existentes) != len(estilo_ids):
+        existentes = {str(e.id) for e in estilos_existentes}
+        faltantes = [str(eid) for eid in estilo_ids if str(eid) not in existentes]
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Estilos no encontrados: {', '.join(faltantes)}",
+        )
+
+    # Eliminar asignaciones actuales
+    db.query(ProductoEstilo).filter(ProductoEstilo.producto_id == producto_id).delete()
+
+    # Crear nuevas asignaciones
+    for estilo_id in estilo_ids:
+        db.add(ProductoEstilo(producto_id=producto_id, estilo_id=estilo_id))
+
+    db.commit()
+
+    # Recargar producto con estilos
+    from sqlalchemy.orm import joinedload
+    producto = (
+        db.query(type(producto))
+        .options(joinedload(type(producto).imagenes), joinedload(type(producto).estilos))
+        .filter(type(producto).id == producto_id)
+        .first()
+    )
+
+    return producto
     
 
