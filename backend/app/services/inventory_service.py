@@ -386,7 +386,7 @@ def get_variantes_producto(db: Session, producto_id: UUID) -> dict:
                 colores_map[inv.color_id] = {
                     "id": str(inv.color_id),
                     "nombre": inv.color.nombre,
-                    "codigo_hex": getattr(inv.color, "codigo_hex", None),
+                    "codigo_hex": getattr(inv.color, "codigo_hexadecimal", None),
                 }
 
     return {

@@ -70,7 +70,7 @@ export class TabsPage implements OnInit {
 
       const modal = await this.modalCtrl.create({
         component: PreferenciasOnboardingModalComponent,
-        canDismiss: async () => false,
+        canDismiss: async (_data, role) => role === 'confirm',
         backdropDismiss: false,
         breakpoints: [0, 1],
         initialBreakpoint: 1,
@@ -80,7 +80,7 @@ export class TabsPage implements OnInit {
       if (role === 'confirm') {
         localStorage.removeItem('onboardingPendiente');
         this.toastService.success('¡Preferencias guardadas! Descubre tu Para Ti');
-        this.router.navigate(['/inicio']);
+        this.router.navigate(['/catalogo']);
       }
     }
   }
