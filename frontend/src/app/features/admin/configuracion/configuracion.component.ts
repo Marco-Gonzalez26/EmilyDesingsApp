@@ -22,6 +22,7 @@ import {
   IonTitle,
   IonToolbar,
   IonBackButton,
+  AlertController,
 } from '@ionic/angular/standalone';
 
 @Component({
@@ -47,6 +48,7 @@ import {
 export class ConfiguracionComponent implements OnInit {
   private api = inject(ApiService);
   private toast = inject(ToastService);
+  private alertCtrl = inject(AlertController);
   auth = inject(AuthService);
 
   @ViewChild('qrCanvas', { static: false })
@@ -139,14 +141,36 @@ export class ConfiguracionComponent implements OnInit {
     });
   }
 
-  desactivar(): void {
-    const password = prompt('Confirma tu contraseña para desactivar 2FA:');
-    if (!password) return;
-    const code = prompt('Ingresa código TOTP vigente (6 dígitos):');
-    if (!code || code.length !== 6) {
-      this.toast.error('Código 6 dígitos requerido');
-      return;
-    }
+  async desactivar(): Promise<void> {
+    const alert = await this.alertCtrl.create({
+      header: 'Desactivar 2FA',
+      message: 'Confirma tu contraseña y tu código actual para desactivar el segundo factor.',
+      backdropDismiss: false,
+      inputs: [
+        { name: 'password', type: 'password' as const, placeholder: 'Contraseña' },
+        { name: 'code', type: 'text' as const, placeholder: 'Código de 6 dígitos', attributes: { maxlength: 6, inputmode: 'numeric' } },
+      ],
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Desactivar',
+          handler: (data: { password?: string; code?: string }) => {
+            const password = (data.password ?? '').trim();
+            const code = (data.code ?? '').trim();
+            if (!password || code.length !== 6) {
+              this.toast.error('Contraseña y código de 6 dígitos requeridos');
+              return false;
+            }
+            this.enviarDesactivar(password, code);
+            return true;
+          },
+        },
+      ],
+    });
+    await alert.present();
+  }
+
+  private enviarDesactivar(password: string, code: string): void {
     this.api.post('/api/auth/2fa/disable', { password, code }).subscribe({
       next: () => {
         this.toast.success('2FA desactivado');
