@@ -55,47 +55,40 @@ export class TabsPage implements OnInit {
     const state = history.state as { showOnboarding?: boolean };
     const pendingFlag = localStorage.getItem('onboardingPendiente') === 'true';
 
-    if (state?.showOnboarding || pendingFlag) {
-      const alreadyDismissed = localStorage.getItem('onboarding_seen') === 'true';
-      if (alreadyDismissed) {
-        localStorage.removeItem('onboardingPendiente');
-        return;
-      }
+    if (!state?.showOnboarding && !pendingFlag) return;
 
-      const top = await this.modalCtrl.getTop();
-      if (top) return;
+    const top = await this.modalCtrl.getTop();
+    if (top) return;
 
-      const shouldShow = await new Promise<boolean>((resolve) => {
-        this.api.get('/api/preferencias/mis-preferencias').subscribe({
-          next: (pref) => {
-            const hasPrefs = !!(pref && Array.isArray((pref as unknown as { estilos_preferidos?: unknown[] })?.estilos_preferidos) && ((pref as unknown as { estilos_preferidos: unknown[] }).estilos_preferidos.length > 0));
-            resolve(!hasPrefs);
-          },
-          error: (err) => resolve(err.status === 404),
-        });
-        setTimeout(() => resolve(true), 1200);
+    const hasPrefs = await new Promise<boolean>((resolve) => {
+      this.api.get('/api/preferencias/mis-preferencias').subscribe({
+        next: (pref) => {
+          const p = pref as { estilos_preferidos?: string[] } | null;
+          resolve(!!(p?.estilos_preferidos?.length));
+        },
+        error: () => resolve(false),
       });
+      setTimeout(() => resolve(false), 1200);
+    });
 
-      if (!shouldShow) {
-        localStorage.removeItem('onboardingPendiente');
-        return;
-      }
+    if (hasPrefs) {
+      localStorage.removeItem('onboardingPendiente');
+      return;
+    }
 
-      const modal = await this.modalCtrl.create({
-        component: PreferenciasOnboardingModalComponent,
-        canDismiss: async (_data, role) => role === 'confirm',
-        backdropDismiss: false,
-        breakpoints: [0, 1],
-        initialBreakpoint: 1,
-      });
-      await modal.present();
-      const { role } = await modal.onWillDismiss();
-      if (role === 'confirm') {
-        localStorage.removeItem('onboardingPendiente');
-        localStorage.setItem('onboarding_seen', '1');
-        this.toastService.success('¡Preferencias guardadas! Descubre tu Para Ti');
-        this.router.navigate(['/catalogo']);
-      }
+    const modal = await this.modalCtrl.create({
+      component: PreferenciasOnboardingModalComponent,
+      canDismiss: async (_data, role) => role === 'confirm',
+      backdropDismiss: false,
+      breakpoints: [0, 1],
+      initialBreakpoint: 1,
+    });
+    await modal.present();
+    const { role } = await modal.onWillDismiss();
+    localStorage.removeItem('onboardingPendiente');
+    if (role === 'confirm') {
+      this.toastService.success('¡Preferencias guardadas! Descubre tu Para Ti');
+      this.router.navigate(['/catalogo']);
     }
   }
 }
