@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, inject } from '@angular/core';
+import { Component, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { forkJoin, of } from 'rxjs';
@@ -27,7 +27,7 @@ import {
   templateUrl: './favorites.page.html',
   styleUrl: './favorites.page.css',
 })
-export class FavoritesPage implements OnInit {
+export class FavoritesPage {
   products = signal<Product[]>([]);
   isLoading = signal(true);
 
@@ -37,7 +37,7 @@ export class FavoritesPage implements OnInit {
   private quickAddService = inject(QuickAddService);
   authService = inject(AuthService);
 
-  ngOnInit(): void {
+  ionViewWillEnter(): void {
     if (this.authService.isLoggedIn()) {
       this.loadFavorites();
     } else {

@@ -6,7 +6,7 @@ export interface Favorito {
   id: string;
   usuario_id: string;
   producto_id: string;
-  creado_en: string;
+  fecha_agregado: string;
 }
 
 @Injectable({
